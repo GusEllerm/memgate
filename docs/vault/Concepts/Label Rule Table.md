@@ -19,19 +19,19 @@ tags: [agentic-memory, design, permissions, policy]
 - **Context:** an open map of attributes, e.g. user, session, agent (or set of agents), environment. New attributes need no schema change.
 - **Rule:** a condition on attributes (equality, set membership, AND) that grants labels, with separate grants for reading and for writing. Example: agent in {planner, critic} AND environment = lab-A grants read on {project-x, lab-A}.
 - **Allowed set:** the union of read grants from all matching rules. Default deny.
-- **Item check (proposed):** item labels ⊆ allowed set. "Any label allowed" would let through an item tagged with one allowed and one locked label.
-- **No unlabelled items (proposed):** every item must carry at least one label, and writes without one are rejected. Several stores' negated filters let unlabelled items through.
+- **Item check (accepted):** item labels ⊆ allowed set. "Any label allowed" would let through an item tagged with one allowed and one locked label.
+- **Unlabelled items (open):** proposed that every item carries at least one label. Gus asked how that fits with an agent's personal memory; see [[Label and Memory Types]].
 
 ## Enforcement
 
 1. Evaluate the rules against the context to get the allowed set.
-2. Map it to the IDs of the stored label sets that are subsets of it. This works on every store; see [[Vector Store Label Filtering]].
+2. Map it to the IDs of the stored label sets that are subsets of it (accepted). This works on every store; see [[Vector Store Label Filtering]].
 3. Put label-set ID IN [...] inside the vector query as a pre-filter. Never filter after the search.
 4. Log the context attributes, matched rules, allowed set and returned item IDs, to meet the audit requirement.
 
 ## Derived data
 
-- **Union inheritance (proposed):** a summary, consolidated fact or embedding carries the union of its sources' labels. It is produced in a context that unlocks all of them, and never merged across label sets unless the union is acceptable.
+- **Union inheritance (accepted as default):** a summary, consolidated fact or embedding carries the union of its sources' labels. Gus requires that propagation can be relaxed per label type; see [[Label and Memory Types]]. It is produced in a context that unlocks all of them, and never merged across label sets unless the union is acceptable.
 - **Embeddings** carry their item's labels exactly. Inversion attacks make them as sensitive as the text.
 - **Later refinement:** labelling by the inputs that actually influenced the output (permissive information-flow control) could replace the union and unlock more.
 
