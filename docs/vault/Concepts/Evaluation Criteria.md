@@ -21,6 +21,7 @@ Each candidate is scored 1–5 per criterion. Memory stores and policy engines a
 | Derived-data safety | Summaries and embeddings inherit source locks automatically |
 | Unlock/lock latency | Context switches change access with no re-indexing |
 | Retrieval quality | Recall is no worse than the unpermissioned baseline |
+| Recall efficacy | High scores on long-term memory benchmarks (LoCoMo, LongMemEval) in our own runs. Vendor claims are recorded but not scored until benchmarked |
 | Auditability | Every access is attributable to a context |
 | Context extensibility | New context attributes can be used in rules without re-indexing or schema changes |
 | Visibility headroom | Per-item "existence visible, content locked" can be added without redesign |
