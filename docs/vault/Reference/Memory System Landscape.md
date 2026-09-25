@@ -28,14 +28,14 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 | 2 | [Mem0](https://github.com/mem0ai/mem0) | 66.0k | 2.44M | 2026-09-25 | Apache-2.0 | Extracted facts | **Surveyed:** [[Mem0]] |
 | 3 | [CrewAI memory](https://github.com/crewAIInc/crewAI)† | 59.0k | 2.44M | 2026-09-25 | MIT | Vector RAG + entities | Skip |
 | 4 | [claude-mem](https://github.com/thedotmack/claude-mem) | 94.7k | 71k | 2026-09-25 | Apache-2.0 | Session compression | Weak: single-user coding tool |
-| 5 | [Hindsight](https://github.com/vectorize-io/hindsight) | 28.9k | 1.06M | 2026-09-25 | MIT | Fact, experience and observation networks + graph | **Deep dive** |
+| 5 | [Hindsight](https://github.com/vectorize-io/hindsight) | 28.9k | 1.06M | 2026-09-25 | MIT | Fact, experience and observation networks + graph | **Strong candidate** (verified below) |
 | 6 | [Graphiti](https://github.com/getzep/graphiti) | 31.2k | 610k | 2026-09-24 | Apache-2.0 | Temporal knowledge graph | **Surveyed:** [[Zep and Graphiti]] |
-| 7 | [OpenViking](https://github.com/volcengine/OpenViking) | 38.7k | 441k | 2026-09-25 | AGPL-3.0 | File-based context database, tiered | Runner-up for a deep dive |
+| 7 | [OpenViking](https://github.com/volcengine/OpenViking) | 38.7k | 441k | 2026-09-25 | AGPL-3.0 | File-based context database, tiered | **Deep-dive candidate** (verified below) |
 | 8 | [Supermemory](https://github.com/supermemoryai/supermemory) | 30.9k | 461k | 2026-09-23 | MIT | Extracted facts + graph; engine mostly hosted | Weak: core is closed |
 | 9 | [Letta](https://github.com/letta-ai/letta-code) | 28.3k | 360k | 2026-09-25 | Apache-2.0 | Tiered / file-based | **Surveyed:** [[Letta]] |
 | 10 | [Honcho](https://github.com/plastic-labs/honcho) | 7.3k | 767k | 2026-09-25 | AGPL-3.0 | Extracted facts about peers; per-observer views | **Deep dive** |
 | 11 | [Semantic Kernel](https://github.com/microsoft/semantic-kernel) / Kernel Memory† | 28.6k / 2.2k | 285k | 2026-09-19 / 06-08 | MIT | Vector RAG | Skip (Kernel Memory dormant) |
-| 12 | [LangMem](https://github.com/langchain-ai/langmem) | 1.7k | 700k | 2026-09-09 | MIT | Extracted facts over LangGraph's store | Weak: thin layer |
+| 12 | [LangMem](https://github.com/langchain-ai/langmem) | 1.7k | 700k | 2026-09-09 | MIT | Extracted facts over LangGraph's store | Weak: search refreshes TTL, no lineage (verified below) |
 | 13 | [Cognee](https://github.com/topoteretes/cognee) | 31.0k | 89k | 2026-09-24 | Apache-2.0 | Knowledge graph + vector; per-dataset access control | **Deep dive** |
 | 14 | [gbrain](https://github.com/garrytan/gbrain) | 30.3k | – | 2026-09-25 | MIT | Markdown "brain" | Skip |
 | 15 | [agentmemory](https://github.com/rohitg00/agentmemory) | 28.8k | – | 2026-09-25 | Apache-2.0 | Coding-agent memory | Skip |
@@ -75,9 +75,9 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 - MemOS: LoCoMo 73–75.
 - Zep/Graphiti: DMR 94.8.
 
-## Verified against code (5 systems)
+## Verified against code (10 systems)
 
-*A late verification pass read the source of five systems on 2026-09-25. File paths are given; the benchmark figures are self-reported.*
+*Two late verification passes read the source of ten systems on 2026-09-25. File paths are given; the benchmark figures are self-reported. Rows not listed here remain unverified.*
 
 | System | Filter inside retrieval | Lineage | Search side effects | Access control | Claims (self-reported) | Revised triage |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -86,6 +86,11 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 | MemOS | Yes: Neo4j filters first (graph_dbs/neo4j.py) | Yes: source messages and version history (memories/textual/item.py) | **Yes**: every search appends a usage record to each returned node (searcher.py) | Roles, plus cube-level read/write sharing | LoCoMo 88.83, LongMemEval 89.20 (README) | Weak: search writes state |
 | Memori | Partly: SQL scopes by entity, but the candidate pool is capped by recency and frequency before ranking, so older facts can silently drop out | Partial: to the conversation, not the message | Minor upserts | Entity scope only | LoCoMo 87% ([benchmark](https://memorilabs.ai/benchmark)) | Weak |
 | memU | Yes on pgvector (one statement); brute force on SQLite | **None**: files link to nothing upstream | None seen | Scope fields only | None current | Weak: no lineage |
+| Hindsight | **Yes**: bank, tag and time filters inside each HNSW search (engine/search/retrieval.py) | **Yes**: consolidated observations store their source memory IDs and a proof count (engine/consolidation/consolidator.py) | None found; mental models refresh in the background | Banks isolate strictly; a tenant extension gives each tenant its own Postgres schema | LongMemEval-S 94.6%, LoCoMo 92% ([benchmarks](https://benchmarks.hindsight.vectorize.io/)) | **Strong candidate** (deep dive running) |
+| Cognee | **Yes**: with backend access control, one graph and vector database per dataset, and search reaches only readable datasets (modules/search/methods/search.py) | **Yes**: every data point records its source pipeline, task, node set, user and content hash (engine/models/DataPoint.py) | **Yes**: every search logs the query and answer to search history | Users, tenants, roles; per-dataset read/write/delete/share. Permission failures return an empty list | BEAM 100K 0.79, 10M 0.67 (README warns the runs are small) | Deep dive (running). Search logging must be off in high-assurance partitions |
+| OpenViking | **Yes**: tenant, access-list and path scope are combined into the vector search call (storage/viking_vector_index_backend.py) | Partial to yes: each session commit writes a memory diff linking the archived messages to what changed | Probable: a usage count feeds a "hotness" score (the code that increments it was not found) | Tenants, roles (ROOT reaches every tenant), optional per-directory and per-file access lists | LoCoMo 80.3–82.9% (README) | **Deep-dive candidate**: a close fourth; AGPL |
+| LangMem | Yes on the Postgres store; the in-memory store filters in Python | None for long-term memories | **Yes**: searches refresh TTL by default, updating the rows returned | None | None from the vendor; the Mem0 paper measured 58.10% on LoCoMo ([arXiv](https://arxiv.org/html/2504.19413)) | Weak |
+| Supermemory | Container tags are hashed into separate namespaces, so that scope applies before search; metadata filter placement is unknown | Partial: update/extend/derive relations and history | Background "dreaming" | API keys scoped to container tags, read or write | LongMemEval 95% Recall@15 and 97% Recall@20; recall figures, not QA accuracy | Weak: the memory engine is closed source |
 
 ## Recommended deep dives
 
@@ -93,7 +98,7 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 2. **Hindsight.** Second only to Mem0 in downloads among dedicated memory systems. Observations and opinions are consolidated from facts, which tests our union-inheritance rule. Its memory banks and tags look like hooks for labels.
 3. **Cognee.** The only popular store with real per-dataset access control (read, write, share, and a separate database per dataset). It is the nearest existing permission layer to compare with our partitions.
 
-**Runners-up:** OpenViking, and EverOS, promoted after the code check above.
+**Next in line:** OpenViking and EverOS, both promoted after the code checks above.
 
 ## Managed services
 
