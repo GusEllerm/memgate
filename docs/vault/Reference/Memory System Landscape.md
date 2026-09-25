@@ -10,7 +10,7 @@ tags: [agentic-memory, reference, survey, landscape]
 
 # Memory System Landscape
 
-*Coverage check, 2026-09-25, per [[Decision Log]]. Stars, last commit, licence and language come from the GitHub API; downloads from pypistats.org and the npm API, all checked on that date. **The family, scoping, lineage and claims columns are unverified background knowledge** (planned verification did not complete) and are leads for deep dives, not findings. Benchmark scores are self-reported and unverified; per [[Evaluation Criteria]] they are not scored until we benchmark ourselves. Managed services are listed separately below. Full reviews are linked from [[Architecture Survey]].*
+*Coverage check, 2026-09-25, per [[Decision Log]]. Five systems were later verified against their code (section below). Stars, last commit, licence and language come from the GitHub API; downloads from pypistats.org and the npm API, all checked on that date. **The family, scoping, lineage and claims columns are unverified background knowledge** (planned verification did not complete) and are leads for deep dives, not findings. Benchmark scores are self-reported and unverified; per [[Evaluation Criteria]] they are not scored until we benchmark ourselves. Managed services are listed separately below. Full reviews are linked from [[Architecture Survey]].*
 
 **What stands out.**
 - **Downloads and stars disagree.** Hindsight, LangMem, Honcho, OpenViking and ReMe are used far more than their stars suggest. gbrain, agentmemory, TencentDB Agent Memory and context-mode have large, recent star counts with little download evidence; treat those as possibly inflated.
@@ -47,9 +47,9 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 | 21 | [Second Me](https://github.com/mindverse/Second-Me) | 15.7k | – | 2025-09-19 | Apache-2.0 | Personal model training | Skip: dormant |
 | 22 | [ReMe](https://github.com/agentscope-ai/ReMe) (was MemoryScope) | 3.5k | 230k | 2026-09-24 | Apache-2.0 | Personal, task and tool memories | Weak |
 | 23 | [memU](https://github.com/NevaMind-AI/memU) | 14.4k | 2k | 2026-09-21 | Not stated | File/category facts | Weak |
-| 24 | [EverOS](https://github.com/EverMind-AI/EverOS) (was EverMemOS) | 13.2k | 21k | 2026-09-24 | Apache-2.0 | Memory cells → episodes and profiles | Runner-up for a deep dive |
+| 24 | [EverOS](https://github.com/EverMind-AI/EverOS) (was EverMemOS) | 13.2k | 21k | 2026-09-24 | Apache-2.0 | Markdown source of truth; memory cells → episodes and facts | **Deep-dive candidate** (verified below) |
 | 25 | [txtai](https://github.com/neuml/txtai) | 13.0k | 13k | 2026-09-25 | Apache-2.0 | Vector + graph store | Weak: a store, not a memory system |
-| 26 | [MemOS](https://github.com/MemTensor/MemOS) | 11.6k | ~1k | 2026-09-22 | Apache-2.0 | Tiered OS-style (MemCube) | Weak: heavy |
+| 26 | [MemOS](https://github.com/MemTensor/MemOS) | 11.6k | ~1k | 2026-09-22 | Apache-2.0 | Tiered OS-style (MemCube) | Weak: search writes usage records (verified below) |
 | 27 | [LongMemory](https://github.com/CaviraOSS/LongMemory) (was OpenMemory) | 4.5k | 56k | 2026-09-20 | Apache-2.0 | Hierarchical sectors + decay | Skip: decay changes state on recall |
 | 28 | [engram](https://github.com/Gentleman-Programming/engram) | 6.8k | – | 2026-09-25 | MIT | SQLite full-text | Skip |
 | 29 | [MemoryBear](https://github.com/SuanmoSuanyangTechnology/MemoryBear) | 6.8k | – | 2026-09-24 | Apache-2.0 | Graph + forgetting | Skip |
@@ -75,13 +75,25 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 - MemOS: LoCoMo 73–75.
 - Zep/Graphiti: DMR 94.8.
 
+## Verified against code (5 systems)
+
+*A late verification pass read the source of five systems on 2026-09-25. File paths are given; the benchmark figures are self-reported.*
+
+| System | Filter inside retrieval | Lineage | Search side effects | Access control | Claims (self-reported) | Revised triage |
+| --- | --- | --- | --- | --- | --- | --- |
+| Honcho | Mostly: pgvector is one SQL statement (crud/document.py); on external vector stores, some filters are applied after top-k | **Yes**: a document-sources table records "derived from" links, with a tool to walk the reasoning chain (models.py) | None: the dialectic tools are read-only; reinforcement counts only at write time | JWT claims for admin, workspace, peer and session (security.py), **off by default** | LongMemEval-S 90.4–92.6%, LoCoMo 89.9% ([blog](https://plasticlabs.ai/blog/research/Benchmarking-Honcho)) | Deep dive (running) |
+| EverOS | **Yes**: owner, app and project are always injected and callers cannot override them; LanceDB filters before ranking (backends/lancedb.py) | **Yes**: episodes and facts carry their source memory cell (tables/episode.py, atomic_fact.py) | **None**: "The manager never writes to storage" (search/manager.py) | None: local-first | LoCoMo 94.42, LongMemEval 94.00 (benchmarks/README.md) | **Promoted to deep-dive candidate.** Offline "reflection" merges episode clusters, which needs checking for label mixing |
+| MemOS | Yes: Neo4j filters first (graph_dbs/neo4j.py) | Yes: source messages and version history (memories/textual/item.py) | **Yes**: every search appends a usage record to each returned node (searcher.py) | Roles, plus cube-level read/write sharing | LoCoMo 88.83, LongMemEval 89.20 (README) | Weak: search writes state |
+| Memori | Partly: SQL scopes by entity, but the candidate pool is capped by recency and frequency before ranking, so older facts can silently drop out | Partial: to the conversation, not the message | Minor upserts | Entity scope only | LoCoMo 87% ([benchmark](https://memorilabs.ai/benchmark)) | Weak |
+| memU | Yes on pgvector (one statement); brute force on SQLite | **None**: files link to nothing upstream | None seen | Scope fields only | None current | Weak: no lineage |
+
 ## Recommended deep dives
 
 1. **Honcho.** Each participant (peer) keeps its own view of the others, e.g. "what B concluded about A". That is the closest built-in analogue to our participant labels. It runs on Postgres with pgvector, so filtering inside the search should be natural, and downloads are high. AGPL licence.
 2. **Hindsight.** Second only to Mem0 in downloads among dedicated memory systems. Observations and opinions are consolidated from facts, which tests our union-inheritance rule. Its memory banks and tags look like hooks for labels.
 3. **Cognee.** The only popular store with real per-dataset access control (read, write, share, and a separate database per dataset). It is the nearest existing permission layer to compare with our partitions.
 
-**Runners-up:** OpenViking and EverOS.
+**Runners-up:** OpenViking, and EverOS, promoted after the code check above.
 
 ## Managed services
 
