@@ -56,7 +56,7 @@ The engine's key job: given a context, list the label-set IDs it may read, fast 
 
 | Engine | Model | Question to answer | Status |
 | --- | --- | --- | --- |
-| Cedar | Attribute-based policies | Can policies over arbitrary context attributes return the allowed label set fast enough for every retrieval? | researching |
+| [[Cedar]] | Attribute-based policies | Can policies over arbitrary context attributes return the allowed label set fast enough for every retrieval? | surveyed: yes via partial evaluation (100k label sets in 0.03 s, experimental); SMT proof of the high-assurance seal |
 | OPA / Rego | General policy-as-code | Is Rego's flexibility worth its cost for per-retrieval decisions? | researching |
 | OpenFGA / SpiceDB (Zanzibar-style) | Relationship-based | Can agent–environment–memory relations express label grants, or does ABAC fit better? | researching |
 | Casbin / Oso | Lightweight ABAC / Polar with list filtering | Does a lighter engine beat OPA for our case? | researching |

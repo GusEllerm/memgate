@@ -10,3 +10,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Mem0]]
 - [[Zep and Graphiti]]
 - [[Letta]]
+- [[Cedar]]
