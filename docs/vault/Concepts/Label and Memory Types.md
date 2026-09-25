@@ -61,7 +61,14 @@ What outbound assurance takes:
 - **No relaxation of L's labels.** Derived memories always keep loc:L.
 - **The personal-memory gate is closed**, *Severance*-style. Agents may keep personal notes tagged {self:A, loc:L}, readable only in L.
 - **No side effects on outside items.** Recalling a personal memory inside L must not update anything stored outside L: usage counts, recency boosts, reinforcement or merges. Falda's ranking uses recency and usage, and even a changed count tells the outside something about L. Recall traces made in L stay in L.
-- **A separate physical store per high-assurance location (proposed).** Isolation then comes from the storage layout, not only a filter, and L's items never enter the ranking statistics or caches that outside searches use.
+- **A partition per high-assurance location (proposed).** Ordinary locations and personal memory share one store, and labels decide every permission. Each high-assurance location gets its own partition (a Falda pool file, Qdrant shard key or Postgres partition), so L's items never enter the ranking statistics or caches outside searches use. Start with a single store; design the API with a partition key so this can be switched on later.
+
+| Agent is in | Searches | Label filter |
+| --- | --- | --- |
+| Ordinary location M | Shared store | self:A, loc:M, any of its participant labels |
+| High-assurance location L | L's partition + shared store (personal items only, read-only, no side effects) | self:A, loc:L, participants; personal items in the shared store |
+
+Recalling a memory from ordinary location M somewhere else needs no data to move. M's environment either allowed the label to be dropped (the item becomes personal, or loses loc:M) or it didn't. Only the labels change.
 
 ## Memory types (deferred)
 
