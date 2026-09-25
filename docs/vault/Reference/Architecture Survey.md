@@ -51,6 +51,9 @@ Specific systems, mapped to the families above.
 | [[Mem0]] | Vector store RAG (extracted facts; entity boost) | Do its filters pre-filter, and does UPDATE mix scopes or drop sources? | surveyed @ 8127e8b: real pre-filters; now add-only; no lineage; add-time lookup ignores labels; fork of 300–600 lines |
 | [[Letta]] (formerly MemGPT) | Tiered / file-based (git-backed Markdown) | Can always-in-context memory blocks be kept per label set? | surveyed @ d7fd0a6: only as a directory per label set; no labels or local vector search; rewrites mix locations; poor base |
 | [[Zep and Graphiti]] | Temporal knowledge graph | How do per-item labels work when entity nodes are shared across locations? | surveyed @ 47f6482: group_id only; graph walks check only end nodes; summaries mix all sources; deep fork |
+| Honcho | Extracted facts about peers; per-observer views | Can peer views stand in for participant labels, and do conclusions record their sources? | researching |
+| Hindsight | Fact, experience, observation and opinion networks | Do observations and opinions inherit their sources' labels, and does recall write anything? | researching |
+| Cognee | Knowledge graph + vector with per-dataset access control | Can dataset permissions serve as label partitions, and do shared entities mix sources? | researching |
 
 ## Policy engines
 
