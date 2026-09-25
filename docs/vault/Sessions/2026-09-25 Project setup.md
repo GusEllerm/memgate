@@ -38,4 +38,6 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 
 **Coverage.** Gus asked for coverage of the popular systems. [[Memory System Landscape]] ranks 37 open-source systems and 13 managed services, 17 of them verified against code. Full reviews: [[Hindsight]] (best fit so far), [[Honcho]], [[Cognee]]. While mapping Cognee, Claude found that its own Cedar sketch granted participant labels to everyone present; it was fixed. Claude also proposed that derived memories take the intersection of participant sets, not the union.
 
-**Next.** Gus rules on hosted services and the participant-intersection rule; then shortlist and prototype with a planted-secret leak test.
+**Rulings.** Participant labels on derived memories take the intersection. Merging happens within a label set, never between label sets (cross-set merges are a possible future idea). Shortlist: Hindsight, Mem0, Falda; backups Redis V0 and EverOS; AgentCore as the hosted reference backend.
+
+**Next.** Design the prototype and the planted-secret leak test.

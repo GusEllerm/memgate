@@ -14,6 +14,16 @@ tags: [agentic-memory, reference, survey]
 
 Coverage of the wider field, with popularity and triage, is in [[Memory System Landscape]].
 
+## Shortlist (accepted 2026-09-25)
+
+| Role | Systems |
+| --- | --- |
+| Candidates | [[Hindsight]], [[Mem0]], [[Falda]] (Rob Ross's fork) |
+| Backups | [[Redis Agent Memory]] (V0 fork), EverOS |
+| Hosted reference backend | AWS AgentCore Memory (see [[Memory System Landscape]]) |
+
+The prototype runs Cedar ([[Label Rule Table]]) in front of each, with a planted-secret leak test through merges, summaries and retelling.
+
 ## Findings so far (2026-09-25)
 
 - **Filtering search by label is the easy part.** Most systems can, or can be made to, filter inside the search: Redis V0, Mem0 on Qdrant or pgvector, and any vector store using label-set IDs.

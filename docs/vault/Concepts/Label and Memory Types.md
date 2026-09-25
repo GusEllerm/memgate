@@ -30,7 +30,7 @@ Across types, every type on an item must be satisfied. Within the participant ty
 - A has taken part in {A, B} and {A, C}. Then {A, B, C} meet.
 - C must not recall or synthesise anything from {A, B}. Memories derived from that conversation carry participants {A, B}, and memories mixing both earlier conversations carry the intersection {A}.
 - Anything said in {A, B, C} is new material with participants {A, B, C}, even if A or B retell the {A, B} conversation. C may remember it. Its provenance links back to the {A, B} memory the speaker recalled.
-- So the memory system must never merge a new {A, B, C} memory into a similar {A, B} one (proposed, [[Decision Log]]). A merge would either leak {A, B} to C or take away C's own memory of the meeting. Similar content stays separate and is linked by provenance.
+- So the memory system never merges across label sets (accepted, [[Decision Log]]); merging within one label set is fine. It must never fold a new {A, B, C} memory into a similar {A, B} one. Cross-label-set merges may be allowed in some cases later. A merge would either leak {A, B} to C or take away C's own memory of the meeting. Similar content stays separate and is linked by provenance.
 
 **Example (Gus).** A, B and C discuss in L. The derived memory is tagged {loc:L, with:A, with:B, with:C}. Later, A alone in L can recall it. D in L cannot, because D wasn't there. A in another location cannot either, unless L let A carry it into personal memory.
 
