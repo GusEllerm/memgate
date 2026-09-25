@@ -31,7 +31,7 @@ Specific systems, mapped to the families above.
 
 | System | Family | Question to answer | Status |
 | --- | --- | --- | --- |
-| Falda (UChicago, Rick Stevens' group) | to be determined | Can its retrieval filter by label, and do its derived memories record their sources? | researching |
+| [[Falda]] (UChicago, Rick Stevens' group) | Tiered, episodic + semantic split | Can its retrieval filter by label, and do its derived memories record their sources? | surveyed: strong provenance, coarse store-per-pool isolation, no per-item filter yet |
 | Redis agent memory system | to be determined | Can its search filters express label-subset checks inside the vector query? | researching |
 
 ## Policy engines
