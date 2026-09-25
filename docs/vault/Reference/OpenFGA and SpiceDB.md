@@ -58,6 +58,7 @@ type label_set
     define readable: with_ok but not violation
 ```
 
+- **Note:** this model grants participant access to every agent present. Our accepted rule grants with:X only to agent X itself ([[Label and Memory Types]]). Replacing present with actor in with_ok fixes it; latencies were measured as written.
 - **Stored records:** the label-set links, plus a wildcard record per agent and location. **Gotcha:** without that wildcard record, the exclusion silently grants access. A test caught this.
 - **Per request:** 2 plus the number of participants in contextual tuples.
 - **Reserved words:** with and self can't be relation names.

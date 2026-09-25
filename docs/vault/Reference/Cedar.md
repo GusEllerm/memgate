@@ -44,10 +44,10 @@ entity LabelSet = { selfs: Set<Agent>, locs: Set<Location>, withs: Set<Agent>, h
 action read appliesTo { principal: Agent, resource: LabelSet, context: { location: Location, present: Set<Agent> } };
 action derive, writePersonal appliesTo { principal: Agent, resource: LabelSet, context: { env: Environment, target: LabelSet } };
 
-permit(principal, action == Action::"read", resource)          // all of self and location, any participant
+permit(principal, action == Action::"read", resource)          // all of self and location; reader must be a participant
 when { [principal].containsAll(resource.selfs)
     && [context.location].containsAll(resource.locs)
-    && (resource.withs.isEmpty() || resource.withs.containsAny(context.present)) };
+    && (resource.withs.isEmpty() || resource.withs.contains(principal)) };
 forbid(principal, action == Action::"read", resource)           // high-assurance seal
 unless { [context.location].containsAll(resource.haLocs) };
 forbid(principal, action in [Action::"derive", Action::"writePersonal"], resource)  // Severance
@@ -55,6 +55,7 @@ when { !context.env.carryOut && !(context.target.locs.containsAll(resource.locs)
                                  && context.target.withs.containsAll(resource.withs)) };
 ```
 
+- **Correction (2026-09-25).** The survey's original sketch used withs.containsAny(context.present). That grants a participant label to everyone present, so a non-witness standing next to a witness could recall the discussion. Our accepted rule grants with:X only to agent X itself, hence withs.contains(principal). The briefing page was corrected and re-verified the same day.
 - **Forbid always overrides permit,** which suits seals.
 - **No quantifiers over set members.** "Does this set include a high-assurance location?" must be precomputed (haLocs) when the label set is created.
 - **Nested locations** can use Cedar's entity hierarchy.
@@ -66,7 +67,7 @@ when { !context.env.carryOut && !(context.target.locs.containsAll(resource.locs)
 | Check every label set (batch) | 4.9 s (about 49 µs each, mostly Python overhead), plus 2.3 s to load entities | Stable; too slow per query |
 | Partial evaluation → residual → filter over the label-set table | Same 3,070 IDs in 0.03 s | Experimental; hand-compiled |
 
-- **The residual** is a plain condition over the label set's attributes: subset checks for self and location, an overlap check for participants, and the seal clause. It maps directly onto array operators (e.g. Postgres subset and overlap).
+- **The residual** is a plain condition over the label set's attributes: subset checks for self and location, a membership check for participants, and the seal clause. It maps directly onto array operators (e.g. Postgres subset and overlap).
 - **The pipeline:**
   1. Compute the residual from the context.
   2. Run it as a query over the small label-set table.

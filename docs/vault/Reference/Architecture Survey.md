@@ -24,7 +24,7 @@ Coverage of the wider field, with popularity and triage, is in [[Memory System L
   - Collaborative Memory lets an LLM strip content before sharing it.
   - Falda alone keeps source links through its condensing step. But its scenes and Core still mix a whole store.
 - **Store-wide summaries are incompatible with selective memory** unless there is one per label set. This covers Falda's Core, Graphiti's communities, Letta's core files and Redis's session summaries.
-- **Cheapest forks:** Mem0 (300–600 lines) and Redis V0. Falda has the best lineage, but seven read paths need filters. Graph systems are the deepest work.
+- **Cheapest forks:** [[Hindsight]] (label-set IDs as tags plus a validator extension; no core changes), then Mem0 (300–600 lines) and Redis V0. Falda has the best lineage, but seven read paths need filters. Graph systems are the deepest work.
 
 The permission layer is surveyed separately from the memory store ([[Decision Log]], 2026-09-25). A store is judged on whether it can filter retrieval by label and track which items derived memories came from; a policy engine is judged on turning an open-ended set of context attributes into allowed labels. A store with built-in permissions gets no extra credit.
 
@@ -51,9 +51,9 @@ Specific systems, mapped to the families above.
 | [[Mem0]] | Vector store RAG (extracted facts; entity boost) | Do its filters pre-filter, and does UPDATE mix scopes or drop sources? | surveyed @ 8127e8b: real pre-filters; now add-only; no lineage; add-time lookup ignores labels; fork of 300–600 lines |
 | [[Letta]] (formerly MemGPT) | Tiered / file-based (git-backed Markdown) | Can always-in-context memory blocks be kept per label set? | surveyed @ d7fd0a6: only as a directory per label set; no labels or local vector search; rewrites mix locations; poor base |
 | [[Zep and Graphiti]] | Temporal knowledge graph | How do per-item labels work when entity nodes are shared across locations? | surveyed @ 47f6482: group_id only; graph walks check only end nodes; summaries mix all sources; deep fork |
-| Honcho | Extracted facts about peers; per-observer views | Can peer views stand in for participant labels, and do conclusions record their sources? | researching |
-| Hindsight | Fact, experience, observation and opinion networks | Do observations and opinions inherit their sources' labels, and does recall write anything? | researching |
-| Cognee | Knowledge graph + vector with per-dataset access control | Can dataset permissions serve as label partitions, and do shared entities mix sources? | researching |
+| [[Honcho]] | Extracted facts about peers; per-observer views | Can peer views stand in for participant labels, and do conclusions record their sources? | surveyed @ c8e97bc: views are write-time copies, not read-time labels; strong derived-from lineage; no labels or export; AGPL |
+| [[Hindsight]] | Facts → observations → mental models | Do observations inherit their sources' labels, and does recall write anything? | surveyed @ 415a8d7: **best fit so far**. Label-set-ID tag injected by a validator, pre-filtered in 3 of 4 arms; observations keep sources; recall writes nothing |
+| [[Cognee]] | Knowledge graph + vector with per-dataset access control | Can dataset permissions serve as label partitions, and do shared entities mix sources? | surveyed @ eb90d03: dataset per label set is safe but coarse; per-item labels break on name-keyed entities; search writes history |
 
 ## Policy engines
 

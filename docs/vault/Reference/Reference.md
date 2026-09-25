@@ -14,3 +14,6 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[OPA and Rego]]
 - [[OpenFGA and SpiceDB]]
 - [[Memory System Landscape]]
+- [[Hindsight]]
+- [[Honcho]]
+- [[Cognee]]

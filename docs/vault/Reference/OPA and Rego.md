@@ -45,6 +45,8 @@ allow_derive if { not env.severance; not high_assurance_violation; dropped_ok }
 
 Environments are flags in data. A new context attribute only needs another granted rule.
 
+**Note:** this sketch grants a participant label to every agent present. Our accepted rule grants with:X only to agent X itself ([[Label and Memory Types]]). The fix is one line, but the latencies above were measured with the sketch as written.
+
 ## Listing readable label sets
 
 | Approach | 10k label sets | 100k label sets | Notes |

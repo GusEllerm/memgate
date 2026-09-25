@@ -36,4 +36,6 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 
 **Engine chosen.** After reviewing an interactive Cedar briefing (linked from [[Cedar]]), Gus adopted Cedar for policy. An in-process index stays as the fallback and performance baseline.
 
-**Next.** Shortlist memory stores and prototype the label rule table on Cedar, with a planted-secret leak test through merges and retelling.
+**Coverage.** Gus asked for coverage of the popular systems. [[Memory System Landscape]] ranks 37 open-source systems and 13 managed services, 17 of them verified against code. Full reviews: [[Hindsight]] (best fit so far), [[Honcho]], [[Cognee]]. While mapping Cognee, Claude found that its own Cedar sketch granted participant labels to everyone present; it was fixed. Claude also proposed that derived memories take the intersection of participant sets, not the union.
+
+**Next.** Gus rules on hosted services and the participant-intersection rule; then shortlist and prototype with a planted-secret leak test.
