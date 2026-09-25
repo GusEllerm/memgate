@@ -28,4 +28,4 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 
 **Survey started.** Gus added Falda and Redis's memory system to the survey, chose Rob Ross's Falda fork, and deferred benchmarking. Surveyed [[Falda]], [[Redis Agent Memory]] and [[Vector Store Label Filtering]], and drafted [[Label Rule Table]]. A peer Claude session also wrote survey notes; one overwrite was reverted.
 
-**Next.** Gus rules on the four proposed label-model rows in [[Decision Log]]. The deeper pass on the Ross fork of Falda is in progress.
+**Next.** Gus rules on the four proposed label-model rows in [[Decision Log]]. The deeper pass on the Ross fork of Falda is done: [[Falda]] now reflects commit 0690078, including the recall path and every point where a label filter would be injected.
