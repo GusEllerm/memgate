@@ -6,3 +6,4 @@ Ideas that span modules. Name code where you make a claim about it.
 - [[Evaluation Criteria]]
 - [[Label Rule Table]]
 - [[Label and Memory Types]]
+- [[Benchmark Plan]]

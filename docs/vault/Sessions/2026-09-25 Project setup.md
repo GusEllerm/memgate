@@ -40,4 +40,6 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 
 **Rulings.** Participant labels on derived memories take the intersection. Merging happens within a label set, never between label sets (cross-set merges are a possible future idea). Shortlist: Hindsight, Mem0, Falda; backups Redis V0 and EverOS; AgentCore as the hosted reference backend.
 
-**Next.** Design the prototype and the planted-secret leak test.
+**Benchmarking.** Agreed to benchmark: a publishable selective-memory benchmark, efficacy (LoCoMo, LongMemEval) and speed. Model: gpt-oss-120b on ALCF, smoke-tested OK (plain, JSON schema, tool calls). At most 6 concurrent ALCF sessions, enforced by a local gateway. Draft in [[Benchmark Plan]].
+
+**Next.** Build the ALCF gateway, then a LoCoMo pilot on two systems.
