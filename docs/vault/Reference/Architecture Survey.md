@@ -52,9 +52,12 @@ Specific systems, mapped to the families above.
 
 ## Policy engines
 
+The engine's key job: given a context, list the label-set IDs it may read, fast enough for every retrieval. That list becomes the ID IN [...] pre-filter ([[Label Rule Table]]). Also judged on write-time environment rules, and on whether the high-assurance property can be tested or proven.
+
 | Engine | Model | Question to answer | Status |
 | --- | --- | --- | --- |
-| Cedar | Attribute-based policies | Can policies over arbitrary context attributes return the allowed label set fast enough for every retrieval? | not surveyed |
-| OPA / Rego | General policy-as-code | Is Rego's flexibility worth its cost for per-retrieval decisions? | not surveyed |
-| OpenFGA / SpiceDB (Zanzibar-style) | Relationship-based | Can agent–environment–memory relations express label grants, or does ABAC fit better? | not surveyed |
+| Cedar | Attribute-based policies | Can policies over arbitrary context attributes return the allowed label set fast enough for every retrieval? | researching |
+| OPA / Rego | General policy-as-code | Is Rego's flexibility worth its cost for per-retrieval decisions? | researching |
+| OpenFGA / SpiceDB (Zanzibar-style) | Relationship-based | Can agent–environment–memory relations express label grants, or does ABAC fit better? | researching |
+| Casbin / Oso | Lightweight ABAC / Polar with list filtering | Does a lighter engine beat OPA for our case? | researching |
 | Hand-rolled rule table | Labels × attribute predicates | Is a small in-process rule set enough, before adopting an engine? | designed: [[Label Rule Table]] |
