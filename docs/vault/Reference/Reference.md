@@ -7,3 +7,5 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Redis Agent Memory]]
 - [[Vector Store Label Filtering]]
 - [[Collaborative Memory]]
+- [[Mem0]]
+- [[Zep and Graphiti]]

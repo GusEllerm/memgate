@@ -34,9 +34,9 @@ Specific systems, mapped to the families above.
 | [[Falda]] (Rob Ross's fork, rbross-hpc/falda) | Tiered, episodic + semantic split | Can its retrieval filter by label, and do its derived memories record their sources? | surveyed @ 0690078: strong atom lineage, physical per-store isolation, tags unused by any filter, Core mixes a whole store |
 | [[Redis Agent Memory]] (Iris, managed; Agent Memory Server V0, open source) | Vector store RAG with working/long-term tiers | Can its search filters express label-subset checks inside the vector query? | surveyed: V0 yes (all/not_in tag pre-filters in KNN), lineage lost on merge, access not enforced; Iris a poor fit |
 | [[Collaborative Memory]] (Rezazadeh et al. 2025) | Private + shared tiers with access control | How close is its access model to ours, and what should we borrow? | surveyed: read rule and provenance match ours; LLM declassifier on shared writes; derived items can lose labels; no code |
-| Mem0 | Extracted facts, optional graph | Do its filters pre-filter, and does UPDATE mix scopes or drop sources? | researching |
+| [[Mem0]] | Vector store RAG (extracted facts; entity boost) | Do its filters pre-filter, and does UPDATE mix scopes or drop sources? | surveyed @ 8127e8b: real pre-filters; now add-only; no lineage; add-time lookup ignores labels; fork of 300–600 lines |
 | Letta (MemGPT) | Tiered / OS-style | Can always-in-context memory blocks be kept per label set? | researching |
-| Zep / Graphiti | Temporal knowledge graph | How do per-item labels work when entity nodes are shared across locations? | researching |
+| [[Zep and Graphiti]] | Temporal knowledge graph | How do per-item labels work when entity nodes are shared across locations? | surveyed @ 47f6482: group_id only; graph walks check only end nodes; summaries mix all sources; deep fork |
 
 ## Policy engines
 
