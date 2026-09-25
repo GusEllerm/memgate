@@ -29,3 +29,7 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 **Survey started.** Gus added Falda and Redis's memory system to the survey, chose Rob Ross's Falda fork, and deferred benchmarking. Surveyed [[Falda]], [[Redis Agent Memory]] and [[Vector Store Label Filtering]], and drafted [[Label Rule Table]]. A peer Claude session also wrote survey notes; one overwrite was reverted.
 
 **Next.** Gus rules on the four proposed label-model rows in [[Decision Log]]. The deeper pass on the Ross fork of Falda is done: [[Falda]] now reflects commit 0690078, including the recall path and every point where a label filter would be injected.
+
+**Design discussion with Gus.** The host system is a social simulation that evolves agents into diverse research entities, and labels give them selective memory. Accepted: all-of label check with any-of within participants, label-set IDs, union inheritance that the environment may relax, three label types (identity, location, participants), personal memory always readable with environment-gated writes, provenance of ideas, cooperative threat model with outbound-only high assurance, one shared store with partitions for high-assurance locations. See [[Label and Memory Types]] and [[Decision Log]].
+
+**Next.** Survey Collaborative Memory, Mem0, Letta and Zep against [[Evaluation Criteria]].
