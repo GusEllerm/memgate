@@ -11,3 +11,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Zep and Graphiti]]
 - [[Letta]]
 - [[Cedar]]
+- [[OPA and Rego]]

@@ -61,6 +61,7 @@ What outbound assurance takes:
 - **No relaxation of L's labels.** Derived memories always keep loc:L.
 - **The personal-memory gate is closed**, *Severance*-style. Agents may keep personal notes tagged {self:A, loc:L}, readable only in L.
 - **No side effects on outside items.** Recalling a personal memory inside L must not update anything stored outside L: usage counts, recency boosts, reinforcement or merges. Falda's ranking uses recency and usage, and even a changed count tells the outside something about L. Recall traces made in L stay in L.
+- **Beware location hierarchies.** If locations nest and a child location grants its parent's label, a high-assurance location can become readable from a neighbour. The OPA survey's exhaustive test caught exactly this: a vault became readable from the lobby ([[OPA and Rego]]). A high-assurance label must never be granted through a hierarchy, and the seal should be proven ([[Cedar]]) or at least tested exhaustively.
 - **A partition per high-assurance location (accepted).** Ordinary locations and personal memory share one store, and labels decide every permission. Each high-assurance location gets its own partition (a Falda pool file, Qdrant shard key or Postgres partition), so L's items never enter the ranking statistics or caches outside searches use. Start with a single store; design the API with a partition key so this can be switched on later.
 
 | Agent is in | Searches | Label filter |
