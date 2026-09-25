@@ -16,6 +16,10 @@ tags: [agentic-memory, design, permissions]
 
 A host project needs an agent whose memory is permissioned at a fine grain. The current context, not the agent, decides which parts of memory are unlocked (readable, writable) and which stay locked. This project surveys agentic memory systems and recommends one that supports this. Candidates are in [[Architecture Survey]]; they are scored with [[Evaluation Criteria]].
 
+## The host system
+
+Gus, 2026-09-25: the host system simulates social experiences between agents, to evolve them into useful and diverse research entities. Memory permissions are a mechanism for **selective memory**: what an agent remembers depends on where it was and who it was with. That is meant to create diversity of opinion. Environments set how strictly information may pass to agents. One environment might be like the TV show *Severance*, where agents forget everything about it when they leave; another might let them keep what they learned. Leakage control matters most in strict environments; elsewhere, controlled relaxation is a feature. Details in [[Label and Memory Types]].
+
 ## What a context is (accepted)
 
 A context is a combination of attributes, and the set of attributes is open-ended. Known attributes so far:

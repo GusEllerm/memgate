@@ -2,7 +2,7 @@
 type: design
 status: draft
 authority: describes
-summary: "Discussion draft: personal memory as an identity-labelled compartment (so no item is unlabelled), label types that decide how strictly labels stick to derived memory, and memory types that decide which relaxations are allowed."
+summary: "Selective memory for a social simulation of agents: three label types (identity, location, participants); participants recall a discussion in its location; personal memory is always readable, and the environment decides what may enter it."
 created: 2026-09-25
 updated: 2026-09-25
 tags: [agentic-memory, design, permissions, memory-types]
@@ -10,50 +10,48 @@ tags: [agentic-memory, design, permissions, memory-types]
 
 # Label and Memory Types
 
-*Discussion draft 2026-09-25. Claude's proposal in response to two questions Gus raised; nothing here is decided. The open rows are in [[Decision Log]]. Extends [[Label Rule Table]].*
+*Draft 2026-09-25. Rulings are in [[Decision Log]]; the rest is Claude's proposal. Extends [[Label Rule Table]]. The host system is described in [[Context-Scoped Memory Permissions]].*
 
-## Personal memory without unlabelled items
+**The idea.** Labels mostly exist to give agents **selective memory**, not to secure data. What an agent can recall depends on where it was and who it was with. So agents who lived through different things form different opinions. Environments set the strictness, from "keep what you learned" to *Severance*.
 
-Gus: if every memory needs a label, how does an agent keep its own personal memory? Personal memory must stay possible, because it is a way for agents to diversify.
+## Label types (accepted: start with three)
 
-**Proposal.**
-- Every agent has an **identity label** (self:A) that is granted only in contexts where agent A is acting.
-- A personal memory is written with self:A, so no item is ever unlabelled.
-- Each agent's personal memory is a compartment only it can open. Two agents in the same role grow apart because their compartments differ.
-
-**The catch.** Personal memory is not an escape hatch. Under union inheritance, A's reflection on project-x material carries {self:A, project-x}. A can then recall it only where project-x is also unlocked. Whether that is right depends on label types.
-
-## Label types
-
-Every label has a type. The read check is the same for all types: all of an item's labels must be allowed. Types differ in how the label **propagates** to derived memory.
-
-| Type | Example | Propagation (proposed) | Why |
+| Type | Example | Granted when | Within the type |
 | --- | --- | --- | --- |
-| Identity | self:A | Sticky on personal memory | The owner's compartment |
-| Location / environment | env:lab-A | Sticky | Gus: an agent's conceptual location is more restrictive |
-| Principal | user:alice | Sticky | Whose data it is |
-| Participants | discussion:{A,B,C} | Relaxable | Gus: which agents were in a discussion is less restrictive |
-| Session | session:42 | Relaxable | Sessions are short-lived |
+| Identity | self:A | Agent A is acting | Only the owner |
+| Location | loc:L | The agent is in conceptual location L | Required |
+| Participants | with:A, with:B, with:C | The agent is one of them | Any one suffices (direction accepted, under discussion) |
 
-- **Sticky:** always carried into derived items (the union default).
-- **Relaxable:** may be dropped when deriving an item, but only under an explicit relaxation rule. The rule names the label type, the memory type being written and a condition on the context. Every relaxation is logged.
+Across types, every type on an item must be satisfied. Within the participant type, holding any one of the labels is enough. Label-set IDs handle this without trouble, because the policy checks each stored label set and the store only sees IDs.
 
-## Memory types
+**Example (Gus).** A, B and C discuss in L. The derived memory is tagged {loc:L, with:A, with:B, with:C}. Later, A alone in L can recall it. D in L cannot, because D wasn't there. A in another location cannot either, unless L let A carry it into personal memory.
 
-Memory types decide which relaxations are allowed:
+## The environment decides (accepted)
 
-| Memory type | Holds | Relaxation (proposed) |
+Environments contain conceptual locations and own their rules:
+- **Relaxation:** whether a derived memory may drop the location or participant labels.
+- **The personal-memory gate:** whether an agent may write what it learned in L into its personal memory. That strips L's labels and makes it readable everywhere.
+
+| Environment strictness | Personal-memory writes | Effect |
 | --- | --- | --- |
-| Episodic | Raw events and turns | None: the raw record keeps every label |
-| Semantic | Facts distilled from episodes | May drop participant and session labels |
-| Procedural | Skills, how-tos, strategies | May drop participant and session labels; location is an open question |
-| Personal / reflective | The agent's own conclusions | Adds self:A; sticky labels from its sources stay |
+| Open | Allowed | Agents carry learnings and opinions out of L |
+| Selective | Allowed for some memory types (e.g. opinions, not facts) | Agents keep a stance but not the specifics |
+| Severance | Forbidden | Agents recall L only inside L; outside, they have forgotten it |
 
-This lines up with Falda's tiers: T0 stream is episodic, T1 atoms are typed facts, patterns and preferences, and Core is a persona document. Mem0, Letta and Zep have their own taxonomies, which are not surveyed yet.
+## Personal memory (accepted)
 
-## Open questions for Gus
+- Labelled with the owner's identity label only, so the owner can always read it.
+- It is how an agent's action space and opinions grow.
+- It is also the only path by which a location's content leaves the location. That is why the environment gates the write.
 
-- [ ] Should an agent's personal memory be readable in **every** context where the agent acts (self:A alone)? Or only where its sources' sticky labels are also unlocked?
-- [ ] Which label types exist, and which are sticky? The table above is a guess.
-- [ ] Who decides a relaxation, a rule or a judgement? "This fact doesn't depend on who was in the discussion" is a judgement an LLM would make. That turns an LLM into a declassifier, which is the leakage path that FIDES and CaMeL guard against ([[Vector Store Label Filtering]]).
-- [ ] Which memory type taxonomy? Adopt one from a surveyed system, or define our own.
+## Memory types (deferred)
+
+The taxonomy will largely be adopted from whichever memory system is chosen. "Selective" environments need at least one distinction, such as opinion versus fact, to gate on.
+
+## Open for discussion
+
+- [ ] **Group memory.** Should an environment be able to switch a location to "only the same group recalls it together", like a shared in-joke? The default is any participant.
+- [ ] **Retelling.** A carries an opinion out of L and tells it to D in M. D's memory is tagged {loc:M, with:A, with:D}. That is how ideas spread, and it is fine for open environments. Is it also the intended behaviour for selective ones?
+- [ ] **Forgetting over time.** Should memory also fade (decay, capacity limits)? That is another lever for selectivity.
+- [ ] **Threat model.** Is enforcement about keeping the simulation accurate (agents cooperate), or must it hold against agents trying to leak? This decides how much side-channel hardening is needed.
+- [ ] **Evolution and training.** If agents evolve by training on their experiences, a *Severance* environment must also be kept out of the training data. Memory filtering alone would not make them forget.
