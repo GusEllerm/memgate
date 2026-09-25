@@ -24,7 +24,13 @@ tags: [agentic-memory, design, permissions, memory-types]
 
 Across types, every type on an item must be satisfied. Within the participant type, holding any one of the labels is enough. Label-set IDs handle this without trouble, because the policy checks each stored label set and the store only sees IDs.
 
-**Derived memories and participants (proposed, 2026-09-25).** A derived memory must be readable only by an agent who could read every one of its sources. For identity and location, where every label must be held, that means taking the union of the sources' labels. For participants, where one's own label suffices, the union would be wrong: a summary of two discussions, one with {A, B} and one with {C}, tagged with {A, B, C} would let C read what A and B said. The participant set must be the **intersection**, here empty. Such a memory is readable through participants by no one, unless the environment relaxes it, for example into a participant's personal memory. See [[Decision Log]].
+**Derived memories and participants (accepted, 2026-09-25).** A derived memory must be readable only by an agent who could read every one of its sources. For identity and location, where every label must be held, that means taking the union of the sources' labels. For participants, where one's own label suffices, the union would be wrong: a summary of two discussions, one with {A, B} and one with {C}, tagged with {A, B, C} would let C read what A and B said. The participant set must be the **intersection**, here empty. Such a memory is readable through participants by no one, unless the environment relaxes it, for example into a participant's personal memory. See [[Decision Log]].
+
+**Gus's example: disclosure happens through agents, not through the memory system.**
+- A has taken part in {A, B} and {A, C}. Then {A, B, C} meet.
+- C must not recall or synthesise anything from {A, B}. Memories derived from that conversation carry participants {A, B}, and memories mixing both earlier conversations carry the intersection {A}.
+- Anything said in {A, B, C} is new material with participants {A, B, C}, even if A or B retell the {A, B} conversation. C may remember it. Its provenance links back to the {A, B} memory the speaker recalled.
+- So the memory system must never merge a new {A, B, C} memory into a similar {A, B} one (proposed, [[Decision Log]]). A merge would either leak {A, B} to C or take away C's own memory of the meeting. Similar content stays separate and is linked by provenance.
 
 **Example (Gus).** A, B and C discuss in L. The derived memory is tagged {loc:L, with:A, with:B, with:C}. Later, A alone in L can recall it. D in L cannot, because D wasn't there. A in another location cannot either, unless L let A carry it into personal memory.
 

@@ -137,6 +137,21 @@ The recurring gap is "any one participant". An agent's readable label sets form 
 | 13 | [Neo4j Agent Memory Service](https://neo4j.com/blog/genai/a-tour-of-the-neo4j-agent-memory-service-nams/) | Labs, experimental | Graph of messages, entities and reasoning traces | Per-user workspaces | Unknown | Entities traced to messages | Weak: shared entity nodes |
 | – | Snowflake, MongoDB | Product feature only (u); partner sample only (u) | – | – | – | – | Skip |
 
+**How a managed service would fit our design.** Only one arrangement is safe:
+1. **One partition per label set.** Each label-set ID becomes a namespace (AgentCore), scope (Memory Bank) or store (Claude Managed Agents). Server-side extraction then never crosses label sets, so our derivation rules hold trivially. The cost, losing synthesis across label sets, is one our own "never merge across label sets" rule already accepts.
+2. **Our own gateway in front.** Cedar computes the readable label-set IDs, the gateway sends one retrieve per partition and merges the results, and it records provenance itself where the service doesn't.
+3. **Credentials that can only reach allowed partitions.** Where the service supports it, IAM conditions on the partition name act as a second lock (AgentCore namespaces, Memory Bank scopes).
+
+**The main cost is fan-out.** No service can search several partitions in one query. An agent in location L can read its personal memory plus every label set tagged with L that it took part in. Over a long simulation, that could be dozens to hundreds of retrieve calls per recall. That's an estimate, to be measured. Each service also adds its own limits:
+- **AgentCore:** 5 equality filters and 3 no-merge keys.
+- **Claude Managed Agents:** 8 stores per session.
+
+**Other academic considerations:**
+- **Reproducibility:** preview APIs and vendor-chosen extraction models change under us.
+- **Cost and data residency.**
+- **High assurance:** it rests on the vendor's isolation plus IAM. A Cedar proof covers our policy, not their infrastructure.
+- **Benchmark comparability, in their favour:** AWS already publishes LoCoMo and LongMemEval numbers for AgentCore, so it is a natural reference backend for a paper.
+
 **Vendor benchmark claims (self-reported, unverified, not scored):**
 - AgentCore: LoCoMo 70.6%, LongMemEval-S 73.6% ([AWS blog](https://aws.amazon.com/blogs/machine-learning/building-smarter-ai-agents-agentcore-long-term-memory-deep-dive/)). Its own RAG baseline scored higher on LoCoMo, at 77.7%.
 - Supermemory: 97% Recall@20 on LongMemEval-S ([research](https://supermemory.ai/research)). This is a retrieval score, not question-answering accuracy.
