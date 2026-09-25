@@ -85,7 +85,49 @@ Popularity score = stars + monthly downloads ÷ 20. † = general framework; its
 
 ## Managed services
 
-*In progress.*
+*Read from the linked docs on 2026-09-25 unless marked (u), meaning seen only in a search snippet. Rankings are by prominence (judgement). Rows marked "prior" come from earlier reviews.*
+
+**The general problem.** Every service that extracts memories on its own servers does so inside a single partition key (namespace, scope, container or store). So none can give a derived memory the union of its sources' labels.
+
+The only safe pattern is to **make the partition key the label-set ID**. Extraction then never crosses label sets and the union rule holds trivially, but nothing can be synthesised across label sets.
+
+The recurring gap is "any one participant". An agent's readable label sets form a list of IDs, and no service supports OR over partitions inside vector search. So recall would be one query per readable label set, merged by us.
+
+| # | Service | Status | Memory model | Scoping and authorisation | Filter inside retrieval | Lineage | Triage |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [AWS Bedrock AgentCore Memory](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory.html) | GA 2025-10 (u); priced per event and per stored record (u) | Short-term events; long-term records from strategies: semantic, summary, preference, episodic, override, self-managed. Superseded records are marked invalid | [Namespace templates](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/specify-long-term-memory-organization.html) from actor, session and up to 5 custom variables. IAM conditions on reads (namespace path) and writes (namespace variables) | Yes, [metadata filters before k-NN](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/long-term-memory-metadata.html). But AND only, equality only, at most 5. "Strictly consistent" keys (at most 3) stop extraction merging across values | Namespace and timestamps; link to source events not documented | **Deep dive candidate** |
+| 2 | [Google Memory Bank](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank) (Vertex / Gemini Enterprise Agent Platform) | Preview 2025-07, now GA | Gemini extracts and consolidates per scope; profiles, TTL | Exact-match scope dict; [IAM condition on scope](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/iam-conditions), but not on multi-scope list or purge | Scope is an exact partition; metadata filters [don't work with similarity search](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/fetch-memories) | [Revisions](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/revisions) keep the extracted text, with no link to the source session | Runner-up |
+| 3 | Mem0 Platform | prior | Extracted facts | User, agent and run IDs plus filters | Yes (OSS) | None | Weak: fork the OSS instead ([[Mem0]]) |
+| 4 | [Microsoft Foundry memory](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/what-is-memory) | Preview | Profile, chat summary, procedural | [One scope string](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/memory-usage); RBAC per store; at most 100 scopes per store | Scope only | None documented | Weak |
+| 5 | [Claude Managed Agents memory stores](https://platform.claude.com/docs/en/managed-agents/memory) | Beta | Files mounted into the session. The agent writes them; no server-side extraction. Optional "dreaming" writes to a new store | Up to 8 stores per session, each read-only or read-write, enforced by the filesystem | Nothing to filter: visibility is fixed when the session starts; search is grep, not vector | Every write is an immutable version attributed to its session | **Deep dive candidate** |
+| 5b | [Claude API memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) | Available | File commands our own handler executes | Ours | Ours | Ours | Not a service: a possible agent-facing interface to our own store |
+| 6 | Zep Cloud | prior | Temporal knowledge graph | group_id | Vector yes; graph walks check only their end nodes | Partial | Weak ([[Zep and Graphiti]]) |
+| 7 | [LangGraph Platform store](https://reference.langchain.com/python/langgraph-sdk/auth/Auth/on) | GA (not re-verified) | Namespaced key-value store plus embeddings; extraction client-side | Namespace tuples; an auth hook can rewrite namespaces | Filter placement unconfirmed | Ours | Only if we want a hosted store. TTL refresh on search is a side effect |
+| 8 | Letta Cloud | prior | Git-backed Markdown | Per agent | Closed | Git history | Weak ([[Letta]]) |
+| 9 | [Supermemory](https://supermemory.ai/docs/concepts/filtering.md) (hosted) | GA | Memory graph; background "dreaming" [derives new facts](https://supermemory.ai/docs/concepts/graph-memory.md) across a container | One container tag per search | Placement not stated | Update history, source documents | Skip: derived facts can't carry correct labels |
+| 10 | OpenAI | – | No hosted long-term memory API verified. The [Agents API](https://developers.openai.com/api/docs/guides/agents-api/overview) keeps session state; [SDK memory](https://openai.github.io/openai-agents-python/sandbox/memory/) is client-side files | – | – | – | Skip |
+| 11 | Redis Agent Memory (Iris) | prior: preview | Extracted | Store plus a caller-supplied owner | Unconfirmed | – | Weak; the V0 fork is viable ([[Redis Agent Memory]]) |
+| 12 | [Databricks agent memory](https://docs.databricks.com/aws/en/agents/agent-memory/managed-memory) | Beta | Path/content entries written by tools | Partitioned by actor, but anyone who can reach a store can read every actor's entries | BM25 only | Optional session | Skip |
+| 13 | [Neo4j Agent Memory Service](https://neo4j.com/blog/genai/a-tour-of-the-neo4j-agent-memory-service-nams/) | Labs, experimental | Graph of messages, entities and reasoning traces | Per-user workspaces | Unknown | Entities traced to messages | Weak: shared entity nodes |
+| – | Snowflake, MongoDB | Product feature only (u); partner sample only (u) | – | – | – | – | Skip |
+
+**Vendor benchmark claims (self-reported, unverified, not scored):**
+- AgentCore: LoCoMo 70.6%, LongMemEval-S 73.6% ([AWS blog](https://aws.amazon.com/blogs/machine-learning/building-smarter-ai-agents-agentcore-long-term-memory-deep-dive/)). Its own RAG baseline scored higher on LoCoMo, at 77.7%.
+- Supermemory: 97% Recall@20 on LongMemEval-S ([research](https://supermemory.ai/research)). This is a retrieval score, not question-answering accuracy.
+
+**Recall side effects.**
+- None apparent: AgentCore retrieve, Memory Bank retrieve and read-only Claude store mounts.
+- Present: LangGraph's TTL refresh on search and Supermemory's background dreaming.
+
+**Deep-dive candidates** (not yet started; hosted services raise the question of whether hosted is acceptable at all):
+1. **AgentCore Memory.** The only managed service with all four of:
+   - extraction that never merges across a key;
+   - pre-filters inside k-NN;
+   - IAM conditions on reads and writes;
+   - a self-managed extraction option.
+
+   Open questions: are records linked to their source events, how does it handle ORing many label-set IDs, and what are the key and filter limits?
+2. **Claude Managed Agents memory stores.** Nothing is extracted server-side, and the stores a session sees are fixed when it starts. That makes union inheritance, provenance and read-only recall enforceable. Limits: beta; 8 stores per session; 10,000 memories per store; no semantic search.
 
 ## Sources
 
