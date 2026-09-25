@@ -22,4 +22,6 @@ tags: [agentic-memory, session]
 
 **Note.** Claude first misread "livedocs" as a Claude Docs artifact and drafted the brief there; Gus corrected it and the artifact was deleted. Project content lives in this vault.
 
-**Next.** Answer the open rows in [[Decision Log]], then survey the candidates one by one.
+**Decisions walked through with Gus.** Context is an open-ended combination of attributes (user, session, agent or agents, environment, more later); scopes are overlapping labels; locked memory is hidden, provided per-item visibility can be added later; stack not tied. Recorded in [[Decision Log]] and folded into [[Context-Scoped Memory Permissions]] and [[Evaluation Criteria]].
+
+**Next.** Rule on the survey-shape proposal and repo visibility in [[Decision Log]], then survey the candidates one by one.
