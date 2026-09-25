@@ -6,4 +6,4 @@ and "locks" parts of memory.
 
 Research notes live in the Obsidian vault at `docs/vault/` (open it with "Open folder as vault"),
 kept in sync with the code by [livedocs](https://github.com/GusEllerm/vault-drift). Start at
-`docs/vault/Home.md`; the brief is `docs/vault/Reference/Research brief.md`.
+`docs/vault/Home.md`; the problem statement is `docs/vault/Concepts/Context-Scoped Memory Permissions.md`.

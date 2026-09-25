@@ -26,4 +26,6 @@ commit that changes the code is blocked until the note is updated or acknowledge
 
 ## Map
 
+- [[Decision Log]]: open questions and rulings
+- [[Context-Scoped Memory Permissions]]: the problem and draft requirements
 - [[Modules]] · [[Concepts]] · [[Reference]] · [[Sessions]]
