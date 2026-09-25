@@ -2,7 +2,7 @@
 type: reference
 status: active
 authority: reference
-summary: "FALDA, Rick Stevens' self-hosted tiered memory engine for scientific agents: strong provenance from atoms to source turns, isolation by physical store per tenant/pool, no per-item filtering at retrieval yet."
+summary: "Falda: tiered, clustered memory for science agents from Rick Stevens' group (Argonne). Isolation is physical (one SQLite store per tenant or pool); atoms keep evidence links to source turns, so label inheritance is feasible, but LLM-written scenes and core mix everything in a store."
 created: 2026-09-25
 updated: 2026-09-25
 tags: [agentic-memory, reference, survey, falda]
@@ -10,79 +10,58 @@ tags: [agentic-memory, reference, survey, falda]
 
 # Falda
 
-*Surveyed 2026-09-25 from the GitHub repos and their docs (POOLS.md, MODEL.md, source). There is no paper yet. Facts are as of that date. Listed in [[Architecture Survey]].*
+*Surveyed 2026-09-25 from the repos below; no paper exists. Facts are as of that date. Scored against [[Evaluation Criteria]]; listed in [[Architecture Survey]].*
 
-**Verdict so far.** Falda's provenance is the best fit for "derived memories inherit source labels". Its permission model is coarse: one physical store per tenant or pool. Per-item label filtering would have to be added to every search path, and the T3 Core summary is the hard case.
+**Verdict so far.** Falda is the only candidate yet with source lineage built in: every distilled fact links to the turns it came from. That makes "derived memory inherits its sources' labels" cheap to add for facts. Its access model is the opposite of ours, though: coarse, physical isolation per store rather than labels filtered within a store, and its highest-level summaries are written from a whole store at once.
 
 ## What it is
 
-- **FALDA**, a self-hosted memory engine for scientific agents. Rick Stevens made the first commit on 2026-06-22, under its earlier name STRATUS: "clustered hierarchical memory for scientific agents".
-- **Canonical repo:** [rick-stevens-ai/falda](https://github.com/rick-stevens-ai/falda).
-  - Apache-2.0, version 0.1.0, no releases.
-  - 26 commits, last push 2026-08-15.
-- **Most active fork:** [rbross-hpc/falda](https://github.com/rbross-hpc/falda), by Rob Ross.
-  - 257 commits, last on 2026-09-05.
-  - Adds an MCP surface, recall traces, failure handling, an analysis TUI and a Docker image.
-- **Related repos under the same account:**
-  - AGENT-MEMORY: a white paper plus the TDAI/STRATUS/UMP specs.
-  - falda-demo: tenant isolation and shared pools.
-  - memory-falda: an OpenClaw plugin.
-  - ump-memory: a "Universal Memory Protocol" reference.
-- **Stack:** TypeScript, SQLite with sqlite-vec and FTS5, any OpenAI-compatible embedder, and an optional Anthropic model for distillation.
-- **Integrations:** Claude Code, opencode, OpenClaw and Hermes.
+"FALDA — clustered hierarchical memory for scientific agents" (*falda*: Italian for layer or stratum). Started by Rick Stevens on 2026-06-22 under the name STRATUS. The AGENT-MEMORY README places it in a memory stack for long-lived agents at Argonne, as the "planned successor, currently shadow dual-run" to a system called TDAI, "hardened for 1,000-agent multi-tenant scale".
+
+| Repo | Commits | Last push | Notes |
+| --- | --- | --- | --- |
+| [rick-stevens-ai/falda](https://github.com/rick-stevens-ai/falda) (upstream) | 26 | 2026-08-15 | 4 stars, 5 forks, v0.1.0, no releases, Apache-2.0 |
+| [rbross-hpc/falda](https://github.com/rbross-hpc/falda) (Rob Ross's fork) | 257 | 2026-09-05 | Far more active: MCP docs, data-model doc, failure handling, Python analysis TUI, ~50 test files |
+
+Companion repos: falda-demo, memory-falda (an OpenClaw plugin), ump-memory. Context: [rick-stevens-ai/AGENT-MEMORY](https://github.com/rick-stevens-ai/AGENT-MEMORY). The data model is adapted from shinzui/kioku.
 
 ## Architecture
 
-Four tiers (family: tiered, with an episodic/semantic split):
+TypeScript on Node, ~11k lines. Storage is SQLite with sqlite-vec (vectors) and FTS5 (keywords). Embeddings from any OpenAI-compatible endpoint or in-process ONNX; distillation by an OpenAI-compatible LLM or Anthropic. Served over HTTP and MCP.
 
 | Tier | Holds |
 | --- | --- |
-| T0 Stream | Raw conversation turns |
-| T1 Atoms | Typed facts, patterns, preferences, constraints, instructions |
-| T2 Scenes | Episodes grouped by session, and topics built by clustering embeddings |
-| T3 Core | One persona/project document per store |
+| T0 Stream | Raw turns (session id, role; no labels) |
+| T1 Atoms | Typed facts, patterns, preferences, constraints, instructions; priority, confidence, pinned, status, a tags JSON array |
+| T2 Scenes | Episodes (one per session) and topics (embedding clusters), summarised by an LLM |
+| T3 Core | One LLM-written core document per store |
 
-**Writing and consolidation.**
-1. Agents write turns to the Stream.
-2. A background worker extracts atoms from windows of turns.
-3. An LLM consolidates each candidate against existing atoms: store, update, merge or skip.
-4. Scenes are built next, then Core is synthesized.
-
-**Retrieval.**
-- Hybrid dense and BM25 search, fused by reciprocal-rank fusion.
-- Re-ranked on recency, priority and confidence, with a pinned-first pass.
-- Context assembly packs all tiers into a character budget.
-- Exposed over HTTP and MCP (recall, remember, forget, distill).
+A background worker distills T0 → T1 → T2 → T3, deciding per new atom whether to store, update, merge or skip. Recall fuses vector and keyword hits (reciprocal-rank fusion), re-ranks by recency, priority and confidence, puts pinned atoms first, and fills a token budget across tiers.
 
 ## Scoping and access control
 
-- **Partitioning:** memory is split by tenant and pool. The tenant comes from a request header plus a bearer token.
-- **One SQLite file per store:** each tenant's private "self" store and each shared pool is its own file. The docs reject a shared tenant column filtered in queries as prone to leaks.
-- **Pools:** declared explicitly, with per-member access of none, read or readwrite.
-- **Retrieval scope:** each search hits exactly one store. There are no session or agent-role filters at retrieval; session_id is only recorded on turns.
-- **Provenance:**
-  - An evidence table links each atom to its source turns, at the granularity of the extraction window.
-  - Merges and updates keep the union of all sources.
-  - Every distillation decision is logged.
-  - Deleting a turn reports the atoms that depended on it, but does not delete them.
-- **Stated gaps:** shared pools are not distilled, and pool writes have no audit log.
+- Every call names a (tenant, pool) pair; bearer-token auth, tenant in a request header.
+- Isolation is physical: one SQLite file per store (a private store per tenant, plus shared pools). The design deliberately rejects row filtering.
+- Shared pools declare members with none, read or readwrite access.
+- Recall searches exactly one store; searching several at once is deferred.
+- Lineage: an atom-evidence table links each atom to its source turns; merges and updates combine evidence and never drop it. An audit table records consolidation decisions.
+- Deferred upstream: distilling shared pools, per-tenant attribution of pool writes, a pool write audit log, erasure.
 
 ## Fit with our label model
 
-- **Label filtering at retrieval (moderate work).**
-  - Atoms already have a JSON tags column, documented as filter-only.
-  - But the atom, scene and stream search functions take only a query and a limit.
-  - We would have to push the label filter into the vector and full-text queries and into context assembly, and add labels to the Stream and Scene tables.
-- **Label inheritance (feasible, not built).**
-  - Atoms: the union of their source turns' labels, taken from the evidence table.
-  - Scenes: the union of their atoms' labels.
-  - Embeddings: one per row, so no mixed content.
-- **Core is the blocker.** It compresses the whole store into one document. It would need to be built per label set, or withheld whenever any of its sources is locked.
-- **Risk:** LLM consolidation merges atoms across sources, which mixes labels. Union inheritance keeps this safe but makes merged atoms harder to unlock.
-- **Natural fit today:** one store per label set, which gives coarse labels rather than fine per-item labels.
+| Requirement | Fit | Why |
+| --- | --- | --- |
+| Label-filtered retrieval | Moderate effort | Search runs over the whole table, then drops inactive rows in JavaScript. A label check fits there, but filtering after the row limit loses recall; a proper fix needs pre-filtering or larger candidate pools. |
+| Labels on raw turns | Missing | Stream rows carry only session and role. |
+| Derived facts inherit labels | Feasible | Evidence links make an atom's labels computable from its source turns; merges already carry evidence forward. |
+| Derived summaries inherit labels | Breaks | Scenes and Core are written from everything in a store, so they mix all labels. They would need per-label synthesis or exclusion. |
+| Coarse isolation today | Available | Tenant and pool stores can stand in for coarse labels, but only one store is searched per call. |
 
 ## For benchmarking later
 
-- Self-hosted SQLite, so it is easy to run locally.
-- Recall traces and a retrieval-policy snapshot exist for evaluation. No public LoCoMo or LongMemEval results were found.
-- Distillation needs an LLM, so benchmarks should separate write-path cost from recall latency.
+No published benchmarks. The docs describe a retrieval evaluation set and recall traces for tuning, and call the ranking weights provisional. A fair benchmark needs the distillation worker's LLM held fixed, and must bench the fork, not just upstream.
+
+## Open
+
+- Gus's brief places Falda at UChicago; the repos only mention Argonne. Rick Stevens holds posts at both, so this is probably the same thing.
+- Which repo is canonical: upstream or Rob Ross's fork?
