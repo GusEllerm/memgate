@@ -33,6 +33,10 @@ Specific systems, mapped to the families above.
 | --- | --- | --- | --- |
 | [[Falda]] (Rob Ross's fork, rbross-hpc/falda) | Tiered, episodic + semantic split | Can its retrieval filter by label, and do its derived memories record their sources? | surveyed @ 0690078: strong atom lineage, physical per-store isolation, tags unused by any filter, Core mixes a whole store |
 | [[Redis Agent Memory]] (Iris, managed; Agent Memory Server V0, open source) | Vector store RAG with working/long-term tiers | Can its search filters express label-subset checks inside the vector query? | surveyed: V0 yes (all/not_in tag pre-filters in KNN), lineage lost on merge, access not enforced; Iris a poor fit |
+| Collaborative Memory (Rezazadeh et al. 2025) | Private + shared tiers with access control | How close is its access model to ours, and what should we borrow? | researching |
+| Mem0 | Extracted facts, optional graph | Do its filters pre-filter, and does UPDATE mix scopes or drop sources? | researching |
+| Letta (MemGPT) | Tiered / OS-style | Can always-in-context memory blocks be kept per label set? | researching |
+| Zep / Graphiti | Temporal knowledge graph | How do per-item labels work when entity nodes are shared across locations? | researching |
 
 ## Policy engines
 
