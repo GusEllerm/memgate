@@ -1,0 +1,9 @@
+#!/bin/sh
+# livedocs: block the commit while a staged code change leaves a vault note unreconciled (D11/D14).
+# Versioned in .githooks/; activated per clone with `git config core.hooksPath .githooks`
+# (livedocs init does this). Skipping with --no-verify is caught by the same check in CI.
+if ! command -v livedocs >/dev/null 2>&1; then
+  echo "livedocs: not on PATH; install it (uv tool install livedocs) or commit with --no-verify." >&2
+  exit 1
+fi
+exec livedocs hook pre-commit

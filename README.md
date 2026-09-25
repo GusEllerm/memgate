@@ -4,4 +4,6 @@ Research into agentic memory systems for a host project that needs fine-grained,
 context-driven permissions over an agent's memory: the active context "unlocks"
 and "locks" parts of memory.
 
-Living research doc: https://claude.ai/code/artifact/4188921d-8717-4b1d-929e-1d7ee3f2a178
+Research notes live in the Obsidian vault at `docs/vault/` (open it with "Open folder as vault"),
+kept in sync with the code by [livedocs](https://github.com/GusEllerm/vault-drift). Start at
+`docs/vault/Home.md`; the brief is `docs/vault/Reference/Research brief.md`.

@@ -1,0 +1,8 @@
+{
+  "vault": "docs/vault",
+  "snapshot_globs": [
+    "Reference/Review *",
+    "Sessions/*",
+    "Templates/*"
+  ]
+}
