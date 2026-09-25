@@ -44,6 +44,21 @@ Environments contain conceptual locations and own their rules:
 - It is how an agent's action space and opinions grow.
 - It is also the only path by which a location's content leaves the location. That is why the environment gates the write.
 
+## Retelling and provenance (accepted)
+
+- **Retelling.** If L lets A carry an idea out, the idea may then spread: A tells D in M, and D's memory is tagged {loc:M, with:A, with:D}. By allowing the carry-out, L has accepted that its information diverges beyond L. Gus is leaning this way, not certain.
+- **Provenance.** Every memory records where its ideas came from, as a trail of source memories, and the agents and locations they passed through. Provenance is lineage, not a label, and never gates access.
+- **How provenance crosses agents.** When D's memory is derived from what A said, it cites the memories A recalled for that turn. Falda's recall traces already record which items were recalled and used ([[Falda]]).
+- **What provenance reveals.** A trail back to L shows that L was the source, though not L's content. That is the "existence visible" option from the hidden-by-default ruling, used deliberately. In strict environments nothing leaves, so no trail points out.
+
+## High-assurance locations
+
+Agents are cooperative. High-assurance locations still need assurance **by design**: an agent inside cannot recall anything from outside the location. Stopping messages from leaving is a different part of the project.
+
+Proposed (see [[Decision Log]]):
+- **A cap.** Inside a high-assurance location, the environment caps the allowed set to that location's labels. That also blocks personal memory, which is information from outside. Agents may keep location-scoped personal notes {self:A, loc:L}, readable only in L.
+- **A separate physical store** for each high-assurance location, as Falda does. Isolation then comes from the storage layout, not only a filter, and ranking statistics and caches are never shared with outside.
+
 ## Memory types (deferred)
 
 The taxonomy will largely be adopted from whichever memory system is chosen. "Selective" environments need at least one distinction, such as opinion versus fact, to gate on.
@@ -51,7 +66,8 @@ The taxonomy will largely be adopted from whichever memory system is chosen. "Se
 ## Open for discussion
 
 - [ ] **Group memory.** Should an environment be able to switch a location to "only the same group recalls it together", like a shared in-joke? The default is any participant.
-- [ ] **Retelling.** A carries an opinion out of L and tells it to D in M. D's memory is tagged {loc:M, with:A, with:D}. That is how ideas spread, and it is fine for open environments. Is it also the intended behaviour for selective ones?
-- [ ] **Forgetting over time.** Should memory also fade (decay, capacity limits)? That is another lever for selectivity.
-- [ ] **Threat model.** Is enforcement about keeping the simulation accurate (agents cooperate), or must it hold against agents trying to leak? This decides how much side-channel hardening is needed.
-- [ ] **Evolution and training.** If agents evolve by training on their experiences, a *Severance* environment must also be kept out of the training data. Memory filtering alone would not make them forget.
+- [x] Retelling: allowed when L permits the carry-out; provenance required (above).
+- [x] Forgetting over time: deferred; probably the memory system's job.
+- [x] Threat model: cooperative agents, assurance by design for high-assurance locations (above).
+- [x] Training: not planned; labels and provenance must survive export so training data can be filtered later.
+- [ ] Personal memory and physical isolation in high-assurance locations (proposed, [[Decision Log]]).

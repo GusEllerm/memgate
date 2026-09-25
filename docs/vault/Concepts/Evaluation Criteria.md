@@ -24,4 +24,8 @@ Each candidate is scored 1–5 per criterion. Memory stores and policy engines a
 | Auditability | Every access is attributable to a context |
 | Context extensibility | New context attributes can be used in rules without re-indexing or schema changes |
 | Visibility headroom | Per-item "existence visible, content locked" can be added without redesign |
+| Provenance | Every derived item links to its sources, including across agents, and merges never drop the links |
+| Label-safe compaction | Forgetting, merging and summarising never mix label sets beyond what the environment allows |
+| Export fidelity | Labels and provenance survive export, so training data can be filtered by them |
+| Physical isolation option | A location can be given its own store without changing the API |
 | Implementation cost | Works with off-the-shelf components; no stack lock-in (host stack is not fixed) |
