@@ -12,6 +12,18 @@ tags: [agentic-memory, reference, survey]
 
 *As of 2026-09-25 no candidate has been surveyed. Each gets its own `Reference/` note when it is, linked from its row. Scored with [[Evaluation Criteria]].*
 
+## Findings so far (2026-09-25)
+
+- **Filtering search by label is the easy part.** Most systems can, or can be made to, filter inside the search: Redis V0, Mem0 on Qdrant or pgvector, and any vector store using label-set IDs.
+- **Where memories get combined is the hard part.** Every system mixes labels or loses sources wherever memories are combined:
+  - Mem0's add-time lookup ignores labels.
+  - Redis V0's merge drops lineage.
+  - Graphiti's entity summaries and Letta's rewritten core files mix every source.
+  - Collaborative Memory lets an LLM strip content before sharing it.
+  - Falda alone keeps source links through its condensing step. But its scenes and Core still mix a whole store.
+- **Store-wide summaries are incompatible with selective memory** unless there is one per label set. This covers Falda's Core, Graphiti's communities, Letta's core files and Redis's session summaries.
+- **Cheapest forks:** Mem0 (300–600 lines) and Redis V0. Falda has the best lineage, but seven read paths need filters. Graph systems are the deepest work.
+
 The permission layer is surveyed separately from the memory store ([[Decision Log]], 2026-09-25). A store is judged on whether it can filter retrieval by label and track which items derived memories came from; a policy engine is judged on turning an open-ended set of context attributes into allowed labels. A store with built-in permissions gets no extra credit.
 
 ## Memory stores
@@ -35,7 +47,7 @@ Specific systems, mapped to the families above.
 | [[Redis Agent Memory]] (Iris, managed; Agent Memory Server V0, open source) | Vector store RAG with working/long-term tiers | Can its search filters express label-subset checks inside the vector query? | surveyed: V0 yes (all/not_in tag pre-filters in KNN), lineage lost on merge, access not enforced; Iris a poor fit |
 | [[Collaborative Memory]] (Rezazadeh et al. 2025) | Private + shared tiers with access control | How close is its access model to ours, and what should we borrow? | surveyed: read rule and provenance match ours; LLM declassifier on shared writes; derived items can lose labels; no code |
 | [[Mem0]] | Vector store RAG (extracted facts; entity boost) | Do its filters pre-filter, and does UPDATE mix scopes or drop sources? | surveyed @ 8127e8b: real pre-filters; now add-only; no lineage; add-time lookup ignores labels; fork of 300–600 lines |
-| Letta (MemGPT) | Tiered / OS-style | Can always-in-context memory blocks be kept per label set? | researching |
+| [[Letta]] (formerly MemGPT) | Tiered / file-based (git-backed Markdown) | Can always-in-context memory blocks be kept per label set? | surveyed @ d7fd0a6: only as a directory per label set; no labels or local vector search; rewrites mix locations; poor base |
 | [[Zep and Graphiti]] | Temporal knowledge graph | How do per-item labels work when entity nodes are shared across locations? | surveyed @ 47f6482: group_id only; graph walks check only end nodes; summaries mix all sources; deep fork |
 
 ## Policy engines

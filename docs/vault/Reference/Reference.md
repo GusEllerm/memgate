@@ -9,3 +9,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Collaborative Memory]]
 - [[Mem0]]
 - [[Zep and Graphiti]]
+- [[Letta]]
