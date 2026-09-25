@@ -41,5 +41,5 @@ Each grant carries a visibility mode, which for now is always "hidden". Later, a
 
 ## Known gaps
 
-- **Side channels:** result counts, rankings and timing under tight filters are not addressed yet.
+- **Side channels:** keyword ranking statistics (IDF) and semantic or KV caches must be computed per allowed set, or not shared across contexts. Otherwise locked content leaks through scores and timing. Hybrid search (as in Falda and Redis) is exposed to this. See [[Vector Store Label Filtering]].
 - **Growth of label-set IDs:** cost scales with the label sets actually in use. Needs measuring at the scale of the host project.

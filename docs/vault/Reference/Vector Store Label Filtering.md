@@ -48,10 +48,22 @@ tags: [agentic-memory, reference, survey, vector-store]
 | [CaMeL](https://arxiv.org/abs/2503.18813) (Debenedetti et al.) | Capability-based data-flow policies; provably secure on 77% of AgentDojo tasks |
 | [Permissive IFC](https://arxiv.org/abs/2410.03055) (Siddiqui et al.) | Labelling output with all input labels is over-conservative; labelling by the inputs that actually influenced it helps in over 85% of cases |
 
+Further sources from a peer session's research, **not yet re-verified here**:
+
+| Source | Shows (as reported) |
+| --- | --- |
+| [Collaborative Memory](https://arxiv.org/abs/2505.18279) (Rezazadeh et al. 2025) | Closest prior work: multi-user memory sharing with access control in agent memory. Read first |
+| [Büttcher & Clarke, FAST'05](https://www.usenix.org/conference/fast-05/security-model-full-text-file-system-search-multi-user-environments) | Filtering search results after ranking leaks locked content through collection-wide ranking statistics |
+| Qdrant multiple-partitions docs | Payload partitioning does not isolate sparse-vector IDF statistics |
+| [Early Bird Catches the Leak](https://arxiv.org/abs/2409.20002) (2024) | Timing on shared KV or semantic caches leaks other users' prompts |
+| [ConfAIde](https://arxiv.org/abs/2310.17884) (ICLR 2024) | GPT-4 leaks private information in context 39% of the time |
+| [f-secure LLM system](https://arxiv.org/abs/2409.19091) (2024) | Information-flow control for LLM systems |
+| [Permissioned LLMs](https://arxiv.org/abs/2505.22860) (2025) | Access control applied to the model itself |
+
 Takeaways for our design:
 - A derived item carries at least the union of its sources' labels, and is derived inside a context that unlocks all of them.
 - A locked item's embedding is as sensitive as its text.
-- No paper opened so far covers leaks through result counts or rankings under filtered search; that's an open gap.
+- Ranking statistics (e.g. keyword IDF) and caches must not be shared across contexts with different allowed sets. Otherwise locked content leaks through scores or timing even when it is filtered correctly (Büttcher & Clarke; Early Bird).
 
 ## For benchmarking later
 
