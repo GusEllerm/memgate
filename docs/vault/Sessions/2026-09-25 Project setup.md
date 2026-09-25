@@ -32,4 +32,6 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 
 **Design discussion with Gus.** The host system is a social simulation that evolves agents into diverse research entities, and labels give them selective memory. Accepted: all-of label check with any-of within participants, label-set IDs, union inheritance that the environment may relax, three label types (identity, location, participants), personal memory always readable with environment-gated writes, provenance of ideas, cooperative threat model with outbound-only high assurance, one shared store with partitions for high-assurance locations. See [[Label and Memory Types]] and [[Decision Log]].
 
-**Next.** Survey Collaborative Memory, Mem0, Letta and Zep against [[Evaluation Criteria]].
+**Survey, round two.** Surveyed [[Collaborative Memory]], [[Mem0]], [[Letta]] and [[Zep and Graphiti]], then the policy engines: [[Cedar]], [[OPA and Rego]] (with Casbin and Oso) and [[OpenFGA and SpiceDB]]. An OpenFGA load of 100k label sets ran over 20 minutes; it was capped and rerun at 10k, and the bench containers were removed.
+
+**Next.** Gus rules on the engine proposal in [[Decision Log]]; then shortlist memory stores and prototype the label rule table with a planted-secret leak test.

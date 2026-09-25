@@ -12,3 +12,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Letta]]
 - [[Cedar]]
 - [[OPA and Rego]]
+- [[OpenFGA and SpiceDB]]
