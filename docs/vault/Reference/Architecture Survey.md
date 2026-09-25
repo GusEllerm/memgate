@@ -25,6 +25,15 @@ The permission layer is surveyed separately from the memory store ([[Decision Lo
 | File / document based | Files the agent reads and writes | Can filesystem-style ACLs serve as the permission layer? | not surveyed |
 | Hybrid | Several of the above | Is one policy engine enforceable across all stores? | not surveyed |
 
+## Named systems
+
+Specific systems, mapped to the families above.
+
+| System | Family | Question to answer | Status |
+| --- | --- | --- | --- |
+| Falda (UChicago, Rick Stevens' group) | to be determined | Can its retrieval filter by label, and do its derived memories record their sources? | researching |
+| Redis agent memory system | to be determined | Can its search filters express label-subset checks inside the vector query? | researching |
+
 ## Policy engines
 
 | Engine | Model | Question to answer | Status |
