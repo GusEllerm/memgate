@@ -12,7 +12,7 @@ tags: [agentic-memory, design, evaluation]
 
 *Draft 2026-09-25, derived from [[Context-Scoped Memory Permissions]]. Scores go in [[Architecture Survey]].*
 
-Each candidate is scored 1–5 per criterion.
+Each candidate is scored 1–5 per criterion. Memory stores and policy engines are scored separately ([[Architecture Survey]]); a criterion that doesn't apply to a layer is left out of that layer's scores.
 
 | Criterion | What a 5 looks like |
 | --- | --- |
