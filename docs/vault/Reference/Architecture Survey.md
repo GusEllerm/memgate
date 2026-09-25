@@ -18,7 +18,7 @@ The permission layer is surveyed separately from the memory store ([[Decision Lo
 
 | Architecture | Where memory lives | Permission question to answer | Status |
 | --- | --- | --- | --- |
-| Vector store RAG | Embeddings + metadata | Can metadata filters enforce locks at query time without leaking via similarity? | not surveyed |
+| Vector store RAG | Embeddings + metadata | Can metadata filters enforce locks at query time without leaking via similarity? | surveyed: yes if filtered inside the search; subset check native only in pgvector and Qdrant, label-set IDs work everywhere. See [[Vector Store Label Filtering]] |
 | Knowledge graph | Nodes and edges | Can locks apply per node/edge, and do traversals respect them? | not surveyed |
 | Tiered / OS-style (core, recall, archival) | Paged in and out of context | Does paging map cleanly onto unlock and lock events? | not surveyed |
 | Episodic + semantic split | Raw episodes plus distilled facts | Do distilled facts inherit the locks of their source episodes? | not surveyed |
@@ -41,4 +41,4 @@ Specific systems, mapped to the families above.
 | Cedar | Attribute-based policies | Can policies over arbitrary context attributes return the allowed label set fast enough for every retrieval? | not surveyed |
 | OPA / Rego | General policy-as-code | Is Rego's flexibility worth its cost for per-retrieval decisions? | not surveyed |
 | OpenFGA / SpiceDB (Zanzibar-style) | Relationship-based | Can agent–environment–memory relations express label grants, or does ABAC fit better? | not surveyed |
-| Hand-rolled rule table | Labels × attribute predicates | Is a small in-process rule set enough, before adopting an engine? | not surveyed |
+| Hand-rolled rule table | Labels × attribute predicates | Is a small in-process rule set enough, before adopting an engine? | designed: [[Label Rule Table]] |
