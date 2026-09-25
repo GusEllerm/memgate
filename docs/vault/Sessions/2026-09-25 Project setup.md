@@ -34,4 +34,6 @@ Gus then accepted the survey shape (memory stores and policy engines surveyed as
 
 **Survey, round two.** Surveyed [[Collaborative Memory]], [[Mem0]], [[Letta]] and [[Zep and Graphiti]], then the policy engines: [[Cedar]], [[OPA and Rego]] (with Casbin and Oso) and [[OpenFGA and SpiceDB]]. An OpenFGA load of 100k label sets ran over 20 minutes; it was capped and rerun at 10k, and the bench containers were removed.
 
-**Next.** Gus rules on the engine proposal in [[Decision Log]]; then shortlist memory stores and prototype the label rule table with a planted-secret leak test.
+**Engine chosen.** After reviewing an interactive Cedar briefing (linked from [[Cedar]]), Gus adopted Cedar for policy. An in-process index stays as the fallback and performance baseline.
+
+**Next.** Shortlist memory stores and prototype the label rule table on Cedar, with a planted-secret leak test through merges and retelling.

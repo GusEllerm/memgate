@@ -1,6 +1,6 @@
 ---
 type: reference
-status: active
+status: adopted
 authority: reference
 summary: "Cedar (v4.13.0, Apache-2.0): our label rules fit in a few validated policies; partial evaluation leaves a residual that compiles to array operators and matched a brute-force run over 100k label sets in 0.03 s; the SMT analyzer can prove the high-assurance seal. Partial evaluation and the filter compiler are experimental or ours to write."
 created: 2026-09-25
@@ -14,7 +14,9 @@ tags: [agentic-memory, reference, survey, policy-engine, cedar]
 
 **Interactive briefing:** [Cedar, in Practice](https://claude.ai/artifact/WU8MjZGLw6mb4qcdjHMpj4) covers Cedar's history and has eight editable example policies for our label model. They run in the browser on Cedar 4.13.0 (private artifact, 2026-09-25).
 
-**Verdict so far.** A strong fit.
+**Adopted as the policy engine** (Gus, 2026-09-25; see [[Decision Log]]).
+
+**Verdict.** A strong fit.
 - **Expressiveness:** our read rule, the high-assurance seal and a *Severance* write rule fit in three short policies that pass validation.
 - **Listing readable label sets:** partial evaluation, with the context known and the item left unknown, leaves a residual condition. That residual compiles straight into array operators. Run over a table of 100k label sets, it produced the same 3,070 allowed IDs as checking each set one by one, in 0.03 s instead of 4.9 s.
 - **Proof:** Cedar's SMT analyzer can prove that no policy lets a high-assurance location's items be read outside it.

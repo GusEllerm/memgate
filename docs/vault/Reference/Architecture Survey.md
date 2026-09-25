@@ -56,7 +56,7 @@ Specific systems, mapped to the families above.
 
 | Engine | Listing readable label sets (100k) | Assurance | Fit |
 | --- | --- | --- | --- |
-| [[Cedar]] | 0.03 s via partial evaluation then a filter over the label-set table (experimental) | SMT proof of the high-assurance seal | Best |
+| [[Cedar]] | 0.03 s via partial evaluation then a filter over the label-set table (experimental) | SMT proof of the high-assurance seal | **Adopted** |
 | [[OPA and Rego]] | 0.38 ms with an offline inverted index (350 ms naive) | Bounded exhaustive tests only | Good |
 | [[OpenFGA and SpiceDB]] | Capped at about 1000 results; 10–95 ms at only 10–20k | Fixture tests only | Poor: fights a flat attribute model |
 | Casbin / Oso | No listing, or cloud-only | — | No |

@@ -24,6 +24,9 @@ tags: [agentic-memory, design, permissions, policy]
 
 ## Enforcement
 
+Policies are written in Cedar (adopted 2026-09-25; see [[Cedar]]). Partial evaluation gives the residual for step 2.
+
+
 1. Evaluate the rules against the context to get the allowed set.
 2. Map it to the IDs of the stored label sets that are subsets of it (accepted). This works on every store; see [[Vector Store Label Filtering]].
 3. Put label-set ID IN [...] inside the vector query as a pre-filter. Never filter after the search.
