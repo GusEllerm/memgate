@@ -12,6 +12,8 @@ tags: [agentic-memory, reference, survey, falda]
 
 *Surveyed 2026-09-25 from the repos below; no paper exists. Facts are as of that date. Scored against [[Evaluation Criteria]]; listed in [[Architecture Survey]].*
 
+**Implementation under evaluation: Rob Ross's fork, [rbross-hpc/falda](https://github.com/rbross-hpc/falda)** ([[Decision Log]], 2026-09-25). A deeper pass on the fork, pinned to a commit, is in progress.
+
 **Verdict so far.** Falda is the only candidate yet with source lineage built in: every distilled fact links to the turns it came from. That makes "derived memory inherits its sources' labels" cheap to add for facts. Its access model is the opposite of ours, though: coarse, physical isolation per store rather than labels filtered within a store, and its highest-level summaries are written from a whole store at once.
 
 ## What it is
@@ -64,4 +66,4 @@ No published benchmarks. The docs describe a retrieval evaluation set and recall
 ## Open
 
 - Gus's brief places Falda at UChicago; the repos only mention Argonne. Rick Stevens holds posts at both, so this is probably the same thing.
-- Which repo is canonical: upstream or Rob Ross's fork?
+- ~~Which repo is canonical: upstream or Rob Ross's fork?~~ Gus: evaluate Rob Ross's fork (2026-09-25).
