@@ -12,6 +12,8 @@ tags: [agentic-memory, reference, survey]
 
 *As of 2026-09-25 no candidate has been surveyed. Each gets its own `Reference/` note when it is, linked from its row. Scored with [[Evaluation Criteria]].*
 
+Coverage of the wider field, with popularity and triage, is in [[Memory System Landscape]].
+
 ## Findings so far (2026-09-25)
 
 - **Filtering search by label is the easy part.** Most systems can, or can be made to, filter inside the search: Redis V0, Mem0 on Qdrant or pgvector, and any vector store using label-set IDs.
