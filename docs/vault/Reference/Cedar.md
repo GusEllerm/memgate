@@ -12,6 +12,8 @@ tags: [agentic-memory, reference, survey, policy-engine, cedar]
 
 *Surveyed 2026-09-25 from [cedar-policy/cedar](https://github.com/cedar-policy/cedar) v4.13.0 (commit 324d3c0), its [changelog](https://raw.githubusercontent.com/cedar-policy/cedar/main/cedar-policy/CHANGELOG.md), the [OOPSLA 2024 paper](https://arxiv.org/abs/2403.04651), [RFC 95 on typed partial evaluation](https://github.com/cedar-policy/rfcs/blob/main/text/0095-type-aware-partial-evaluation.md), the [Cedar Analysis announcement](https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/) and the [operator docs](https://docs.cedarpolicy.com/policies/syntax-operators.html). The agent also ran experiments with cedarpy 4.12.1 on 100k synthetic label sets. Facts are as of that date. Listed in [[Architecture Survey]].*
 
+**Interactive briefing:** [Cedar, in Practice](https://claude.ai/artifact/WU8MjZGLw6mb4qcdjHMpj4) covers Cedar's history and has eight editable example policies for our label model. They run in the browser on Cedar 4.13.0 (private artifact, 2026-09-25).
+
 **Verdict so far.** A strong fit.
 - **Expressiveness:** our read rule, the high-assurance seal and a *Severance* write rule fit in three short policies that pass validation.
 - **Listing readable label sets:** partial evaluation, with the context known and the item left unknown, leaves a residual condition. That residual compiles straight into array operators. Run over a table of 100k label sets, it produced the same 3,070 allowed IDs as checking each set one by one, in 0.03 s instead of 4.9 s.
