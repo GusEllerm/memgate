@@ -57,7 +57,8 @@ class HindsightAdapter:
     def finalize(self, conversation_id: str) -> None:
         bank = self._bank(conversation_id)
         while True:
-            pending = [o for o in self._operations(bank) if o.get("status") in ("pending", "running", "queued")]
+            # Hindsight reports "pending" and "processing"; anything not finished counts as pending.
+            pending = [o for o in self._operations(bank) if o.get("status") not in ("completed", "failed", "cancelled")]
             if not pending:
                 return
             time.sleep(5)

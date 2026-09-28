@@ -20,7 +20,7 @@ Code: `benchmark/src/smbench/locomo/run.py`, with `benchmark/src/smbench/locomo/
 1. **Load.** `load` reads LoCoMo (CC BY-NC 4.0, downloaded and hash-checked by `benchmark/scripts/get_locomo.sh`, never committed).
    - `sessions` turns each conversation into dated sessions, adding image captions to turns that share an image.
    - `questions` drops category 5 (adversarial) by convention, leaving 1,540 of 1,986 questions.
-2. **Ingest.** `Runner.ingest` gives every session to the adapter's `ingest_session`, then calls `finalize`, which waits for background extraction and consolidation. Progress goes to state.json, so a run resumes where it stopped.
+2. **Ingest.** `Runner.ingest` gives every session to the adapter's `ingest_session`, then calls `finalize`, which waits for background extraction and consolidation. Progress goes to state.json, so a run resumes where it stopped. With --skip-ingest (questions only), `finalize` still runs first.
 3. **Answer and grade.** `Runner.questions` runs six questions in parallel; the gateway still caps ALCF at 6. For each question it:
    - retrieves k = 20 memories;
    - answers with the shared `ANSWER` prompt on gpt-oss-120b;
@@ -34,7 +34,18 @@ Code: `benchmark/src/smbench/locomo/run.py`, with `benchmark/src/smbench/locomo/
 
 | Adapter | Setup and decisions |
 | --- | --- |
-| `HindsightAdapter` | Talks to hindsight-api 0.10.1 started by `benchmark/scripts/serve_hindsight.sh`. LLM via the gateway; LLM trace and OTel off. Setup: one bank per conversation; one synchronous retain per session transcript with its timestamp; `finalize` polls the bank's operations until none are pending; recall with budget "mid", first k results. The client runs its own event loop, so there is one client per worker thread |
+| `HindsightAdapter` | Talks to hindsight-api 0.10.1 started by `benchmark/scripts/serve_hindsight.sh`. LLM via the gateway; LLM trace and OTel off. Setup: one bank per conversation; one synchronous retain per session transcript with its timestamp; `finalize` polls the bank's operations until every one is completed, failed or cancelled. Hindsight reports "processing"; an earlier check that looked only for pending, running or queued returned early and let questions start mid-consolidation, and was fixed 2026-09-28; recall with budget "mid", first k results. The client runs its own event loop, so there is one client per worker thread |
 | `Mem0Adapter` | mem0ai 2.2.0 in-process with local Qdrant, fastembed and telemetry off. One add per session, speaker A as user and B as assistant, names kept in the text. Two fixes, both needed for a fair run: **max_tokens raised to 8000**, because Mem0's 2000 cut gpt-oss-120b's extraction off mid-JSON and silently stored nothing; and **extraction dated to the session** via `_resolve_session_dates`, because the OSS add() anchors "yesterday" to today's wall clock (the Platform's timestamp does the same job) |
 
 Each system runs in its own virtual environment (benchmark/.venvs/, gitignored), with smbench installed into it.
+
+## Full runs and monitoring
+
+- `benchmark/scripts/run_locomo_full.sh` runs one process per conversation, N at a time, through `benchmark/scripts/run_locomo_one.sh`.
+  - Each process gets its own run ID, so nothing is shared between processes. That matters because Mem0's session-date hook isn't thread-safe.
+  - Extra flags go in SMBENCH_EXTRA_ARGS, e.g. --skip-ingest.
+- `smbench.locomo.watch` (in `benchmark/src/smbench/locomo/watch.py`) is a live terminal view: per-conversation progress, running accuracy, gateway load.
+- `benchmark/src/smbench/locomo/aggregate.py` combines per-conversation runs. It reports:
+  - Wilson intervals (`wilson`);
+  - a paired McNemar test between systems (`mcnemar`, `paired`);
+  - run-to-run variance against an earlier run of the same conversation.

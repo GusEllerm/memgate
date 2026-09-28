@@ -182,6 +182,8 @@ def main() -> None:
         print(f"{sample['sample_id']}: ingest", flush=True)
         if not args.skip_ingest:
             runner.ingest(sample)
+        else:
+            runner.adapter.finalize(sample["sample_id"])  # still wait for background processing
         print(f"{sample['sample_id']}: questions", flush=True)
         runner.questions(sample)
     s = runner.summary()
