@@ -24,3 +24,78 @@ sig = "cdc75c3c065b2b1e"
 doc = "docs/vault/Modules/ALCF Gateway.md"
 target = "benchmark/src/smbench/alcf/gateway.py#create_app"
 sig = "6d670e1c3da48285"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/scripts/get_locomo.sh"
+sig = "38e2e458c00eee1a"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/scripts/serve_hindsight.sh"
+sig = "2927b28fec460543"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/__init__.py"
+sig = "1b343404ca336c85"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/__init__.py#MemoryAdapter"
+sig = "a239b48e47673e54"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/__init__.py#load_adapter"
+sig = "30682cd84f657fd5"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/hindsight.py#HindsightAdapter"
+sig = "39ba2eea8a16b802"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/mem0.py#Mem0Adapter"
+sig = "21ef34aa5a39185a"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/mem0.py#_resolve_session_dates"
+sig = "6ed57f9aa4ebad7e"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/data.py"
+sig = "5dd20acb536966fc"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/data.py#load"
+sig = "037477d5026e9fa9"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/data.py#questions"
+sig = "0642951ba6d9d039"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/data.py#sessions"
+sig = "f2b7c21999aca43c"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/metrics.py#summarise"
+sig = "96753a38cbb7d1d6"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/prompts.py"
+sig = "12bb339f30ba97c2"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/locomo/run.py#Runner"
+sig = "c22645765c687856"

@@ -21,7 +21,7 @@ tags: [agentic-memory, design, benchmark]
 
 - **Model:** openai/gpt-oss-120b on the ALCF Sophia vLLM endpoint (OpenAI-compatible, Globus token auth via the vendored `inference-endpoints` helper, as in zollman-structures).
   - Smoke test, 2026-09-25: plain answers in ~2 s; JSON-schema extraction in ~3 s; tool calls in ~1.3 s. The model-listing route is not served at that path.
-- **Embeddings:** local, the same model for every system: nomic-embed-text-v1.5 via fastembed, as in the Cairn paper. ALCF does serve embeddings (SFR-Embedding-Mistral, embeddinggemma-300m on Sophia), but local embedding keeps those calls out of the 6-request budget.
+- **Embeddings:** local, the same model for every system: **BAAI/bge-small-en-v1.5** (changed 2026-09-28 from nomic-embed-text-v1.5). It is the default of both Hindsight (sentence-transformers) and Mem0's fastembed. nomic needs document and query prefixes that the memory systems don't add, and remote code in Hindsight. ALCF does serve embeddings (SFR-Embedding-Mistral, embeddinggemma-300m on Sophia), but local embedding keeps those calls out of the 6-request budget.
 - **ALCF gateway:** one local OpenAI-compatible proxy that every system and script points at. It:
   - caps **concurrent upstream requests at 6** globally (accepted), queueing the rest;
   - injects and refreshes the Globus token;
