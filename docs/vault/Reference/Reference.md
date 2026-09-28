@@ -18,3 +18,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Honcho]]
 - [[Cognee]]
 - [[Review LoCoMo pilot 2026-09-28]]
+- [[Review LoCoMo full 2026-09-28]]
