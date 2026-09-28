@@ -98,4 +98,4 @@ sig = "12bb339f30ba97c2"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/locomo/run.py#Runner"
-sig = "c22645765c687856"
+sig = "4b22ed06501643cb"

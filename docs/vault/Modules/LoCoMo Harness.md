@@ -24,7 +24,7 @@ Code: `benchmark/src/smbench/locomo/run.py`, with `benchmark/src/smbench/locomo/
 3. **Answer and grade.** `Runner.questions` runs six questions in parallel; the gateway still caps ALCF at 6. For each question it:
    - retrieves k = 20 memories;
    - answers with the shared `ANSWER` prompt on gpt-oss-120b;
-   - grades with the `JUDGE` prompt on nemotron-3-ultra;
+   - grades with the `JUDGE` prompt on nemotron-3-ultra through `Runner._judge`, which retries empty or unreadable replies; `Runner.rejudge` re-grades any row left without a label;
    - appends one line to answers.jsonl.
 4. **Score.** `summarise` reports judge accuracy (primary) and token `f1`, overall and per category (`CATEGORIES`: multi-hop, temporal, open-domain, single-hop). The run's settings and timings are saved in summary.json.
 

@@ -95,17 +95,39 @@ class Runner:
                                                   temperature=0, max_tokens=4000).choices[0].message.content or ""
         t_answer = time.monotonic() - t1
         t2 = time.monotonic()
-        judged = self.llm.chat.completions.create(
-            model=self.args.judge, temperature=0, max_tokens=2000,
-            messages=[{"role": "user", "content": JUDGE.format(question=q.question, gold=q.answer, answer=answer.strip())}],
-        ).choices[0].message.content
+        judged, label = self._judge(q.question, q.answer, answer)
         return {
             "conversation_id": q.conversation_id, "index": q.index, "category": q.category,
             "question": q.question, "gold": q.answer, "answer": answer.strip(),
-            "label": _json_label(judged), "judge_raw": (judged or "")[:500], "f1": round(f1(answer, q.answer), 4),
+            "label": label, "judge_raw": (judged or "")[:500], "f1": round(f1(answer, q.answer), 4),
             "retrieved": [m.render() for m in mems],
             "search_s": round(t_search, 3), "answer_s": round(t_answer, 3), "judge_s": round(time.monotonic() - t2, 3),
         }
+
+    def _judge(self, question: str, gold: str, answer: str, attempts: int = 3) -> tuple[str, str | None]:
+        """Grade with the judge model; retry when the reply is empty or has no readable label."""
+        judged = ""
+        for _ in range(attempts):
+            judged = self.llm.chat.completions.create(
+                model=self.args.judge, temperature=0, max_tokens=4000,
+                messages=[{"role": "user", "content": JUDGE.format(question=question, gold=gold, answer=answer.strip())}],
+            ).choices[0].message.content or ""
+            label = _json_label(judged)
+            if label:
+                return judged, label
+        return judged, None
+
+    def rejudge(self) -> int:
+        """Re-grade rows whose label is missing (e.g. an empty judge reply)."""
+        path = self.out / "answers.jsonl"
+        rows = [json.loads(l) for l in path.read_text().splitlines()]
+        fixed = 0
+        for r in rows:
+            if r.get("label") is None:
+                r["judge_raw"], r["label"] = (lambda j: ((j[0] or "")[:500], j[1]))(self._judge(r["question"], r["gold"], r["answer"]))
+                fixed += r["label"] is not None
+        path.write_text("".join(json.dumps(r) + "\n" for r in rows))
+        return fixed
 
     def questions(self, sample: dict) -> None:
         path = self.out / "answers.jsonl"
@@ -144,12 +166,17 @@ def main() -> None:
     p.add_argument("--max-questions", type=int, default=0, help="stop after this many questions per run (0 = all)")
     p.add_argument("--max-sessions", type=int, default=0, help="ingest only the first N sessions (smoke tests)")
     p.add_argument("--skip-ingest", action="store_true")
+    p.add_argument("--rejudge", action="store_true", help="only re-grade unlabelled answers, then re-summarise")
     p.add_argument("--gateway", default=GATEWAY)
     p.add_argument("--model", default=ANSWER_MODEL)
     p.add_argument("--judge", default=JUDGE_MODEL)
     args = p.parse_args()
 
     runner = Runner(args)
+    if args.rejudge:
+        print(f"re-graded {runner.rejudge()} answers")
+        print(json.dumps(runner.summary()["scores"], indent=1))
+        return
     samples = [s for s in data.load() if not args.conversations or s["sample_id"] in args.conversations]
     for sample in samples:
         print(f"{sample['sample_id']}: ingest", flush=True)

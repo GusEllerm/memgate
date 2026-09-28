@@ -1,0 +1,156 @@
+{
+ "date": "2026-09-28",
+ "conversation": "conv-26",
+ "questions": 152,
+ "hindsight": {
+  "run_id": "pilot-conv26-hindsight",
+  "system": {
+   "system": "hindsight",
+   "hindsight_api": "0.10.1",
+   "hindsight_client": "0.10.1",
+   "ingest": "one retain per session transcript, synchronous; default observation consolidation",
+   "search": "recall budget=mid, first k results"
+  },
+  "answer_model": "openai/gpt-oss-120b",
+  "judge_model": "nemotron-3-ultra",
+  "k": 20,
+  "scores": {
+   "overall": {
+    "n": 152,
+    "judge_accuracy": 0.7039,
+    "f1": 0.391,
+    "unjudged": 0
+   },
+   "temporal": {
+    "n": 37,
+    "judge_accuracy": 0.7838,
+    "f1": 0.566,
+    "unjudged": 0
+   },
+   "open-domain": {
+    "n": 13,
+    "judge_accuracy": 0.8462,
+    "f1": 0.2051,
+    "unjudged": 0
+   },
+   "multi-hop": {
+    "n": 32,
+    "judge_accuracy": 0.4062,
+    "f1": 0.2892,
+    "unjudged": 0
+   },
+   "single-hop": {
+    "n": 70,
+    "judge_accuracy": 0.7714,
+    "f1": 0.3796,
+    "unjudged": 0
+   }
+  },
+  "timings": {
+   "conv-26": {
+    "sessions": {
+     "1": 15.1,
+     "2": 16.54,
+     "3": 27.07,
+     "4": 22.0,
+     "5": 18.07,
+     "6": 16.08,
+     "7": 29.44,
+     "8": 25.57,
+     "9": 23.5,
+     "10": 77.74,
+     "11": 17.91,
+     "12": 20.52,
+     "13": 20.51,
+     "14": 22.18,
+     "15": 18.86,
+     "16": 28.58,
+     "17": 19.55,
+     "18": 14.14,
+     "19": 13.98
+    },
+    "finalize_s": 60.11,
+    "questions_s": 195.13
+   }
+  }
+ },
+ "mem0": {
+  "run_id": "pilot-conv26-mem0",
+  "system": {
+   "system": "mem0",
+   "mem0ai": "2.2.0",
+   "fastembed": "0.8.1",
+   "embedder": "BAAI/bge-small-en-v1.5",
+   "ingest": "one add() per session (speaker A as user, B as assistant; names kept in text); extraction's current/observation date set to the session date (as the Platform's timestamp does)",
+   "llm_max_tokens": 8000,
+   "search": "search top_k=k filtered by user_id=conversation"
+  },
+  "answer_model": "openai/gpt-oss-120b",
+  "judge_model": "nemotron-3-ultra",
+  "k": 20,
+  "scores": {
+   "overall": {
+    "n": 152,
+    "judge_accuracy": 0.6118,
+    "f1": 0.3272,
+    "unjudged": 0
+   },
+   "temporal": {
+    "n": 37,
+    "judge_accuracy": 0.7027,
+    "f1": 0.4767,
+    "unjudged": 0
+   },
+   "open-domain": {
+    "n": 13,
+    "judge_accuracy": 0.6923,
+    "f1": 0.1794,
+    "unjudged": 0
+   },
+   "multi-hop": {
+    "n": 32,
+    "judge_accuracy": 0.4375,
+    "f1": 0.3083,
+    "unjudged": 0
+   },
+   "single-hop": {
+    "n": 70,
+    "judge_accuracy": 0.6286,
+    "f1": 0.2841,
+    "unjudged": 0
+   }
+  },
+  "timings": {
+   "conv-26": {
+    "sessions": {
+     "1": 17.23,
+     "2": 20.72,
+     "3": 20.98,
+     "4": 17.66,
+     "5": 11.87,
+     "6": 27.02,
+     "7": 39.21,
+     "8": 34.55,
+     "9": 14.39,
+     "10": 19.03,
+     "11": 48.08,
+     "12": 18.6,
+     "13": 16.55,
+     "14": 31.94,
+     "15": 27.65,
+     "16": 37.4,
+     "17": 26.07,
+     "18": 25.19,
+     "19": 13.98
+    },
+    "finalize_s": 0.0,
+    "questions_s": 185.77
+   }
+  }
+ },
+ "paired": {
+  "hindsight_only_correct": 27,
+  "mem0_only_correct": 13,
+  "mcnemar_exact_p": 0.0385
+ }
+}
