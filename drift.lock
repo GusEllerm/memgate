@@ -1,1 +1,26 @@
 version = 1
+
+[[bindings]]
+doc = "docs/vault/Modules/ALCF Gateway.md"
+target = "benchmark/src/smbench/alcf/auth.py#get_access_token"
+sig = "5d95c969dc260ad9"
+
+[[bindings]]
+doc = "docs/vault/Modules/ALCF Gateway.md"
+target = "benchmark/src/smbench/alcf/gateway.py"
+sig = "44a21c505c9c1199"
+
+[[bindings]]
+doc = "docs/vault/Modules/ALCF Gateway.md"
+target = "benchmark/src/smbench/alcf/gateway.py#RequestLog"
+sig = "fffcea073ff9bb50"
+
+[[bindings]]
+doc = "docs/vault/Modules/ALCF Gateway.md"
+target = "benchmark/src/smbench/alcf/gateway.py#TokenCache"
+sig = "cdc75c3c065b2b1e"
+
+[[bindings]]
+doc = "docs/vault/Modules/ALCF Gateway.md"
+target = "benchmark/src/smbench/alcf/gateway.py#create_app"
+sig = "6d670e1c3da48285"
