@@ -3,74 +3,270 @@
   "summary": "Benchmarks for selective agent memory: memory systems compared under one fixed protocol, so the memory system is the only thing that varies.",
   "updated": "2026-09-28",
   "protocol": [
-    {"label": "Answer and memory-system model", "value": "openai/gpt-oss-120b (ALCF Sophia, vLLM)"},
-    {"label": "Judge", "value": "nemotron-3-ultra (ALCF Minerva); fallback nvidia/nemotron-3-super-120b"},
-    {"label": "Embedder", "value": "BAAI/bge-small-en-v1.5, local, the same for every system"},
-    {"label": "Retrieval depth", "value": "k = 20 memories per question, one retrieval, one answer"},
-    {"label": "Answer prompt", "value": "One shared prompt for every system (benchmark/src/smbench/locomo/prompts.py)"},
-    {"label": "Load on ALCF", "value": "At most 6 concurrent requests, enforced by the local gateway"},
-    {"label": "Accuracy", "value": "LLM-judge accuracy with 95% Wilson intervals; paired systems compared with an exact McNemar test"}
+    {
+      "label": "Answer and memory-system model",
+      "value": "openai/gpt-oss-120b (ALCF Sophia, vLLM)"
+    },
+    {
+      "label": "Judge",
+      "value": "nemotron-3-ultra (ALCF Minerva); fallback nvidia/nemotron-3-super-120b"
+    },
+    {
+      "label": "Embedder",
+      "value": "BAAI/bge-small-en-v1.5, local, the same for every system"
+    },
+    {
+      "label": "Retrieval depth",
+      "value": "k = 20 memories per question, one retrieval, one answer"
+    },
+    {
+      "label": "Answer prompt",
+      "value": "One shared prompt for every system (benchmark/src/smbench/locomo/prompts.py)"
+    },
+    {
+      "label": "Load on ALCF",
+      "value": "At most 6 concurrent requests, enforced by the local gateway"
+    },
+    {
+      "label": "Accuracy",
+      "value": "LLM-judge accuracy with 95% Wilson intervals; paired systems compared with an exact McNemar test"
+    }
   ],
   "systems": [
-    {"id": "hindsight", "name": "Hindsight", "slot": 1, "version": "hindsight-api 0.10.1", "family": "Facts → observations → mental models (Postgres/pgvector)",
-     "role": "Candidate", "status": "benchmarked", "url": "https://github.com/vectorize-io/hindsight",
-     "notes": "Best fit for selective memory: label-set IDs as tags through a validator hook, observations keep their sources. Adapter waits for consolidation before questions."},
-    {"id": "mem0", "name": "Mem0", "slot": 2, "version": "mem0ai 2.2.0 (open source)", "family": "Extracted facts, add-only (Qdrant)",
-     "role": "Candidate", "status": "benchmarked", "url": "https://github.com/mem0ai/mem0",
-     "notes": "Adapter fixes needed for a fair run: max_tokens raised to 8000 (default cut extraction off), and extraction dated to the session (OSS uses today's date)."},
-    {"id": "falda", "name": "Falda", "slot": 3, "version": "rbross-hpc/falda @ 0690078", "family": "Tiered memory (TypeScript, SQLite)",
-     "role": "Candidate", "status": "adapter planned", "url": "https://github.com/rbross-hpc/falda",
-     "notes": "Rob Ross's fork. Strongest lineage (atoms link to source turns); physical per-store isolation."},
-    {"id": "agentcore", "name": "AWS AgentCore Memory", "slot": 4, "version": "managed", "family": "Managed: namespaces + extraction strategies",
-     "role": "Hosted reference", "status": "planned", "url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory.html",
-     "notes": "Reference backend only. Self-managed extraction strategy keeps the model fixed."},
-    {"id": "redis-v0", "name": "Redis Agent Memory Server (V0)", "slot": null, "version": "v0.15.2", "family": "Vector RAG with tag pre-filters",
-     "role": "Backup", "status": "not scheduled", "url": "https://github.com/redis/agent-memory-server", "notes": ""},
-    {"id": "everos", "name": "EverOS", "slot": null, "version": "-", "family": "Memory cells → episodes and facts",
-     "role": "Backup", "status": "not scheduled", "url": "https://github.com/EverMind-AI/EverOS", "notes": ""}
+    {
+      "id": "hindsight",
+      "name": "Hindsight",
+      "slot": 1,
+      "version": "hindsight-api 0.10.1",
+      "family": "Facts → observations → mental models (Postgres/pgvector)",
+      "role": "Candidate",
+      "status": "benchmarked",
+      "url": "https://github.com/vectorize-io/hindsight",
+      "notes": "Best fit for selective memory: label-set IDs as tags through a validator hook, observations keep their sources. Adapter waits for consolidation before questions."
+    },
+    {
+      "id": "mem0",
+      "name": "Mem0",
+      "slot": 2,
+      "version": "mem0ai 2.2.0 (open source)",
+      "family": "Extracted facts, add-only (Qdrant)",
+      "role": "Candidate",
+      "status": "benchmarked",
+      "url": "https://github.com/mem0ai/mem0",
+      "notes": "Adapter fixes needed for a fair run: max_tokens raised to 8000 (default cut extraction off), and extraction dated to the session (OSS uses today's date)."
+    },
+    {
+      "id": "falda",
+      "name": "Falda",
+      "slot": 3,
+      "version": "rbross-hpc/falda @ 0690078",
+      "family": "Tiered memory (TypeScript, SQLite)",
+      "role": "Candidate",
+      "status": "adapter planned",
+      "url": "https://github.com/rbross-hpc/falda",
+      "notes": "Rob Ross's fork. Strongest lineage (atoms link to source turns); physical per-store isolation."
+    },
+    {
+      "id": "agentcore",
+      "name": "AWS AgentCore Memory",
+      "slot": 4,
+      "version": "managed",
+      "family": "Managed: namespaces + extraction strategies",
+      "role": "Hosted reference",
+      "status": "planned",
+      "url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory.html",
+      "notes": "Reference backend only. Self-managed extraction strategy keeps the model fixed."
+    },
+    {
+      "id": "redis-v0",
+      "name": "Redis Agent Memory Server (V0)",
+      "slot": null,
+      "version": "v0.15.2",
+      "family": "Vector RAG with tag pre-filters",
+      "role": "Backup",
+      "status": "not scheduled",
+      "url": "https://github.com/redis/agent-memory-server",
+      "notes": ""
+    },
+    {
+      "id": "everos",
+      "name": "EverOS",
+      "slot": null,
+      "version": "-",
+      "family": "Memory cells → episodes and facts",
+      "role": "Backup",
+      "status": "not scheduled",
+      "url": "https://github.com/EverMind-AI/EverOS",
+      "notes": ""
+    }
   ],
   "benchmarks": [
-    {"id": "locomo", "name": "LoCoMo", "kind": "Efficacy", "status": "complete",
-     "measures": "Recall over long two-person conversations: 10 conversations, 272 sessions, 1,540 questions (adversarial excluded).",
-     "dataset": "snap-research/locomo (CC BY-NC 4.0)", "url": "https://github.com/snap-research/locomo",
-     "categories": [{"id": 1, "name": "Multi-hop"}, {"id": 2, "name": "Temporal"}, {"id": 3, "name": "Open-domain"}, {"id": 4, "name": "Single-hop"}],
-     "note": "Category names follow the data (category 1 averages 3.1 evidence turns). The Mem0 and Hindsight papers call category 1 \"single-hop\" and 4 \"open-domain\"; published comparisons are aligned by number."},
-    {"id": "selective", "name": "Selective memory", "kind": "Our benchmark (for publication)", "status": "in design",
-     "measures": "Leaks of locked memory, retelling, permitted recall and side effects in generated multi-agent worlds, with Cedar as the answer key.",
-     "dataset": "Generated, to be released", "url": "", "categories": [], "note": ""},
-    {"id": "longmemeval", "name": "LongMemEval", "kind": "Efficacy", "status": "planned",
-     "measures": "Long-term chat memory across 500 questions; a subset first.", "dataset": "LongMemEval-S", "url": "https://github.com/xiaowu0162/LongMemEval", "categories": [], "note": ""},
-    {"id": "speed", "name": "Speed", "kind": "Systems", "status": "planned",
-     "measures": "Cedar evaluation, filtered vector search, AgentCore fan-out, complex-policy stress.", "dataset": "Synthetic", "url": "", "categories": [], "note": ""}
+    {
+      "id": "locomo",
+      "name": "LoCoMo",
+      "kind": "Efficacy",
+      "status": "complete",
+      "measures": "Recall over long two-person conversations: 10 conversations, 272 sessions, 1,540 questions (adversarial excluded).",
+      "dataset": "snap-research/locomo (CC BY-NC 4.0)",
+      "url": "https://github.com/snap-research/locomo",
+      "categories": [
+        {
+          "id": 1,
+          "name": "Multi-hop"
+        },
+        {
+          "id": 2,
+          "name": "Temporal"
+        },
+        {
+          "id": 3,
+          "name": "Open-domain"
+        },
+        {
+          "id": 4,
+          "name": "Single-hop"
+        }
+      ],
+      "note": "Category names follow the data (category 1 averages 3.1 evidence turns). The Mem0 and Hindsight papers call category 1 \"single-hop\" and 4 \"open-domain\"; published comparisons are aligned by number."
+    },
+    {
+      "id": "selective",
+      "name": "Selective memory",
+      "kind": "Our benchmark (for publication)",
+      "status": "in design",
+      "measures": "Leaks of locked memory, retelling, permitted recall and side effects in generated multi-agent worlds, with Cedar as the answer key.",
+      "dataset": "Generated, to be released",
+      "url": "",
+      "categories": [],
+      "note": ""
+    },
+    {
+      "id": "longmemeval",
+      "name": "LongMemEval",
+      "kind": "Efficacy",
+      "status": "planned",
+      "measures": "Long-term chat memory across 500 questions; a subset first.",
+      "dataset": "LongMemEval-S",
+      "url": "https://github.com/xiaowu0162/LongMemEval",
+      "categories": [],
+      "note": ""
+    },
+    {
+      "id": "speed",
+      "name": "Speed",
+      "kind": "Systems",
+      "status": "planned",
+      "measures": "Cedar evaluation, filtered vector search, AgentCore fan-out, complex-policy stress.",
+      "dataset": "Synthetic",
+      "url": "",
+      "categories": [],
+      "note": ""
+    }
   ],
   "runs": [
-    {"id": "locomo-full-2026-09-28", "benchmark": "locomo", "date": "2026-09-28", "kind": "Full", "headline": true,
-     "report": "reports/locomo-full-2026-09-28.json", "format": "aggregate",
-     "scope": "10 conversations, 1,540 questions",
-     "wall_time": "1 h 50 min", "requests": 9991, "failed": 0,
-     "tokens": "Memory systems 10.1M prompt + 2.6M completion (both); answers and judging ~2M per system",
-     "conclusion": "Tied: Hindsight 69.5% vs Mem0 69.4% (paired p = 0.96). Efficacy does not separate these two systems."},
-    {"id": "locomo-pilot-2026-09-28", "benchmark": "locomo", "date": "2026-09-28", "kind": "Pilot", "headline": false,
-     "report": "reports/locomo-pilot-2026-09-28.json", "format": "pilot",
-     "scope": "conv-26 only, 152 questions",
-     "wall_time": "~11 min", "requests": 741, "failed": 0, "tokens": "Memory systems 0.8M prompt + 0.2M completion (both)",
-     "conclusion": "Hindsight 70.4% vs Mem0 61.2% (p = 0.04) on one conversation; not borne out by the full run."}
+    {
+      "id": "locomo-full-2026-09-28",
+      "benchmark": "locomo",
+      "date": "2026-09-28",
+      "kind": "Full",
+      "headline": true,
+      "report": "reports/locomo-full-2026-09-28.json",
+      "format": "aggregate",
+      "scope": "10 conversations, 1,540 questions",
+      "wall_time": "1 h 50 min",
+      "requests": 9991,
+      "failed": 0,
+      "tokens": "Memory systems 10.1M prompt + 2.6M completion (both); answers and judging ~2M per system",
+      "conclusion": "Tied: Hindsight 69.5% vs Mem0 69.4% (paired p = 0.96). Efficacy does not separate these two systems."
+    },
+    {
+      "id": "locomo-pilot-2026-09-28",
+      "benchmark": "locomo",
+      "date": "2026-09-28",
+      "kind": "Pilot",
+      "headline": false,
+      "report": "reports/locomo-pilot-2026-09-28.json",
+      "format": "pilot",
+      "scope": "conv-26 only, 152 questions",
+      "wall_time": "~11 min",
+      "requests": 741,
+      "failed": 0,
+      "tokens": "Memory systems 0.8M prompt + 0.2M completion (both)",
+      "conclusion": "Hindsight 70.4% vs Mem0 61.2% (p = 0.04) on one conversation; not borne out by the full run."
+    }
   ],
   "published": [
-    {"benchmark": "locomo", "source": "Mem0 paper (2025)", "url": "https://arxiv.org/abs/2504.19413", "system": "mem0",
-     "setup": "Mem0 OSS, GPT-4o-mini answering, 10 runs", "overall": 66.9, "categories": {"1": 67.1, "2": 55.5, "3": 51.2, "4": 72.9}},
-    {"benchmark": "locomo", "source": "Hindsight paper", "url": "https://arxiv.org/abs/2512.12818", "system": "hindsight",
-     "setup": "gpt-oss-120b, answered via reflect, gpt-oss-120b judge", "overall": 85.7, "categories": {"1": 76.8, "2": 79.4, "3": 62.5, "4": 93.7}},
-    {"benchmark": "locomo", "source": "Mem0 docs (current)", "url": "https://docs.mem0.ai/core-concepts/memory-evaluation", "system": "mem0",
-     "setup": "Platform v3, top-200 retrieval (~7k tokens per query), models not stated", "overall": 92.5, "categories": {}},
-    {"benchmark": "locomo", "source": "Hindsight benchmarks site", "url": "https://benchmarks.hindsight.vectorize.io/", "system": "hindsight",
-     "setup": "Not stated", "overall": 92.0, "categories": {}}
+    {
+      "benchmark": "locomo",
+      "source": "Mem0 paper (2025)",
+      "url": "https://arxiv.org/abs/2504.19413",
+      "system": "mem0",
+      "setup": "Mem0 OSS, GPT-4o-mini answering, 10 runs",
+      "overall": 66.9,
+      "categories": {
+        "1": 67.1,
+        "2": 55.5,
+        "3": 51.2,
+        "4": 72.9
+      },
+      "kind": "paper"
+    },
+    {
+      "benchmark": "locomo",
+      "source": "Hindsight paper",
+      "url": "https://arxiv.org/abs/2512.12818",
+      "system": "hindsight",
+      "setup": "gpt-oss-120b, answered via reflect, gpt-oss-120b judge",
+      "overall": 85.7,
+      "categories": {
+        "1": 76.8,
+        "2": 79.4,
+        "3": 62.5,
+        "4": 93.7
+      },
+      "kind": "paper"
+    },
+    {
+      "benchmark": "locomo",
+      "source": "Mem0 docs (current)",
+      "url": "https://docs.mem0.ai/core-concepts/memory-evaluation",
+      "system": "mem0",
+      "setup": "Platform v3, top-200 retrieval (~7k tokens per query), models not stated",
+      "overall": 92.5,
+      "categories": {},
+      "kind": "vendor"
+    },
+    {
+      "benchmark": "locomo",
+      "source": "Hindsight benchmarks site",
+      "url": "https://benchmarks.hindsight.vectorize.io/",
+      "system": "hindsight",
+      "setup": "Not stated",
+      "overall": 92.0,
+      "categories": {},
+      "kind": "vendor"
+    }
   ],
   "findings": [
-    {"date": "2026-09-28", "text": "Hindsight and Mem0 are tied on full LoCoMo under a fixed protocol; the 9-point pilot gap was single-conversation noise."},
-    {"date": "2026-09-28", "text": "Runs of the same conversation vary by about ±5 points, so claims need all questions and ideally repeated runs."},
-    {"date": "2026-09-28", "text": "Our Mem0 result matches its paper (69.4% vs 66.9%). Our Hindsight result is 16 points below its paper on the same model; the likely causes are reflect-based answering, retrieval budget and a same-model judge."},
-    {"date": "2026-09-28", "text": "Mem0's default max_tokens silently dropped every extraction on full sessions; its open-source add() dated memories to today. Both fixed in the adapter."},
-    {"date": "2026-09-28", "text": "Hindsight adapter answered before consolidation finished on some conversations. Fixed; re-running the questions changed accuracy by 0.1 points."}
+    {
+      "date": "2026-09-28",
+      "text": "Hindsight and Mem0 are tied on full LoCoMo under a fixed protocol; the 9-point pilot gap was single-conversation noise."
+    },
+    {
+      "date": "2026-09-28",
+      "text": "Runs of the same conversation vary by about ±5 points, so claims need all questions and ideally repeated runs."
+    },
+    {
+      "date": "2026-09-28",
+      "text": "Our Mem0 result matches its paper (69.4% vs 66.9%). Our Hindsight result is 16 points below its paper on the same model; the likely causes are reflect-based answering, retrieval budget and a same-model judge."
+    },
+    {
+      "date": "2026-09-28",
+      "text": "Mem0's default max_tokens silently dropped every extraction on full sessions; its open-source add() dated memories to today. Both fixed in the adapter."
+    },
+    {
+      "date": "2026-09-28",
+      "text": "Hindsight adapter answered before consolidation finished on some conversations. Fixed; re-running the questions changed accuracy by 0.1 points."
+    }
   ]
 }

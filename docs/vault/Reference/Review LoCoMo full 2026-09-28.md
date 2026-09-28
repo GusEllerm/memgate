@@ -33,7 +33,7 @@ Per system, three conversations ran in parallel, one process each; both systems 
 | **Overall** | 1,540 | **69.5%** (67.1–71.7) | **69.4%** (67.0–71.6) |
 | Single-hop | 841 | 75.7% (72.7–78.5) | 76.3% (73.4–79.1) |
 | Temporal | 321 | 74.5% (69.4–78.9) | 77.0% (72.0–81.2) |
-| Multi-hop | 282 | 49.6% (43.9–55.5) | 45.0% (39.3–50.9) |
+| Multi-hop | 282 | 49.7% (43.9–55.5) | 45.0% (39.3–50.9) |
 | Open-domain | 96 | 56.3% (46.3–65.7) | 54.2% (44.2–63.8) |
 | Token F1 | 1,540 | 0.442 | 0.420 |
 
@@ -68,7 +68,7 @@ Per conversation, Hindsight ranges from 60.5% to 75.3% and Mem0 from 65.3% to 76
 | Source | Memory setup | Answer / judge | Overall | Multi-hop (1) | Temporal (2) | Open-domain (3) | Single-hop (4) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | **Ours, Mem0** | OSS 2.2.0, k=20 | gpt-oss-120b / Nemotron Ultra | **69.4** | 45.0 | 77.0 | 54.2 | 76.3 |
-| **Ours, Hindsight** | 0.10.1, recall, k=20 | gpt-oss-120b / Nemotron Ultra | **69.5** | 49.6 | 74.5 | 56.3 | 75.7 |
+| **Ours, Hindsight** | 0.10.1, recall, k=20 | gpt-oss-120b / Nemotron Ultra | **69.5** | 49.7 | 74.5 | 56.3 | 75.7 |
 | [Mem0 paper](https://arxiv.org/abs/2504.19413) (2025), Mem0 | OSS (then), top-k memories | GPT-4o-mini / stronger LLM, 10 runs | 66.9 | 67.1 | 55.5 | 51.2 | 72.9 |
 | [Hindsight paper](https://arxiv.org/abs/2512.12818), Hindsight | recall + **reflect** | **gpt-oss-120b** / gpt-oss-120b | 85.7 | 76.8 | 79.4 | 62.5 | 93.7 |
 | [Mem0 docs](https://docs.mem0.ai/core-concepts/memory-evaluation) (current) | **Platform** v3, top-200 (~7k tokens per query) | not stated | 92.5 | – | – | – | – |
@@ -88,7 +88,7 @@ Other points of reference, all self-reported:
   2. **Budget.** Their retrieval budget is not stated; ours is 20 memories. Mem0's current headline uses 200.
   3. **Judge.** Theirs is gpt-oss-120b judging its own answers; ours is a different model family.
 
-  The biggest gaps are on single-hop (75.7 vs 93.7) and multi-hop (49.6 vs 76.8), which fits (1) and (2).
+  The biggest gaps are on single-hop (75.7 vs 93.7) and multi-hop (49.7 vs 76.8), which fits (1) and (2).
 - **Headline numbers of 92% or more** (Mem0 Platform v3, Hindsight's site) use the vendor's own pipeline, large retrieval budgets and unstated models. They aren't comparable to a fixed-protocol run.
 - **What would attribute the gaps:** a small ablation on one or two conversations:
   - Hindsight answering via reflect;

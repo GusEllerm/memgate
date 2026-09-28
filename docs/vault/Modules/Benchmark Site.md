@@ -28,7 +28,7 @@ The built page, benchmark/site/build/smbench.html, is gitignored.
    - a memory system goes in `systems`; its `slot` (1–4) fixes its chart colour;
    - a benchmark goes in `benchmarks`, with its categories;
    - a run goes in `runs`, pointing at its report JSON; `headline: true` puts it at the top of the page;
-   - vendor or paper figures go in `published`;
+   - vendor or paper figures go in `published`, each with a `kind` of `paper` or `vendor`. They appear inline in that benchmark's results, as a hollow ○ (paper) or ◇ (vendor claim) in the system's colour on the chart, and as indented rows under the system in the table;
    - dated lessons go in `findings`;
    - fixed settings go in `protocol`.
 2. **Rebuild:** `uv run python -m smbench.site.build` (from benchmark/, in any env with smbench installed).

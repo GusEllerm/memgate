@@ -28,12 +28,12 @@ sig = "6d670e1c3da48285"
 [[bindings]]
 doc = "docs/vault/Modules/Benchmark Site.md"
 target = "benchmark/site/registry.json"
-sig = "e18cc43b5a7b2793"
+sig = "ddef8eb17427dfe3"
 
 [[bindings]]
 doc = "docs/vault/Modules/Benchmark Site.md"
 target = "benchmark/site/template.html"
-sig = "2bfe1a59064bf765"
+sig = "f537a471e127834e"
 
 [[bindings]]
 doc = "docs/vault/Modules/Benchmark Site.md"

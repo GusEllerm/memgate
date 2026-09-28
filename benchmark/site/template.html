@@ -78,6 +78,11 @@ td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
 td.n,th.n{text-align:right;white-space:nowrap}
 td .ci{color:var(--faint);font-size:.8rem;display:block}
 tr.ours td{background:var(--accent-soft)}
+tr.pubrow td{color:var(--muted);font-size:.84rem;padding-top:5px;padding-bottom:5px}
+tr.pubrow td:first-child{padding-left:28px}
+.glyph{display:inline-block;width:14px;margin-right:6px;color:var(--muted);text-align:center;font-size:1.15em;line-height:1}
+.legend-sep{width:1px;align-self:stretch;background:var(--line)}
+.shape-key{display:inline-flex;align-items:center;color:var(--muted)}
 .kv{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:8px 20px;margin:0}
 .kv dt{color:var(--muted);font-size:.9rem} .kv dd{margin:0}
 .findings{list-style:none;padding:0;margin:0;display:grid;gap:10px;max-width:820px}
@@ -165,6 +170,9 @@ const color = id => sys[id] && sys[id].slot ? `var(--s${sys[id].slot})` : "var(-
 const STATUS_ICON = { complete: "●", benchmarked: "●", "in design": "◐", "in progress": "◐", "adapter planned": "○", planned: "○", "not scheduled": "·" };
 const status = t => el("span", { class: "status" }, el("i", { text: STATUS_ICON[t] || "○", "aria-hidden": "true" }), t);
 const swatch = id => el("span", { class: "swatch", style: `background:${color(id)}` });
+const publishedFor = (benchmarkId, sid) => DATA.published.filter(p => p.benchmark === benchmarkId && p.system === sid);
+const pubValue = (p, key) => { const v = key === "overall" ? p.overall : p.categories?.[key]; return v == null ? null : v / 100; };
+const PUB_KIND = { paper: "paper", vendor: "vendor claim" };
 
 /* header */
 $("#summary").textContent = DATA.summary;
@@ -190,9 +198,12 @@ function dotChart(run, res, { overallOnly = false } = {}) {
   const rows = [{ key: "overall", name: "Overall" }, ...(overallOnly ? [] : b.categories.map(c => ({ key: String(c.id), name: c.name })))];
   const get = (sid, key) => key === "overall" ? res.systems[sid].overall : res.systems[sid].categories[key];
   let lo = 1, hi = 0;
-  for (const sid of ids) for (const r of rows) { const v = get(sid, r.key); if (v && v.ci) { lo = Math.min(lo, v.ci[0]); hi = Math.max(hi, v.ci[1]); } }
+  for (const sid of ids) for (const r of rows) {
+    const v = get(sid, r.key); if (v && v.ci) { lo = Math.min(lo, v.ci[0]); hi = Math.max(hi, v.ci[1]); }
+    for (const p of publishedFor(run.benchmark, sid)) { const pv = pubValue(p, r.key); if (pv != null) { lo = Math.min(lo, pv); hi = Math.max(hi, pv); } }
+  }
   lo = Math.max(0, Math.floor(lo * 10) / 10); hi = Math.min(1, Math.ceil(hi * 10) / 10);
-  const W = 760, L = 150, R = 70, rowH = overallOnly ? 26 + ids.length * 12 : 30 + ids.length * 14, T = 22, H = T + rows.length * rowH + 6;
+  const W = 760, L = 150, R = 80, rowH = overallOnly ? 26 + ids.length * 12 : 30 + ids.length * 14, T = 22, H = T + rows.length * rowH + 6;
   const x = v => L + (v - lo) / (hi - lo) * (W - L - R);
   const svg = s("svg", { class: "dots", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": `${b.name} accuracy by category and system, with 95% intervals` });
   for (let t = lo; t <= hi + 1e-9; t = Math.round((t + 0.1) * 10) / 10) {
@@ -214,6 +225,24 @@ function dotChart(run, res, { overallOnly = false } = {}) {
         svg.append(s("line", { x1: x(v.ci[0]), x2: x(v.ci[1]), y1: y, y2: y, stroke: c, "stroke-width": 2, "stroke-linecap": "round" }));
         for (const e of v.ci) svg.append(s("line", { x1: x(e), x2: x(e), y1: y - 4, y2: y + 4, stroke: c, "stroke-width": 2, "stroke-linecap": "round" }));
       }
+      for (const p of publishedFor(run.benchmark, sid)) {
+        const pv = pubValue(p, r.key); if (pv == null) continue;
+        const px = x(pv);
+        const mark = p.kind === "vendor"
+          ? s("path", { d: `M${px} ${y - 6.5} L${px + 6.5} ${y} L${px} ${y + 6.5} L${px - 6.5} ${y} Z`, fill: "var(--surface)", stroke: c, "stroke-width": 2 })
+          : s("circle", { cx: px, cy: y, r: 5.5, fill: "var(--surface)", stroke: c, "stroke-width": 2 });
+        svg.append(mark);
+        const phit = s("circle", { cx: px, cy: y, r: 11, fill: "transparent", tabindex: 0,
+          "aria-label": `${p.source} (${PUB_KIND[p.kind] || p.kind}), ${sys[sid]?.name || sid}, ${r.name}: ${pct(pv)}. Setup: ${p.setup}` });
+        const pshow = () => {
+          tip.textContent = `${p.source} (${PUB_KIND[p.kind] || p.kind}) · ${sys[sid]?.name || sid} · ${r.name}: ${pct(pv)} · ${p.setup}`;
+          const box = svg.getBoundingClientRect(), k = box.width / W;
+          tip.style.left = `${px * k}px`; tip.style.top = `${y * k}px`; tip.hidden = false;
+        };
+        phit.addEventListener("mouseenter", pshow); phit.addEventListener("focus", pshow);
+        phit.addEventListener("mouseleave", () => tip.hidden = true); phit.addEventListener("blur", () => tip.hidden = true);
+        svg.append(phit);
+      }
       const dot = s("circle", { cx: x(v.acc), cy: y, r: 5.5, fill: c, stroke: "var(--surface)", "stroke-width": 2 });
       svg.append(dot);
       if (r.key === "overall") svg.append(s("text", { class: "val", x: x(v.ci ? v.ci[1] : v.acc) + 8, y: y + 4, text: pct(v.acc) }));
@@ -230,6 +259,12 @@ function dotChart(run, res, { overallOnly = false } = {}) {
     });
   });
   const legend = el("div", { class: "legend" }, ...ids.map(sid => el("span", {}, swatch(sid), sys[sid]?.name || sid)));
+  const kinds = new Set(ids.flatMap(sid => publishedFor(run.benchmark, sid).map(p => p.kind)));
+  if (kinds.size) {
+    const key = (glyph, label) => el("span", { class: "shape-key" }, el("span", { class: "glyph", "aria-hidden": "true", text: glyph }), label);
+    legend.append(el("span", { class: "legend-sep", "aria-hidden": "true" }), key("●", "ours, 95% interval"),
+      ...(kinds.has("paper") ? [key("○", "published paper")] : []), ...(kinds.has("vendor") ? [key("◇", "vendor claim")] : []));
+  }
   wrap.append(svg, tip);
   return el("div", {}, legend, wrap);
 }
@@ -263,10 +298,18 @@ function renderRun() {
   const body = ids.map(sid => {
     const v = res.systems[sid];
     const cell = x => el("td", { class: "n" }, x ? pct(x.acc) : "–", x?.ci ? el("span", { class: "ci", text: `${pct(x.ci[0])}–${pct(x.ci[1])}` }) : null);
-    return el("tr", {}, el("td", {}, swatch(sid), sys[sid]?.name || sid), cell(v.overall),
+    const main = el("tr", {}, el("td", {}, swatch(sid), sys[sid]?.name || sid), cell(v.overall),
       ...b.categories.map(c => cell(v.categories[String(c.id)])), el("td", { class: "n", text: v.overall.f1?.toFixed(3) ?? "–" }));
-  });
+    const pubs = publishedFor(run.benchmark, sid).map(p => el("tr", { class: "pubrow" },
+      el("td", {}, el("span", { class: "glyph", "aria-hidden": "true", text: p.kind === "vendor" ? "◇" : "○" }), el("a", { href: p.url, text: p.source }),
+        el("span", { class: "ci", text: `${PUB_KIND[p.kind] || p.kind}: ${p.setup}` })),
+      el("td", { class: "n", text: pct(pubValue(p, "overall")) }),
+      ...b.categories.map(c => el("td", { class: "n", text: pct(pubValue(p, String(c.id))) })), el("td", { class: "n", text: "–" })));
+    return [main, ...pubs];
+  }).flat();
   box.append(el("div", { class: "tablewrap" }, el("table", {}, el("thead", {}, head), el("tbody", {}, ...body))));
+  if (ids.some(sid => publishedFor(run.benchmark, sid).length))
+    box.append(el("p", { class: "small muted", text: "Published figures use each source's own setup (model, retrieval budget, answering pipeline, judge), so they are context for our fixed-protocol numbers, not a like-for-like comparison." }));
   if (res.paired && res.paired.mcnemar_p != null) {
     const [a, c] = res.paired.systems;
     box.append(el("p", { class: "small muted", text: `Paired questions: ${res.paired.only_first_correct} answered correctly only by ${sys[a]?.name || a}, ${res.paired.only_second_correct} only by ${sys[c]?.name || c}; exact McNemar p = ${res.paired.mcnemar_p}.` }));
