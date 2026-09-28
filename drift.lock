@@ -26,6 +26,26 @@ target = "benchmark/src/smbench/alcf/gateway.py#create_app"
 sig = "6d670e1c3da48285"
 
 [[bindings]]
+doc = "docs/vault/Modules/Benchmark Site.md"
+target = "benchmark/site/registry.json"
+sig = "e18cc43b5a7b2793"
+
+[[bindings]]
+doc = "docs/vault/Modules/Benchmark Site.md"
+target = "benchmark/site/template.html"
+sig = "2bfe1a59064bf765"
+
+[[bindings]]
+doc = "docs/vault/Modules/Benchmark Site.md"
+target = "benchmark/src/smbench/site/build.py#build"
+sig = "a35d2274ba53ac1b"
+
+[[bindings]]
+doc = "docs/vault/Modules/Benchmark Site.md"
+target = "benchmark/src/smbench/site/build.py#normalise"
+sig = "cd1651d8ee453860"
+
+[[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/scripts/get_locomo.sh"
 sig = "38e2e458c00eee1a"
