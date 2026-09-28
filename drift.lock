@@ -93,7 +93,7 @@ sig = "9e88e6d354903c80"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/locomo/data.py"
-sig = "5dd20acb536966fc"
+sig = "21f08b14def58a61"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"

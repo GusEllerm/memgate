@@ -61,6 +61,40 @@ Per conversation, Hindsight ranges from 60.5% to 75.3% and Mem0 from 65.3% to 76
 
   These overlapped in time and competed for the same 6 slots, so they are not a clean speed comparison. The speed benchmark in [[Benchmark Plan]] measures that properly.
 
+## Against published results
+
+**Category labels differ across papers.** The Mem0 and Hindsight papers call category 1 "single-hop" and category 4 "open-domain". Their overall scores only add up that way. The data says the reverse: category 1 averages 3.1 evidence turns (98% need more than one), and category 4 averages 1.07. So per-category scores below are aligned by **category number**, using our semantic names.
+
+| Source | Memory setup | Answer / judge | Overall | Multi-hop (1) | Temporal (2) | Open-domain (3) | Single-hop (4) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| **Ours, Mem0** | OSS 2.2.0, k=20 | gpt-oss-120b / Nemotron Ultra | **69.4** | 45.0 | 77.0 | 54.2 | 76.3 |
+| **Ours, Hindsight** | 0.10.1, recall, k=20 | gpt-oss-120b / Nemotron Ultra | **69.5** | 49.6 | 74.5 | 56.3 | 75.7 |
+| [Mem0 paper](https://arxiv.org/abs/2504.19413) (2025), Mem0 | OSS (then), top-k memories | GPT-4o-mini / stronger LLM, 10 runs | 66.9 | 67.1 | 55.5 | 51.2 | 72.9 |
+| [Hindsight paper](https://arxiv.org/abs/2512.12818), Hindsight | recall + **reflect** | **gpt-oss-120b** / gpt-oss-120b | 85.7 | 76.8 | 79.4 | 62.5 | 93.7 |
+| [Mem0 docs](https://docs.mem0.ai/core-concepts/memory-evaluation) (current) | **Platform** v3, top-200 (~7k tokens per query) | not stated | 92.5 | – | – | – | – |
+| [Hindsight benchmarks site](https://benchmarks.hindsight.vectorize.io/) | not stated | not stated | 92 | – | – | – | – |
+
+Other points of reference, all self-reported:
+- **Memobase:** 75.78.
+- **Zep's own rerun:** 75.14 (GPT-4o).
+- **LangMem:** 58.10, and **OpenAI memory:** 52.90, both as measured in the Mem0 paper.
+
+**Independent check.** [Maximem](https://www.maximem.ai/blog/state-of-ai-memory-2026-claimed-vs-observed), which sells a competing product (disclosed), reran Mem0 on LongMemEval with GPT-5 answering and a strict binary judge. It measured 57.5%, then 73.8% after an update, against a claimed 93.4%. It attributes the gap to benchmark-specific prompting.
+
+**Reading it.**
+- **Our Mem0 matches its paper.** 69.4% against 66.9% with GPT-4o-mini: the harness is sound. Our temporal score is much higher (77.0 vs 55.5), plausibly thanks to the session-date fix and a reasoning model, and our multi-hop score lower (45.0 vs 67.1).
+- **Our Hindsight trails its paper by 16 points on the same backbone** (69.5% vs 85.7% with gpt-oss-120b). Three differences, all on the answering side, are candidates:
+  1. **Answering.** Their paper answers through **reflect**, an agentic loop that can retrieve again. We do one retrieval and one answer.
+  2. **Budget.** Their retrieval budget is not stated; ours is 20 memories. Mem0's current headline uses 200.
+  3. **Judge.** Theirs is gpt-oss-120b judging its own answers; ours is a different model family.
+
+  The biggest gaps are on single-hop (75.7 vs 93.7) and multi-hop (49.6 vs 76.8), which fits (1) and (2).
+- **Headline numbers of 92% or more** (Mem0 Platform v3, Hindsight's site) use the vendor's own pipeline, large retrieval budgets and unstated models. They aren't comparable to a fixed-protocol run.
+- **What would attribute the gaps:** a small ablation on one or two conversations:
+  - Hindsight answering via reflect;
+  - both systems at a ~7k-token retrieval budget instead of k=20;
+  - our answers re-graded with gpt-oss-120b as judge.
+
 ## What this means
 
 - **On standard long-conversation recall,** with the model held fixed, Hindsight and Mem0 are equivalent. Efficacy gives neither an advantage. Our earlier preference for Hindsight rests on how well it fits selective memory, where it needs no core changes. Mem0 needs its add-time lookup fixed, and has no lineage.

@@ -12,7 +12,10 @@ from smbench.adapters import Session, Turn
 DATA = Path("data/locomo/locomo10.json")
 SHA256 = "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4"
 
-# Category numbering as used by the Mem0 LoCoMo evaluation; 5 (adversarial) is excluded by convention.
+# Semantic labels, checked against the data: category 1 averages 3.1 evidence turns (multi-hop), 4 averages
+# 1.07 (single-hop), 3 is inference ("would X likely..."), 2 is dates. The Mem0 paper and the Hindsight paper
+# label 1 "single-hop" and 4 "open-domain"; compare published per-category scores by number, not by name.
+# Category 5 (adversarial) is excluded by convention.
 CATEGORIES = {1: "multi-hop", 2: "temporal", 3: "open-domain", 4: "single-hop", 5: "adversarial"}
 
 
