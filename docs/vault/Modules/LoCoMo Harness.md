@@ -34,7 +34,7 @@ Code: `benchmark/src/smbench/locomo/run.py`, with `benchmark/src/smbench/locomo/
 
 | Adapter | Setup and decisions |
 | --- | --- |
-| `HindsightAdapter` | Talks to hindsight-api 0.10.1 started by `benchmark/scripts/serve_hindsight.sh`. LLM via the gateway; LLM trace and OTel off. Setup: one bank per conversation; one synchronous retain per session transcript with its timestamp; `finalize` polls the bank's operations until every one is completed, failed or cancelled. Hindsight reports "processing"; an earlier check that looked only for pending, running or queued returned early and let questions start mid-consolidation, and was fixed 2026-09-28; recall with budget "mid", first k results. The client runs its own event loop, so there is one client per worker thread |
+| `HindsightAdapter` | Talks to hindsight-api 0.10.1 started by `benchmark/scripts/serve_hindsight.sh`, bound to 127.0.0.1 (since 2026-09-29). LLM via the gateway; LLM trace and OTel off. Setup: one bank per conversation; one synchronous retain per session transcript with its timestamp; `finalize` polls the bank's operations until every one is completed, failed or cancelled. Hindsight reports "processing"; an earlier check that looked only for pending, running or queued returned early and let questions start mid-consolidation, and was fixed 2026-09-28; recall with budget "mid", first k results. The client runs its own event loop, so there is one client per worker thread |
 | `Mem0Adapter` | mem0ai 2.2.0 in-process with local Qdrant, fastembed and telemetry off. One add per session, speaker A as user and B as assistant, names kept in the text. Two fixes, both needed for a fair run: **max_tokens raised to 8000**, because Mem0's 2000 cut gpt-oss-120b's extraction off mid-JSON and silently stored nothing; and **extraction dated to the session** via `_resolve_session_dates`, because the OSS add() anchors "yesterday" to today's wall clock (the Platform's timestamp does the same job) |
 
 Each system runs in its own virtual environment (benchmark/.venvs/, gitignored), with smbench installed into it.
@@ -49,3 +49,4 @@ Each system runs in its own virtual environment (benchmark/.venvs/, gitignored),
   - Wilson intervals (`wilson`);
   - a paired McNemar test between systems (`mcnemar`, `paired`);
   - run-to-run variance against an earlier run of the same conversation.
+- `benchmark/src/smbench/locomo/regrade.py` re-grades existing answers with another judge model, and optionally with `JUDGE_LENIENT`, Hindsight's paper-era LoCoMo judge prompt. It writes answers.judge-<model>[-lenient].jsonl beside each run, so it measures how much a score depends on the judge without re-answering.

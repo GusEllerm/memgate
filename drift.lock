@@ -63,7 +63,7 @@ sig = "01be6c9400914188"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/scripts/serve_hindsight.sh"
-sig = "2927b28fec460543"
+sig = "8d938a20a1d319b6"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
@@ -138,12 +138,17 @@ sig = "96753a38cbb7d1d6"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/locomo/prompts.py"
-sig = "12bb339f30ba97c2"
+sig = "a789d2eb8d950959"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/locomo/run.py#Runner"
 sig = "4b22ed06501643cb"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/site/build.py#wilson"
+sig = "89c623f3e2a6465b"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -219,3 +224,33 @@ sig = "623f110511650fcf"
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/world.py#World"
 sig = "e1b9c98f30245abd"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/scripts/serve_hindsight_gated.sh"
+sig = "820718580c860561"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
+sig = "e7cc057897ec062a"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
+sig = "f43ea7531077e0d8"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/context.py#Gate"
+sig = "9f7a9861a666d04a"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/context.py#load_world"
+sig = "0323221357c95a17"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/policy.py#Policy"
+sig = "77a3659af1d4821d"

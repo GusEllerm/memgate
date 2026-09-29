@@ -16,8 +16,10 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from smbench.locomo.prompts import JUDGE
+from smbench.locomo.prompts import JUDGE, JUDGE_LENIENT
 from smbench.locomo.run import GATEWAY, _json_label
+
+PROMPTS = {"strict": JUDGE, "lenient": JUDGE_LENIENT}
 
 RESULTS = Path("results/locomo")
 
@@ -26,12 +28,12 @@ def slug(model: str) -> str:
     return model.split("/")[-1]
 
 
-def grade(llm: OpenAI, judge: str, row: dict, attempts: int = 3) -> dict:
+def grade(llm: OpenAI, judge: str, row: dict, prompt: str = JUDGE, attempts: int = 3) -> dict:
     text = ""
     for _ in range(attempts):
         text = llm.chat.completions.create(
             model=judge, temperature=0, max_tokens=4000,
-            messages=[{"role": "user", "content": JUDGE.format(question=row["question"], gold=row["gold"], answer=row["answer"])}],
+            messages=[{"role": "user", "content": prompt.format(question=row["question"], gold=row["gold"], answer=row["answer"])}],
         ).choices[0].message.content or ""
         label = _json_label(text)
         if label:
@@ -43,6 +45,8 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("prefix")
     p.add_argument("--judge", required=True)
+    p.add_argument("--prompt", choices=sorted(PROMPTS), default="strict",
+                   help="strict = our judge prompt; lenient = Hindsight's paper-era LoCoMo judge prompt")
     p.add_argument("--workers", type=int, default=6)
     p.add_argument("--gateway", default=GATEWAY)
     args = p.parse_args()
@@ -52,12 +56,13 @@ def main() -> None:
     totals: dict[str, dict] = {}
     for d in sorted(RESULTS.glob(f"{args.prefix}-*-conv-*")):
         system = d.name[len(args.prefix) + 1:].split("-conv-")[0]
-        out = d / f"answers.judge-{slug(args.judge)}.jsonl"
+        suffix = slug(args.judge) + ("" if args.prompt == "strict" else f"-{args.prompt}")
+        out = d / f"answers.judge-{suffix}.jsonl"
         rows = [json.loads(l) for l in (d / "answers.jsonl").read_text().splitlines()]
         done = {json.loads(l)["index"] for l in out.read_text().splitlines()} if out.exists() else set()
         todo = [r for r in rows if r["index"] not in done]
         with ThreadPoolExecutor(args.workers) as pool, out.open("a") as f:
-            for new in pool.map(lambda r: grade(llm, args.judge, r), todo):
+            for new in pool.map(lambda r: grade(llm, args.judge, r, PROMPTS[args.prompt]), todo):
                 f.write(json.dumps(new) + "\n")
                 f.flush()
         regraded = {json.loads(l)["index"]: json.loads(l)["label"] for l in out.read_text().splitlines()}
@@ -71,7 +76,7 @@ def main() -> None:
             t["unjudged"] += new is None
         print(f"{d.name}: {len(todo)} regraded", flush=True)
     for system, t in totals.items():
-        print(f"{system}: n={t['n']} original judge {t['orig'] / t['n']:.1%}, {args.judge} {t['new'] / t['n']:.1%}, "
+        print(f"{system}: n={t['n']} original judge {t['orig'] / t['n']:.1%}, {args.judge} ({args.prompt}) {t['new'] / t['n']:.1%}, "
               f"agreement {t['agree'] / t['n']:.1%}, unjudged {t['unjudged']}")
 
 

@@ -12,5 +12,6 @@ export HINDSIGHT_API_EMBEDDINGS_PROVIDER=local
 export HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL=BAAI/bge-small-en-v1.5
 export HINDSIGHT_API_LLM_TRACE_ENABLED=false       # default on; not needed for benchmarks
 export HINDSIGHT_API_OTEL_TRACES_ENABLED=false
+export HINDSIGHT_API_HOST=127.0.0.1
 export HINDSIGHT_API_PORT=${HINDSIGHT_PORT:-8888}
 exec .venvs/hindsight/bin/hindsight-api
