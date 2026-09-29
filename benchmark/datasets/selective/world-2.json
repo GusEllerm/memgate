@@ -1,0 +1,586 @@
+{
+ "seed": 2,
+ "agents": [
+  "ada2",
+  "bo2",
+  "cy2",
+  "dee2",
+  "eli2",
+  "fay2"
+ ],
+ "locations": [
+  "lab2",
+  "cafe2",
+  "garden2"
+ ],
+ "facts": {
+  "f2-0": {
+   "id": "f2-0",
+   "topic": "the name chosen for the new research project",
+   "code": "RIDGE-9358"
+  },
+  "f2-1": {
+   "id": "f2-1",
+   "topic": "the password for the old archive",
+   "code": "GARNET-7793"
+  },
+  "f2-2": {
+   "id": "f2-2",
+   "topic": "the code for the storeroom",
+   "code": "PIXEL-6929"
+  },
+  "f2-3": {
+   "id": "f2-3",
+   "topic": "the room booked for the secret party",
+   "code": "NECTAR-9689"
+  },
+  "f2-4": {
+   "id": "f2-4",
+   "topic": "the locker number for the spare keys",
+   "code": "QUILL-9444"
+  },
+  "f2-5": {
+   "id": "f2-5",
+   "topic": "the name picked for the garden pond",
+   "code": "ZEPHYR-8449"
+  },
+  "f2-6": {
+   "id": "f2-6",
+   "topic": "the recipe codeword for the cake contest",
+   "code": "FROST-6747"
+  },
+  "f2-7": {
+   "id": "f2-7",
+   "topic": "the name of the prototype robot",
+   "code": "HARBOR-4634"
+  },
+  "f2-8": {
+   "id": "f2-8",
+   "topic": "the name of the rescued cat",
+   "code": "COBALT-6319"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c2-0",
+   "scenario": "S1",
+   "location": "lab2",
+   "participants": [
+    "bo2",
+    "fay2"
+   ],
+   "facts": [
+    "f2-0"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-0": "fay2"
+   },
+   "turns": [
+    {
+     "speaker": "bo2",
+     "text": "Morning, Fay. Did you get a chance to grab coffee before the experiment?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "I did, thanks. It helped me clear my head for the data analysis."
+    },
+    {
+     "speaker": "bo2",
+     "text": "Nice. I was thinking of taking a short walk after lunch to stretch my legs."
+    },
+    {
+     "speaker": "fay2",
+     "text": "The name chosen for the new research project is RIDGE-9358."
+    },
+    {
+     "speaker": "bo2",
+     "text": "That's a solid name. Have you heard any feedback from the committee yet?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "They seemed enthusiastic, especially about the environmental angle."
+    },
+    {
+     "speaker": "bo2",
+     "text": "Great. I also need to order some fresh reagents. Any preferences?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "Just the standard buffers we use for the assays, nothing special."
+    },
+    {
+     "speaker": "bo2",
+     "text": "Got it. I'll drop by the supply room after the meeting."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Sounds good. Let\u2019s catch up later and see how the samples look."
+    }
+   ]
+  },
+  {
+   "id": "c2-1",
+   "scenario": "S1",
+   "location": "garden2",
+   "participants": [
+    "bo2",
+    "dee2",
+    "eli2"
+   ],
+   "facts": [
+    "f2-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-1": "eli2"
+   },
+   "turns": [
+    {
+     "speaker": "bo2",
+     "text": "Morning, Dee! The roses are finally opening up."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Hey Bo, they look amazing. I was just pruning the lavender."
+    },
+    {
+     "speaker": "eli2",
+     "text": "The password for the old archive is GARNET-7793."
+    },
+    {
+     "speaker": "bo2",
+     "text": "Thanks, Eli. I might need that later. How's the soil feeling after the rain?"
+    },
+    {
+     "speaker": "dee2",
+     "text": "It's perfect, actually. The garden feels refreshed."
+    },
+    {
+     "speaker": "eli2",
+     "text": "I noticed a few ladybugs on the basil. They should help with the pests."
+    },
+    {
+     "speaker": "bo2",
+     "text": "Good to hear. I was thinking of setting up a small bench near the pond."
+    },
+    {
+     "speaker": "dee2",
+     "text": "That would be lovely. We could have tea out there this afternoon."
+    },
+    {
+     "speaker": "eli2",
+     "text": "Count me in. I'll bring the fresh mint from the herb patch."
+    }
+   ]
+  },
+  {
+   "id": "c2-2",
+   "scenario": "S1",
+   "location": "garden2",
+   "participants": [
+    "cy2",
+    "eli2"
+   ],
+   "facts": [
+    "f2-2"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-2": "eli2"
+   },
+   "turns": [
+    {
+     "speaker": "cy2",
+     "text": "Hey Eli, nice weather for a garden walk, isn't it?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "Definitely, the roses are in full bloom today."
+    },
+    {
+     "speaker": "cy2",
+     "text": "I was just finishing up the compost, hope the soil's ready for planting."
+    },
+    {
+     "speaker": "eli2",
+     "text": "Sounds good. By the way, the code for the storeroom is PIXEL-6929."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Got it, thanks. I'll grab the extra pots from there later."
+    },
+    {
+     "speaker": "eli2",
+     "text": "No rush, whenever you have a moment."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Did you manage to finish the new watering schedule?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "Yes, I set it up this morning, so the beds should stay moist."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Great, that should help the tomatoes grow."
+    },
+    {
+     "speaker": "eli2",
+     "text": "I'm looking forward to the harvest. Maybe we can have a little tasting later."
+    }
+   ]
+  },
+  {
+   "id": "c2-3",
+   "scenario": "S1",
+   "location": "lab2",
+   "participants": [
+    "dee2",
+    "fay2"
+   ],
+   "facts": [
+    "f2-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-3": "dee2"
+   },
+   "turns": [
+    {
+     "speaker": "dee2",
+     "text": "Morning, Fay! Did you get a chance to calibrate the spectrometer yesterday?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "Hey Dee, I did. It was a bit finicky, but I think it's stable now."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Great, that should smooth out the readings for today's samples."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Speaking of today, I grabbed a fresh pot of coffee. It smells amazing."
+    },
+    {
+     "speaker": "dee2",
+     "text": "The room booked for the secret party is NECTAR-9689."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Whoa, that's the code you mentioned last week, right? All set then?"
+    },
+    {
+     "speaker": "dee2",
+     "text": "Yep, just need to put up the signs and make sure the lights are dimmed."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Do you think we should order some snacks before the lab shuts down?"
+    },
+    {
+     "speaker": "dee2",
+     "text": "I was thinking of bringing some fruit and those mini sandwiches we like."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Sounds perfect. I'll finish up the data entry and then we can head over."
+    }
+   ]
+  },
+  {
+   "id": "c2-4",
+   "scenario": "S2",
+   "location": "garden2",
+   "participants": [
+    "cy2",
+    "dee2"
+   ],
+   "facts": [
+    "f2-4"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-4": "dee2"
+   },
+   "turns": [
+    {
+     "speaker": "cy2",
+     "text": "Morning, Dee! The roses look especially bright today."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Hey Cy, they do. I was just pruning the lavender."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Did you manage to finish the compost pile?"
+    },
+    {
+     "speaker": "dee2",
+     "text": "Almost, just need to turn it over later."
+    },
+    {
+     "speaker": "cy2",
+     "text": "By the way, I need the spare keys for the shed."
+    },
+    {
+     "speaker": "dee2",
+     "text": "The locker number for the spare keys is QUILL-9444."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Got it, thanks. I'll swing by after watering the tomatoes."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Sounds good. Let me know if you need any extra tools."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Will do. I also wanted to ask how your new tea plant is doing."
+    },
+    {
+     "speaker": "dee2",
+     "text": "It's thriving, the leaves are a lovely shade of green."
+    }
+   ]
+  },
+  {
+   "id": "c2-5",
+   "scenario": "S2",
+   "location": "garden2",
+   "participants": [
+    "dee2",
+    "fay2"
+   ],
+   "facts": [
+    "f2-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-5": "fay2"
+   },
+   "turns": [
+    {
+     "speaker": "dee2",
+     "text": "Morning, Fay! The roses are finally opening."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Good morning, Dee! I was just watering the lavender."
+    },
+    {
+     "speaker": "dee2",
+     "text": "The sun feels perfect for a walk around the vegetable beds."
+    },
+    {
+     "speaker": "fay2",
+     "text": "The name picked for the garden pond is ZEPHYR-8449."
+    },
+    {
+     "speaker": "dee2",
+     "text": "ZEPHYR-8449 has a nice ring to it. It sounds breezy."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Exactly, I thought it matched the gentle wind we get this time of year."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Did you see the bluebird that nested near the oak?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "Yes, they sang all afternoon. It lifted my mood."
+    },
+    {
+     "speaker": "dee2",
+     "text": "I plan to add some marigolds near the pond to attract more pollinators."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Great idea, it'll make the water edge even more lively."
+    }
+   ]
+  },
+  {
+   "id": "c2-6",
+   "scenario": "S2",
+   "location": "garden2",
+   "participants": [
+    "cy2",
+    "dee2",
+    "fay2"
+   ],
+   "facts": [
+    "f2-6"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-6": "fay2"
+   },
+   "turns": [
+    {
+     "speaker": "cy2",
+     "text": "Morning, it's so nice out here."
+    },
+    {
+     "speaker": "dee2",
+     "text": "I love how the roses are blooming."
+    },
+    {
+     "speaker": "fay2",
+     "text": "The recipe codeword for the cake contest is FROST-6747."
+    },
+    {
+     "speaker": "cy2",
+     "text": "Thanks, Fay! I was wondering what the secret phrase was."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Did anyone see the bluebird that was perched on the fence?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "I think it was just a quick visitor, but it brightened my morning."
+    },
+    {
+     "speaker": "cy2",
+     "text": "I spent the afternoon pruning the lavender, feels good to be productive."
+    },
+    {
+     "speaker": "dee2",
+     "text": "I was reading in the garden, the book about garden design is inspiring."
+    },
+    {
+     "speaker": "fay2",
+     "text": "We should bring some fresh herbs to the potluck later."
+    }
+   ]
+  },
+  {
+   "id": "c2-7",
+   "scenario": "S3",
+   "location": "cafe2",
+   "participants": [
+    "eli2",
+    "fay2"
+   ],
+   "facts": [
+    "f2-7",
+    "f2-8"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f2-7": "eli2",
+    "f2-8": "fay2"
+   },
+   "turns": [
+    {
+     "speaker": "eli2",
+     "text": "Hey Fay, how's your morning going?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "The name of the prototype robot is HARBOR-4634."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Wow, that's a cool name! Is it ready for testing today?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "The name of the rescued cat is COBALT-6319."
+    },
+    {
+     "speaker": "eli2",
+     "text": "She looks sleek\u2014like a little spy on a mission."
+    },
+    {
+     "speaker": "fay2",
+     "text": "I grabbed a latte, want to share a sip?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "Sure, I have a meeting later, but I can swing by the back table before it starts."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Great, after that I was thinking of getting a sandwich. Any cravings?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "A veggie wrap sounds perfect. Let's meet by the window."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Sounds like a plan. See you in a few!"
+    }
+   ]
+  },
+  {
+   "id": "c2-8",
+   "scenario": "S3",
+   "location": "cafe2",
+   "participants": [
+    "dee2",
+    "eli2",
+    "fay2"
+   ],
+   "facts": [
+    "f2-7"
+   ],
+   "retells": {
+    "f2-7": "c2-7"
+   },
+   "speaker_for": {
+    "f2-7": "fay2"
+   },
+   "turns": [
+    {
+     "speaker": "dee2",
+     "text": "Hey, this place has the best latte in town, doesn't it?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "Absolutely, I could drink one of these every day."
+    },
+    {
+     "speaker": "fay2",
+     "text": "I agree, the quiet corner here is perfect for catching up."
+    },
+    {
+     "speaker": "dee2",
+     "text": "How's your morning been so far?"
+    },
+    {
+     "speaker": "eli2",
+     "text": "Busy, but good. I finally finished the report that was due last week."
+    },
+    {
+     "speaker": "fay2",
+     "text": "Nice work! I spent most of mine in the lab, testing a new sensor."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Speaking of the lab, any news on that new robot you were mentioning?"
+    },
+    {
+     "speaker": "fay2",
+     "text": "Sure thing. The name of the prototype robot is HARBOR-4634."
+    },
+    {
+     "speaker": "eli2",
+     "text": "HARBOR-4634? That's a catchy name, I\u2019m curious to see it in action."
+    },
+    {
+     "speaker": "dee2",
+     "text": "Me too, maybe we can schedule a demo after lunch."
+    }
+   ]
+  }
+ ]
+}

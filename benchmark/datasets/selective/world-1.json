@@ -1,0 +1,580 @@
+{
+ "seed": 1,
+ "agents": [
+  "ada1",
+  "bo1",
+  "cy1",
+  "dee1",
+  "eli1",
+  "fay1"
+ ],
+ "locations": [
+  "lab1",
+  "cafe1",
+  "garden1"
+ ],
+ "facts": {
+  "f1-0": {
+   "id": "f1-0",
+   "topic": "the name of the rescued cat",
+   "code": "PIXEL-4584"
+  },
+  "f1-1": {
+   "id": "f1-1",
+   "topic": "the password for the old archive",
+   "code": "HARBOR-2638"
+  },
+  "f1-2": {
+   "id": "f1-2",
+   "topic": "the label on the sealed crate",
+   "code": "ORBIT-9205"
+  },
+  "f1-3": {
+   "id": "f1-3",
+   "topic": "the name chosen for the new research project",
+   "code": "GARNET-9181"
+  },
+  "f1-4": {
+   "id": "f1-4",
+   "topic": "the key phrase for the bike lock",
+   "code": "FROST-4977"
+  },
+  "f1-5": {
+   "id": "f1-5",
+   "topic": "the call sign for the radio test",
+   "code": "QUILL-7788"
+  },
+  "f1-6": {
+   "id": "f1-6",
+   "topic": "the locker number for the spare keys",
+   "code": "WILLOW-7014"
+  },
+  "f1-7": {
+   "id": "f1-7",
+   "topic": "the recipe codeword for the cake contest",
+   "code": "COBALT-9330"
+  },
+  "f1-8": {
+   "id": "f1-8",
+   "topic": "the nickname for the new telescope",
+   "code": "RIDGE-2768"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c1-0",
+   "scenario": "S1",
+   "location": "cafe1",
+   "participants": [
+    "bo1",
+    "cy1",
+    "fay1"
+   ],
+   "facts": [
+    "f1-0"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-0": "cy1"
+   },
+   "turns": [
+    {
+     "speaker": "bo1",
+     "text": "Hey, this place has a nice vibe today, doesn't it?"
+    },
+    {
+     "speaker": "cy1",
+     "text": "It does! By the way, the name of the rescued cat is PIXEL-4584."
+    },
+    {
+     "speaker": "fay1",
+     "text": "Aren't you excited about PIXEL-4584? That's such a cool name."
+    },
+    {
+     "speaker": "bo1",
+     "text": "I love their coffee here; the latte art always makes my morning brighter."
+    },
+    {
+     "speaker": "cy1",
+     "text": "I helped with the rescue last week, and seeing PIXEL-4584 settle in was the best part."
+    },
+    {
+     "speaker": "fay1",
+     "text": "My day was pretty hectic at the studio, but a quiet coffee break feels perfect now."
+    },
+    {
+     "speaker": "bo1",
+     "text": "Do you have any plans for the weekend?"
+    },
+    {
+     "speaker": "cy1",
+     "text": "Thinking of visiting the shelter again\u2014maybe I can adopt a friend for PIXEL-4584."
+    },
+    {
+     "speaker": "fay1",
+     "text": "That sounds wonderful; let us know how it goes. I might join you for a walk afterward."
+    }
+   ]
+  },
+  {
+   "id": "c1-1",
+   "scenario": "S1",
+   "location": "cafe1",
+   "participants": [
+    "dee1",
+    "eli1"
+   ],
+   "facts": [
+    "f1-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-1": "dee1"
+   },
+   "turns": [
+    {
+     "speaker": "dee1",
+     "text": "Hey Eli, nice to see you. How's your morning going?"
+    },
+    {
+     "speaker": "eli1",
+     "text": "Hey Dee, it's been pretty calm. I just grabbed a latte and I'm settling in."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Same here, the house blend is surprisingly smooth today."
+    },
+    {
+     "speaker": "eli1",
+     "text": "I was thinking about that project we discussed last week. Any updates?"
+    },
+    {
+     "speaker": "dee1",
+     "text": "The password for the old archive is HARBOR-2638."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Got it, thanks. That should help us pull the files we need."
+    },
+    {
+     "speaker": "dee1",
+     "text": "I have a quick call after this, but I should be free by the afternoon."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Perfect, maybe we can grab a bite later and go over the data together."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Sounds like a plan. See you soon!"
+    }
+   ]
+  },
+  {
+   "id": "c1-2",
+   "scenario": "S1",
+   "location": "garden1",
+   "participants": [
+    "ada1",
+    "cy1",
+    "fay1"
+   ],
+   "facts": [
+    "f1-2"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-2": "cy1"
+   },
+   "turns": [
+    {
+     "speaker": "ada1",
+     "text": "Morning, everyone! The garden looks especially bright today."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Good morning! I was just checking on the new shipment we got yesterday."
+    },
+    {
+     "speaker": "fay1",
+     "text": "Did you see the roses blooming? They\u2019re already spilling over the border."
+    },
+    {
+     "speaker": "ada1",
+     "text": "I noticed a sealed crate by the shed. Any idea what\u2019s inside?"
+    },
+    {
+     "speaker": "cy1",
+     "text": "The label on the sealed crate is ORBIT-9205."
+    },
+    {
+     "speaker": "fay1",
+     "text": "That sounds mysterious\u2014maybe it\u2019s more seeds for the vegetable patch."
+    },
+    {
+     "speaker": "ada1",
+     "text": "I hope it brings some new colors; I could use a splash of orange or purple."
+    },
+    {
+     "speaker": "cy1",
+     "text": "The sky is clear and the breeze is gentle, perfect for a bit of digging later."
+    },
+    {
+     "speaker": "fay1",
+     "text": "Let\u2019s finish watering the herbs and then see what the crate holds."
+    }
+   ]
+  },
+  {
+   "id": "c1-3",
+   "scenario": "S1",
+   "location": "garden1",
+   "participants": [
+    "bo1",
+    "cy1",
+    "eli1"
+   ],
+   "facts": [
+    "f1-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-3": "eli1"
+   },
+   "turns": [
+    {
+     "speaker": "bo1",
+     "text": "Morning, everyone! The sun's finally out, perfect for weeding."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Hey bo1, I just trimmed the roses. They look brighter already."
+    },
+    {
+     "speaker": "eli1",
+     "text": "I was just watering the tomatoes. They seem thirsty after the night chill."
+    },
+    {
+     "speaker": "bo1",
+     "text": "Did you both get a chance to grab coffee before coming out?"
+    },
+    {
+     "speaker": "cy1",
+     "text": "I did, a quick espresso. It gave me the boost to prune the lilies."
+    },
+    {
+     "speaker": "eli1",
+     "text": "The name chosen for the new research project is GARNET-9181."
+    },
+    {
+     "speaker": "bo1",
+     "text": "Sounds impressive! Hope it brings good results."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Speaking of projects, I\u2019m planning to start a small herb garden next week."
+    },
+    {
+     "speaker": "eli1",
+     "text": "That\u2019ll be lovely. Fresh basil and mint right here in the garden."
+    },
+    {
+     "speaker": "bo1",
+     "text": "We should all share a salad from the garden soon. It'll be a nice end to the day."
+    }
+   ]
+  },
+  {
+   "id": "c1-4",
+   "scenario": "S2",
+   "location": "cafe1",
+   "participants": [
+    "dee1",
+    "eli1"
+   ],
+   "facts": [
+    "f1-4"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-4": "eli1"
+   },
+   "turns": [
+    {
+     "speaker": "dee1",
+     "text": "Hey Eli, mind if I join you? This place smells amazing."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Sure thing, Dee. I was just nursing a latte. How's your morning going?"
+    },
+    {
+     "speaker": "dee1",
+     "text": "Pretty good, just finished a meeting that ran a bit long. I could use this caffeine."
+    },
+    {
+     "speaker": "eli1",
+     "text": "I hear you. By the way, the key phrase for the bike lock is FROST-4977."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Got it, thanks. I\u2019ll make sure to write that down before I head out."
+    },
+    {
+     "speaker": "eli1",
+     "text": "No problem. This espresso is hitting the spot, don't you think?"
+    },
+    {
+     "speaker": "dee1",
+     "text": "Absolutely, it\u2019s the perfect pick\u2011me\u2011up after that marathon of emails."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Speaking of pick\u2011me\u2011ups, any fun plans for the weekend?"
+    },
+    {
+     "speaker": "dee1",
+     "text": "I\u2019m thinking of taking a hike up the trail by the lake, weather should be nice."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Sounds wonderful. Let\u2019s catch up later and swap stories over another coffee."
+    }
+   ]
+  },
+  {
+   "id": "c1-5",
+   "scenario": "S2",
+   "location": "cafe1",
+   "participants": [
+    "ada1",
+    "dee1"
+   ],
+   "facts": [
+    "f1-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-5": "ada1"
+   },
+   "turns": [
+    {
+     "speaker": "ada1",
+     "text": "Hey Dee, nice to see you\u2014this caf\u00e9 has the perfect vibe for a rainy afternoon."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Hey Ada! Yeah, the coffee smells amazing. How's your morning been?"
+    },
+    {
+     "speaker": "ada1",
+     "text": "Busy but good. I had a quick meeting and then headed out to grab a latte."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Did you manage to finish that radio test you mentioned yesterday?"
+    },
+    {
+     "speaker": "ada1",
+     "text": "The call sign for the radio test is QUILL-7788."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Got it, thanks! That should make the logs easier to track."
+    },
+    {
+     "speaker": "ada1",
+     "text": "I hope so. After that I\u2019m planning to sketch some ideas for the new project."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Sounds creative. The soft jazz playing here always sparks inspiration."
+    },
+    {
+     "speaker": "ada1",
+     "text": "Exactly. Let\u2019s order another round of drinks and keep the conversation going."
+    }
+   ]
+  },
+  {
+   "id": "c1-6",
+   "scenario": "S2",
+   "location": "cafe1",
+   "participants": [
+    "ada1",
+    "dee1",
+    "eli1"
+   ],
+   "facts": [
+    "f1-6"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-6": "eli1"
+   },
+   "turns": [
+    {
+     "speaker": "ada1",
+     "text": "Hey Dee, how's your morning going?"
+    },
+    {
+     "speaker": "dee1",
+     "text": "Pretty good, just grabbed a coffee. You?"
+    },
+    {
+     "speaker": "ada1",
+     "text": "Busy, I had a meeting but I'm glad we could meet up."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Hey, you two, I just got the info you needed. The locker number for the spare keys is WILLOW-7014."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Thanks, Eli! That'll make things easier."
+    },
+    {
+     "speaker": "ada1",
+     "text": "Yeah, appreciate it. Did you have a chance to finish the report?"
+    },
+    {
+     "speaker": "eli1",
+     "text": "I made some good progress, should be done by this afternoon."
+    },
+    {
+     "speaker": "dee1",
+     "text": "Great! After that maybe we can take a walk in the park."
+    },
+    {
+     "speaker": "ada1",
+     "text": "Sounds perfect. The weather's been lovely."
+    },
+    {
+     "speaker": "eli1",
+     "text": "Looking forward to it. Let's grab another round of coffee before we head out."
+    }
+   ]
+  },
+  {
+   "id": "c1-7",
+   "scenario": "S3",
+   "location": "cafe1",
+   "participants": [
+    "cy1",
+    "fay1"
+   ],
+   "facts": [
+    "f1-7",
+    "f1-8"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f1-7": "cy1",
+    "f1-8": "fay1"
+   },
+   "turns": [
+    {
+     "speaker": "cy1",
+     "text": "Hey Fay, how's your morning going?"
+    },
+    {
+     "speaker": "fay1",
+     "text": "Pretty good, just grabbed a coffee. How about you?"
+    },
+    {
+     "speaker": "cy1",
+     "text": "Busy as usual, but I managed to finish the prep for the bake\u2011off. By the way, the recipe codeword for the cake contest is COBALT-9330."
+    },
+    {
+     "speaker": "fay1",
+     "text": "Nice, that sounds fancy. I was just checking the specs for the new telescope we\u2019re testing."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Oh right, what\u2019s the nickname they gave it?"
+    },
+    {
+     "speaker": "fay1",
+     "text": "The nickname for the new telescope is RIDGE-2768."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Sounds high\u2011tech! I might need to celebrate that win with a slice later."
+    },
+    {
+     "speaker": "fay1",
+     "text": "Let me know if you need a taste tester, I could use a break from the data."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Will do. Maybe we can meet after lunch and compare notes."
+    },
+    {
+     "speaker": "fay1",
+     "text": "Sounds perfect, see you then."
+    }
+   ]
+  },
+  {
+   "id": "c1-8",
+   "scenario": "S3",
+   "location": "cafe1",
+   "participants": [
+    "ada1",
+    "cy1",
+    "fay1"
+   ],
+   "facts": [
+    "f1-7"
+   ],
+   "retells": {
+    "f1-7": "c1-7"
+   },
+   "speaker_for": {
+    "f1-7": "fay1"
+   },
+   "turns": [
+    {
+     "speaker": "ada1",
+     "text": "Hey, this coffee smells amazing today. Did you get a chance to try the new blend?"
+    },
+    {
+     "speaker": "cy1",
+     "text": "I just had a sip\u2014it's smooth with a hint of caramel. Perfect for a busy morning."
+    },
+    {
+     "speaker": "fay1",
+     "text": "I agree, it's exactly what I needed after the sprint yesterday."
+    },
+    {
+     "speaker": "ada1",
+     "text": "Speaking of yesterday, my meeting ran longer than expected, but at least we nailed the deadline."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Nice work! Do you think the client will like the new feature we added?"
+    },
+    {
+     "speaker": "fay1",
+     "text": "I hope so. By the way, the recipe codeword for the cake contest is COBALT-9330."
+    },
+    {
+     "speaker": "ada1",
+     "text": "Got it, thanks for passing that along. I'll make sure the baker notes it."
+    },
+    {
+     "speaker": "cy1",
+     "text": "Sounds like the contest will be a sweet success\u2014pun intended!"
+    },
+    {
+     "speaker": "fay1",
+     "text": "I'm excited to taste everyone's creations later. Hopefully the judges appreciate the flavor."
+    },
+    {
+     "speaker": "ada1",
+     "text": "We should all grab a slice after work and compare notes."
+    }
+   ]
+  }
+ ]
+}

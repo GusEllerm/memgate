@@ -1,0 +1,579 @@
+{
+ "seed": 3,
+ "agents": [
+  "ada3",
+  "bo3",
+  "cy3",
+  "dee3",
+  "eli3",
+  "fay3"
+ ],
+ "locations": [
+  "lab3",
+  "cafe3",
+  "garden3"
+ ],
+ "facts": {
+  "f3-0": {
+   "id": "f3-0",
+   "topic": "the key phrase for the bike lock",
+   "code": "WILLOW-6988"
+  },
+  "f3-1": {
+   "id": "f3-1",
+   "topic": "the name of the rescued cat",
+   "code": "MAPLE-5226"
+  },
+  "f3-2": {
+   "id": "f3-2",
+   "topic": "the recipe codeword for the cake contest",
+   "code": "HARBOR-7322"
+  },
+  "f3-3": {
+   "id": "f3-3",
+   "topic": "the title chosen for the joint paper",
+   "code": "SAFFRON-6517"
+  },
+  "f3-4": {
+   "id": "f3-4",
+   "topic": "the codename for the field trip",
+   "code": "CEDAR-6347"
+  },
+  "f3-5": {
+   "id": "f3-5",
+   "topic": "the password for the shared drive",
+   "code": "PIXEL-4459"
+  },
+  "f3-6": {
+   "id": "f3-6",
+   "topic": "the name of the prototype robot",
+   "code": "LUMEN-5668"
+  },
+  "f3-7": {
+   "id": "f3-7",
+   "topic": "the locker number for the spare keys",
+   "code": "QUILL-6637"
+  },
+  "f3-8": {
+   "id": "f3-8",
+   "topic": "the name chosen for the new research project",
+   "code": "EMBER-2091"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c3-0",
+   "scenario": "S1",
+   "location": "cafe3",
+   "participants": [
+    "bo3",
+    "dee3",
+    "eli3"
+   ],
+   "facts": [
+    "f3-0"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-0": "bo3"
+   },
+   "turns": [
+    {
+     "speaker": "bo3",
+     "text": "Hey, how's everyone doing this morning?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Pretty good! I just finished a meeting and grabbed a latte."
+    },
+    {
+     "speaker": "eli3",
+     "text": "Nice, I was running some errands and thought I'd stop by for a quick coffee."
+    },
+    {
+     "speaker": "bo3",
+     "text": "By the way, the key phrase for the bike lock is WILLOW-6988."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Got it, thanks! Did you finally get that lock fixed?"
+    },
+    {
+     "speaker": "eli3",
+     "text": "I hope it works now; I hate when I can't find a place to park."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Yeah, I tested it this afternoon and it clicked right in."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Great to hear. I\u2019ve got a project deadline looming, so I\u2019m hoping to finish early."
+    },
+    {
+     "speaker": "eli3",
+     "text": "Same here\u2014just trying to wrap things up before the weekend."
+    }
+   ]
+  },
+  {
+   "id": "c3-1",
+   "scenario": "S1",
+   "location": "lab3",
+   "participants": [
+    "bo3",
+    "dee3"
+   ],
+   "facts": [
+    "f3-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-1": "dee3"
+   },
+   "turns": [
+    {
+     "speaker": "bo3",
+     "text": "Morning, Dee. How's the experiment going?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Hey Bo, it's going well. I just finished calibrating the sensor."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Nice. Did you get a chance to check the new lab schedule?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Yes, and I also rescued a cat from the hallway earlier."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Oh really? What's its name?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "The name of the rescued cat is MAPLE-5226."
+    },
+    {
+     "speaker": "bo3",
+     "text": "What a unique name! How's the little one settling in?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "She seems curious, already sniffing around the bench."
+    },
+    {
+     "speaker": "bo3",
+     "text": "We should make a tiny bed for her near the workstation."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Good idea, she'll have a cozy spot while we work."
+    }
+   ]
+  },
+  {
+   "id": "c3-2",
+   "scenario": "S1",
+   "location": "garden3",
+   "participants": [
+    "dee3",
+    "eli3"
+   ],
+   "facts": [
+    "f3-2"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-2": "eli3"
+   },
+   "turns": [
+    {
+     "speaker": "dee3",
+     "text": "Hey Eli, nice day for gardening, huh?"
+    },
+    {
+     "speaker": "eli3",
+     "text": "It really is. The sun's just perfect for the roses."
+    },
+    {
+     "speaker": "dee3",
+     "text": "I was just pruning the lavender. How's the lettuce looking?"
+    },
+    {
+     "speaker": "eli3",
+     "text": "The lettuce is thriving. By the way, the recipe codeword for the cake contest is HARBOR-7322."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Got it, thanks for the reminder. I hope the judges love the flavor."
+    },
+    {
+     "speaker": "eli3",
+     "text": "I\u2019m sure they will. I just need to finish watering the herbs before they wilt."
+    },
+    {
+     "speaker": "dee3",
+     "text": "I planted some cherry tomatoes yesterday; they're already sprouting tiny greens."
+    },
+    {
+     "speaker": "eli3",
+     "text": "Sounds delicious. Did you have anything special for lunch?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Just a simple veggie wrap, but it hit the spot after all the digging."
+    },
+    {
+     "speaker": "eli3",
+     "text": "Perfect. Good luck with the contest, and enjoy the garden while it lasts!"
+    }
+   ]
+  },
+  {
+   "id": "c3-3",
+   "scenario": "S1",
+   "location": "garden3",
+   "participants": [
+    "bo3",
+    "dee3",
+    "eli3"
+   ],
+   "facts": [
+    "f3-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-3": "eli3"
+   },
+   "turns": [
+    {
+     "speaker": "bo3",
+     "text": "Morning, Dee! The roses look brighter today."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Hey Bo, they\u2019re finally waking up after the rain."
+    },
+    {
+     "speaker": "eli3",
+     "text": "I just finished a cup of tea and was thinking about our project."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Did you manage to water the herb patch yet?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Yes, I gave the basil a good soak and the mint is spreading nicely."
+    },
+    {
+     "speaker": "eli3",
+     "text": "The title chosen for the joint paper is SAFFRON-6517."
+    },
+    {
+     "speaker": "bo3",
+     "text": "That\u2019s a solid title\u2014definitely catches the eye."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Do you think the reviewers will like the new angle?"
+    },
+    {
+     "speaker": "eli3",
+     "text": "I\u2019m hopeful; the data looks clean and the narrative feels fresh."
+    }
+   ]
+  },
+  {
+   "id": "c3-4",
+   "scenario": "S2",
+   "location": "garden3",
+   "participants": [
+    "ada3",
+    "cy3"
+   ],
+   "facts": [
+    "f3-4"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-4": "ada3"
+   },
+   "turns": [
+    {
+     "speaker": "ada3",
+     "text": "Morning, Cy! The garden looks fresh after the rain."
+    },
+    {
+     "speaker": "cy3",
+     "text": "Hey Ada, it does. I was just watering the tomatoes."
+    },
+    {
+     "speaker": "ada3",
+     "text": "The codename for the field trip is CEDAR-6347, so we need to finish the prep."
+    },
+    {
+     "speaker": "cy3",
+     "text": "Got it. I'll trim the rosemary while you check the checklist."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Sounds good. How's your morning been so far?"
+    },
+    {
+     "speaker": "cy3",
+     "text": "Pretty relaxed, just humming along with the birds."
+    },
+    {
+     "speaker": "ada3",
+     "text": "I grabbed a coffee and walked over here; the scent of soil is calming."
+    },
+    {
+     "speaker": "cy3",
+     "text": "I wish I had some fresh lemonade too."
+    },
+    {
+     "speaker": "ada3",
+     "text": "We can make some later, after we pack the supplies."
+    },
+    {
+     "speaker": "cy3",
+     "text": "Perfect, then we\u2019ll be ready for the trip."
+    }
+   ]
+  },
+  {
+   "id": "c3-5",
+   "scenario": "S2",
+   "location": "garden3",
+   "participants": [
+    "ada3",
+    "bo3"
+   ],
+   "facts": [
+    "f3-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-5": "bo3"
+   },
+   "turns": [
+    {
+     "speaker": "ada3",
+     "text": "The roses are finally opening, it's such a nice morning."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Yeah, I love how the garden feels after the rain."
+    },
+    {
+     "speaker": "ada3",
+     "text": "I was thinking of taking some photos for the project."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Great idea, I can help upload them later."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Do you still have access to the shared drive?"
+    },
+    {
+     "speaker": "bo3",
+     "text": "The password for the shared drive is PIXEL-4459."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Perfect, I'll log in as soon as I finish watering the basil."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Let me know if anything looks off, I can double\u2011check the files."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Will do. By the way, did you see the new butterfly near the lilies?"
+    },
+    {
+     "speaker": "bo3",
+     "text": "I did, they\u2019re beautiful. Maybe we can add a note about them in the report."
+    }
+   ]
+  },
+  {
+   "id": "c3-6",
+   "scenario": "S2",
+   "location": "garden3",
+   "participants": [
+    "ada3",
+    "bo3",
+    "cy3"
+   ],
+   "facts": [
+    "f3-6"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-6": "ada3"
+   },
+   "turns": [
+    {
+     "speaker": "ada3",
+     "text": "Morning, everyone! The garden looks fresh after the rain."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Hey Ada, it does feel crisp. I just finished watering the tomatoes."
+    },
+    {
+     "speaker": "cy3",
+     "text": "I was just pruning the roses, they\u2019re blooming nicely."
+    },
+    {
+     "speaker": "ada3",
+     "text": "The name of the prototype robot is LUMEN-5668."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Oh, that\u2019s the one you were testing last week, right?"
+    },
+    {
+     "speaker": "cy3",
+     "text": "Did it help you with the compost pile?"
+    },
+    {
+     "speaker": "ada3",
+     "text": "It did, and it also gave me a quick reminder to check the soil moisture."
+    },
+    {
+     "speaker": "bo3",
+     "text": "Sounds handy. I might borrow it for the herb beds."
+    },
+    {
+     "speaker": "cy3",
+     "text": "Let\u2019s meet later and see how it works together."
+    }
+   ]
+  },
+  {
+   "id": "c3-7",
+   "scenario": "S3",
+   "location": "lab3",
+   "participants": [
+    "ada3",
+    "dee3"
+   ],
+   "facts": [
+    "f3-7",
+    "f3-8"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f3-7": "dee3",
+    "f3-8": "ada3"
+   },
+   "turns": [
+    {
+     "speaker": "ada3",
+     "text": "Morning, Dee! Did you manage to get the coffee machine working again?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Hey Ada, yes\u2014it's finally humming. I think it likes the new filter."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Great! I was wondering if you saw where the spare keys were placed after the cleaning."
+    },
+    {
+     "speaker": "dee3",
+     "text": "The locker number for the spare keys is QUILL-6637."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Got it, thanks. By the way, the name chosen for the new research project is EMBER-2091."
+    },
+    {
+     "speaker": "dee3",
+     "text": "EMBER-2091\u2014nice and fiery. I think it\u2019ll catch a lot of interest."
+    },
+    {
+     "speaker": "ada3",
+     "text": "I agree. After lunch I\u2019ll start drafting the abstract."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Sounds good. I\u2019m planning to run a quick calibration on the spectrometer before the afternoon session."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Do you think we\u2019ll have time for the brief sync before the next experiment?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "We should be fine. Let\u2019s meet by the whiteboard in ten minutes."
+    }
+   ]
+  },
+  {
+   "id": "c3-8",
+   "scenario": "S3",
+   "location": "lab3",
+   "participants": [
+    "ada3",
+    "dee3",
+    "eli3"
+   ],
+   "facts": [
+    "f3-7"
+   ],
+   "retells": {
+    "f3-7": "c3-7"
+   },
+   "speaker_for": {
+    "f3-7": "ada3"
+   },
+   "turns": [
+    {
+     "speaker": "ada3",
+     "text": "Morning, everyone\u2014how's the lab vibe today?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Hey Ada, pretty good. I finally got the centrifuge humming without any hiccups."
+    },
+    {
+     "speaker": "eli3",
+     "text": "Nice! I was just tweaking the pH probe and it\u2019s finally stable."
+    },
+    {
+     "speaker": "ada3",
+     "text": "Great to hear. By the way, the locker number for the spare keys is QUILL-6637."
+    },
+    {
+     "speaker": "dee3",
+     "text": "Got it, thanks for the heads\u2011up. I\u2019ll grab a spare before the afternoon run."
+    },
+    {
+     "speaker": "eli3",
+     "text": "I could use a fresh cup of coffee\u2014do you think the new beans are ready yet?"
+    },
+    {
+     "speaker": "ada3",
+     "text": "They should be. I\u2019m heading to the break area in a few minutes, want to join?"
+    },
+    {
+     "speaker": "dee3",
+     "text": "Count me in. After that I need to check the data logs from yesterday\u2019s trial."
+    },
+    {
+     "speaker": "eli3",
+     "text": "Sounds like a plan. Let\u2019s reconvene after coffee and see where we stand."
+    }
+   ]
+  }
+ ]
+}

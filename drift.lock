@@ -151,6 +151,81 @@ target = "benchmark/src/smbench/site/build.py#wilson"
 sig = "89c623f3e2a6465b"
 
 [[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/locomo/metrics.py#summarise"
+sig = "96753a38cbb7d1d6"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/dialogue.py#build"
+sig = "612ab146bfaaabc3"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/dialogue.py#write_dialogue"
+sig = "2c80246871ddddc5"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/oracle.py#expected"
+sig = "8b7f5f01c8624090"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/oracle.py#probe_kind"
+sig = "4c92077e0963a94b"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/run.py#summarise"
+sig = "8f910e8a8b2220fd"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/systems.py#Memgate"
+sig = "6481f3be596c1603"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/systems.py#NoFilter"
+sig = "2e28f4a5f1dccf0e"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/systems.py#PerAgent"
+sig = "e5dfa04c0a2489f7"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/world.py#Conversation"
+sig = "aa1faae520b0f97a"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/world.py#Fact"
+sig = "54b08d314cf82ed3"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/world.py#World"
+sig = "cc7220091b84d4d0"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/world.py#plan"
+sig = "ae5d99658fca591f"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/site/build.py#build"
+sig = "a35d2274ba53ac1b"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "memgate/src/memgate/world.py#World"
+sig = "80d643aa4a33130d"
+
+[[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/derivation.py#CrossLabelSetMerge"
 sig = "ae2e2bbbdbf6f017"

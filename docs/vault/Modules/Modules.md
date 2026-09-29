@@ -7,3 +7,4 @@ One note per module or package. Name the code in backticks; livedocs checks it.
 - [[Benchmark Site]]
 - [[memgate Core]]
 - [[memgate Hindsight Adapter]]
+- [[Selective Memory Benchmark]]
