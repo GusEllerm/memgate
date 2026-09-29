@@ -121,3 +121,30 @@ def test_writes_must_carry_a_label_set_the_writer_may_write(mem):
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([ab]), agent_dee)[0] == 403        # not a participant
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([]), agent_dee)[0] == 403          # unlabelled
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item(["ls_madeup"]), agent_dee)[0] == 403  # unregistered
+
+
+def test_retelling_leaves_a_trail(tmp_path):
+    """Ada recalls an {A,B} memory in front of Cy and retells it; the memory formed from that turn
+    points back to the {A,B} memory, which Cy can see exists but cannot read."""
+    from memgate.adapters.hindsight.client import HindsightMemory
+    from memgate.provenance import ProvenanceLog
+
+    gate = Gate.from_env()
+    log = ProvenanceLog(tmp_path, gate.world)
+    m = HindsightMemory(gate, bank=f"it-prov-{uuid.uuid4().hex[:8]}", base_url=URL, provenance=log)
+    m.create_bank()
+    w_ab = m.remember("ada", "lab", ["ada", "bo"], "Ada and Bo agreed the lab safe combination is CANARY-AB-7731.")
+    while m.pending_operations():
+        time.sleep(3)
+
+    recalled = m.recall("ada", "lab", "safe combination")
+    assert any(r.write_id == w_ab for r in recalled)          # Hindsight's document_id carries the write ID
+    turn = m.say("ada", "lab", ["ada", "bo", "cy"], "Bo and I set the safe combination last week.", [recalled.recall_id])
+    w_abc = m.remember("ada", "lab", ["ada", "bo", "cy"], "Ada told Bo and Cy the safe combination was set last week.", turns=[turn])
+
+    assert log.sources_of(w_abc, ["shared"]) == [w_ab]
+    cy = log.trail(w_abc, "cy", "lab", gate.policy)
+    assert cy.visibility == "full" and [s.visibility for s in cy.sources] == ["existence"]
+    assert cy.sources[0].text is None
+    ada = log.trail(w_abc, "ada", "lab", gate.policy)
+    assert "7731" in ada.sources[0].text

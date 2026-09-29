@@ -99,7 +99,7 @@ The benchmark imports memgate; memgate never imports the benchmark.
 2. Allowed-ID resolver, with a Cedar proof of the high-assurance seal.
 3. Write labeller and derivation guard.
 4. Hindsight adapter: validator extension, tags, scopes, tenant schema.
-5. Provenance log and audit.
+5. Provenance log and audit (built 2026-09-29, see [[memgate Core]]).
 6. S1–S3 conformance suite against Hindsight, with a no-filter baseline to show the tests catch leaks.
 
 ## Open questions

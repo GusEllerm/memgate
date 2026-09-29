@@ -207,6 +207,16 @@ sig = "77a3659af1d4821d"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/provenance.py#ProvenanceLog"
+sig = "ecb5864b05292117"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/provenance.py#TrailNode"
+sig = "65805f5240e82863"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/registry.py#Registry"
 sig = "ef7f2799fcce8a95"
 
@@ -233,7 +243,17 @@ sig = "820718580c860561"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "e7cc057897ec062a"
+sig = "9a23fb35b6d988ca"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#RecallBatch"
+sig = "bd1d5abb6f6c77c2"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#Recalled"
+sig = "bf88f3ee6542be87"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -254,3 +274,13 @@ sig = "0323221357c95a17"
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/policy.py#Policy"
 sig = "77a3659af1d4821d"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/provenance.py#ProvenanceLog"
+sig = "ecb5864b05292117"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/provenance.py#TrailNode"
+sig = "65805f5240e82863"

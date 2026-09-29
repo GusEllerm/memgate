@@ -39,7 +39,13 @@ tags: [module, memgate, permissions]
   - `derived_labels` combines identity and location labels and intersects participants.
   - `check_merge` raises `CrossLabelSetMerge` if a merge would cross label sets.
 
-## Tests (19)
+- **Provenance and audit** (`memgate/src/memgate/provenance.py`):
+  - **What it records:** `ProvenanceLog` records recalls (`record_recall`: who, where, the query, the allowed label sets, what came back), turns (`record_turn`: what an agent said and which recalls it drew on) and writes (`record_write`: the memory, its label set, and the turns or memories it came from), plus `audit` events.
+  - **Tracing:** `sources_of` follows a write back through its turns' recalls, which is how a retold idea traces across agents.
+  - **Partitioned like memory:** each high-assurance location keeps its own log (`partition`). A recall made inside the vault never reaches the shared log, not even the fact that it happened.
+  - **Trails:** `trail` shows a memory's trail to an asker under the recall rules. A readable source is shown in full. An unreadable one shows only that it exists and where it came from, and nothing of what it was built from. An unreadable high-assurance source is left out entirely. `TrailNode` is one entry.
+
+## Tests (19 + 4 provenance)
 
 `memgate/tests/`:
 - **Recall:**
@@ -56,4 +62,4 @@ tags: [module, memgate, permissions]
 
 - **The allowed-ID resolver checks every label set.** Compiling Cedar's residual into a registry query waits until the label-set count needs it.
 - **The SMT proof of the seal** needs the Cedar CLI with its analysis feature, plus cvc5; neither is installed yet.
-- **Provenance log, audit, and the Hindsight adapter** are next.
+- **Provenance and audit are built** (2026-09-29) and wired into [[memgate Hindsight Adapter]].

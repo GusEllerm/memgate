@@ -28,6 +28,12 @@ Code: `memgate/src/memgate/adapters/hindsight/client.py`.
 
 Every request carries the gate secret plus the agent and location headers, from `memgate/src/memgate/context.py` (`Gate`, `load_world`).
 
+**Provenance** (optional, when given a `ProvenanceLog`):
+- **Writes:** every write gets a write ID, stored as Hindsight's document_id, so every fact Hindsight extracts from it traces back to it. The write and its sources are logged.
+- **Recalls:** `HindsightMemory.recall` returns a `RecallBatch`. Each `Recalled` item carries its `write_id`, and the batch carries the `recall_id` of the logged recall.
+- **Turns:** `HindsightMemory.say` records what an agent said and which recalls it drew on. `HindsightMemory.remember(turns=...)` links a new memory to those turns.
+- **Audit:** carry-outs, allowed or refused, are audited.
+
 ## Validator: the second lock, inside Hindsight
 
 Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` is loaded by Hindsight from HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION.
@@ -63,7 +69,12 @@ Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` 
   - reflect, list and export: 403;
   - writing to a label set you're not in, unlabelled, or with an unregistered tag: 403.
 
-First run, 2026-09-29: **6 passed** in 63 s.
+- **Retelling leaves a trail** (`test_retelling_leaves_a_trail`):
+  - Ada recalls the {A,B} memory in front of Cy and retells it.
+  - The {A,B,C} memory formed from that turn points back to it.
+  - Ada can read that source; Cy sees only that it exists.
+
+2026-09-29: **7 passed** (80 s).
 
 ## Known limits
 
