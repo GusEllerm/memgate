@@ -208,7 +208,7 @@ sig = "77a3659af1d4821d"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/provenance.py#ProvenanceLog"
-sig = "ecb5864b05292117"
+sig = "51d86bcc42ccff20"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -278,7 +278,7 @@ sig = "77a3659af1d4821d"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/provenance.py#ProvenanceLog"
-sig = "ecb5864b05292117"
+sig = "51d86bcc42ccff20"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"

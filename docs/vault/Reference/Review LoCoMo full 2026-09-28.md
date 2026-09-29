@@ -97,7 +97,15 @@ Other points of reference, all self-reported:
   - year-only facts render as [YYYY-01-01];
   - observations and the facts they came from both appear in the 20 slots, about 12% near-duplicates. Fix with types=["world","experience"] or prefer_observations.
 
-  Re-grades running on 2026-09-29 measure the judge's share.
+  **Re-grades, 2026-09-29:** all 3,080 existing answers were re-graded with gpt-oss-120b as judge. No re-answering.
+
+  | Judge model / prompt | Hindsight | Mem0 | Agreement with original |
+  | --- | --- | --- | --- |
+  | nemotron-3-ultra / ours (original) | 69.5% | 69.4% | – |
+  | gpt-oss-120b / ours | 69.8% | 69.4% | ~95% |
+  | gpt-oss-120b / **Hindsight's lenient prompt** | **76.9%** | **76.4%** | ~91% |
+
+  **The judge model doesn't matter; the judge prompt is worth about 7 points,** equally for both systems. The rest of the gap (~9 points to 85.7%) is the paper's larger retrieval budget (facts plus raw transcript) and its answer prompt. Under every judge, Hindsight and Mem0 stay tied.
 - **Headline numbers of 92% or more** (Mem0 Platform v3, Hindsight's site) use the vendor's own pipeline, large retrieval budgets and unstated models. They aren't comparable to a fixed-protocol run.
 - **What would attribute the gaps:** a small ablation on one or two conversations:
   - Hindsight answering via reflect;

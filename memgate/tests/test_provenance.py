@@ -52,10 +52,10 @@ def test_high_assurance_recalls_and_writes_stay_in_their_partition(log, registry
     shared_path = tmp_path / "provenance-shared.sqlite"
     if shared_path.exists():                     # created only if something was written outside the vault
         shared = sqlite3.connect(shared_path)
-        for table in ("recalls", "writes", "audit"):
+        for table in ("activity", "entity", "used", "audit"):
             assert shared.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] == 0
     ha = sqlite3.connect(tmp_path / "provenance-ha-vault.sqlite")
-    assert ha.execute("SELECT COUNT(*) FROM recalls").fetchone()[0] == 1
+    assert ha.execute("SELECT COUNT(*) FROM activity WHERE kind = 'recall'").fetchone()[0] == 1
 
 
 def test_high_assurance_sources_are_sealed_outside(log, registry, policy):
@@ -76,3 +76,54 @@ def test_derived_from_links_directly(log, registry, policy):
           kind="observation", derived_from=["w_a", "w_b"])
     t = log.trail("w_obs", "bo", "lab", policy)
     assert {s.write_id for s in t.sources} == {"w_a", "w_b"}
+
+
+def _retelling(log, registry):
+    ab = write(log, registry, "w_ab", "ada", "lab", conversation_labels("lab", ["ada", "bo"]), "safe code 7731")
+    rid = log.record_recall("ada", "lab", "safe code", {ab}, [("w_ab", ab)])
+    tid = log.record_turn("ada", "lab", ["ada", "bo", "cy"], "Bo and I set the safe code.", [rid])
+    abc = write(log, registry, "w_abc", "ada", "lab", conversation_labels("lab", ["ada", "bo", "cy"]), "retold", turns=[tid])
+    rid2 = log.record_recall("cy", "lab", "safe code", {abc}, [("w_abc", abc)])
+    mine = write(log, registry, "w_cy", "cy", "lab", personal_labels("cy"), "Cy's take on it", kind="carry_out",
+                 derived_from=["w_abc"])
+    return ab, abc, mine
+
+
+def test_impact_finds_everything_built_downstream(log, registry):
+    _retelling(log, registry)
+    assert log.descendants("w_ab") == [("w_abc", 1), ("w_cy", 2)]
+
+
+def test_exposure_counts_what_each_agent_was_shown(log, registry):
+    ab, abc, _ = _retelling(log, registry)
+    assert log.exposure("ada") == {ab: 1}
+    assert log.exposure("cy") == {abc: 1}
+    assert log.exposure("dee") == {}
+
+
+def test_flows_show_where_a_label_set_went(log, registry):
+    ab, abc, mine = _retelling(log, registry)
+    f = log.flows(ab)
+    assert f["recalled_by"] == [("ada", "lab", 1)]
+    assert [(r[0], r[1], r[4]) for r in f["derived_elsewhere"]] == [("w_abc", abc, 1), ("w_cy", mine, 2)]
+
+
+def test_trail_inside_high_assurance_spans_personal_memory_from_outside(log, registry, policy):
+    mine = write(log, registry, "w_mine", "ada", "cafe", personal_labels("ada"), "Ada's view of the reactor")
+    rid = log.record_recall("ada", "vault", "reactor", {mine}, [("w_mine", mine)])
+    tid = log.record_turn("ada", "vault", ["ada", "bo"], "I've always thought it runs hot.", [rid])
+    write(log, registry, "w_vault", "ada", "vault", conversation_labels("vault", ["ada", "bo"]), "reactor runs hot", turns=[tid])
+    inside = log.trail("w_vault", "ada", "vault", policy)
+    assert [s.write_id for s in inside.sources] == ["w_mine"]      # the vault's log links to shared memory
+    assert log.descendants("w_mine") == []                          # but the shared log never learns what the vault built
+
+
+def test_prov_json_export(log, registry):
+    _retelling(log, registry)
+    doc = log.export_prov()
+    assert "mg:w_ab" in doc["entity"] and "prov:value" not in doc["entity"]["mg:w_ab"]
+    assert {r["prov:entity"] for r in doc["used"].values()} == {"mg:w_ab", "mg:w_abc"}
+    assert any(r == {"prov:informed": r["prov:informed"], "prov:informant": r["prov:informant"]} for r in doc["wasInformedBy"].values())
+    assert {"prov:generatedEntity": "mg:w_cy", "prov:usedEntity": "mg:w_abc"} in doc["wasDerivedFrom"].values()
+    assert "mg:agent-cy" in doc["agent"]
+    assert "prov:value" in log.export_prov(include_text=True)["entity"]["mg:w_ab"]
