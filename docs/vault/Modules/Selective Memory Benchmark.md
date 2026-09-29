@@ -37,4 +37,4 @@ tags: [module, benchmark, selective-memory]
 ## Limits of this version
 
 - **Retrieval-level only.** Paraphrased leaks, where the content surfaces without the code, aren't caught. An answer-level check with a judge comes later.
-- **Small scale:** 3 worlds × 162 probes. Suites S4–S7 (environments, high assurance, hierarchy, scale) are still to come.
+- **Scale:** small worlds give 3 × 162 probes, large worlds about 3,060 each. Suites S4–S7 (environments, high assurance, hierarchy, scale) are still to come.
