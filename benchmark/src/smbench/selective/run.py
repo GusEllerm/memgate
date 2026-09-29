@@ -39,7 +39,8 @@ def make_system(name: str, run: str, args):
 def probe(system, world, agent, loc, fid, k) -> dict:
     f = world.facts[fid]
     texts = system.recall(world, agent, loc, f"What is {f.topic}?", k)
-    scenario = next(c.scenario for c in world.conversations if fid in c.facts)
+    # Notes (S5) belong to no conversation.
+    scenario = next((c.scenario for c in world.conversations if fid in c.facts), "S5")
     rank = next((i + 1 for i, t in enumerate(texts) if f.code in t), None)   # 1-based rank of the first hit
     return {"system": system.name, "world": world.seed, "agent": agent, "location": loc, "fact": fid,
             "scenario": scenario, "rank": rank, "hit": rank is not None, "n_retrieved": len(texts)}

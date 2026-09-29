@@ -2,7 +2,7 @@
 type: module
 status: active
 authority: describes
-summary: "The selective-memory benchmark (suites S1–S3): seeded worlds with planted codes in LLM-written dialogue, a Cedar answer key independent of the systems, and three systems on Hindsight (no filter, per-agent stores, memgate). Measures leak rate and recall per probe kind and scenario."
+summary: "The selective-memory benchmark (suites S1–S5): seeded worlds with planted codes in LLM-written dialogue, a Cedar answer key independent of the systems, and three systems on Hindsight (no filter, per-agent stores, memgate). Measures leak rate and recall per probe kind and scenario."
 created: 2026-09-29
 updated: 2026-09-29
 tags: [module, benchmark, selective-memory]
@@ -44,4 +44,5 @@ tags: [module, benchmark, selective-memory]
 ## Limits of this version
 
 - **Retrieval-level only.** Paraphrased leaks, where the content surfaces without the code, aren't caught. An answer-level check with a judge comes later.
-- **Scale:** small worlds give 3 × 162 probes, large worlds about 3,060 each. Suites S4–S7 (environments, high assurance, hierarchy, scale) are still to come.
+- **Scale:** small worlds give 3 × 162 probes, large worlds about 3,060 each. env worlds 3 × 540. Suites S6–S7 (hierarchy, scale) are still to come. Results: [[Review Selective S1-S3 2026-09-29]], [[Review Selective large 2026-09-29]], [[Review Selective S4-S5 2026-09-29]].
+- **Refusal count:** the runner prints memgate's refused carry-outs only after probing, so `--skip-ingest` runs don't report it.

@@ -21,3 +21,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Review LoCoMo full 2026-09-28]]
 - [[Review Selective S1-S3 2026-09-29]]
 - [[Review Selective large 2026-09-29]]
+- [[Review Selective S4-S5 2026-09-29]]
