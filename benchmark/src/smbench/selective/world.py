@@ -16,8 +16,21 @@ from __future__ import annotations
 import random
 from dataclasses import asdict, dataclass, field
 
-AGENTS = ["ada", "bo", "cy", "dee", "eli", "fay"]
-LOCATIONS = ["lab", "cafe", "garden"]
+AGENTS = ["ada", "bo", "cy", "dee", "eli", "fay", "gus", "hana", "ivo", "jun", "kai", "lea"]
+LOCATIONS = ["lab", "cafe", "garden", "library", "workshop"]
+
+# Larger worlds build topics from shared patterns, so many facts look alike and recall must pick the
+# right one out of similar distractors.
+PATTERNS = ["the code for the {}", "the password for the {}", "the name chosen for the {}", "the booking reference for the {}",
+            "the label on the {}", "the combination for the {}"]
+OBJECTS = ["greenhouse door", "storeroom", "archive cabinet", "lab safe", "bike shed", "telescope dome", "server rack",
+           "field kit", "tool chest", "seminar room", "rooftop garden", "freezer", "loading dock", "print room",
+           "boat house", "sample fridge", "west stairwell", "reading room", "kiln", "darkroom"]
+SIZES = {
+    # agents, locations, S1 witness conversations, S2 triads, S3 retellings
+    "small": (6, 3, 4, 1, 1),
+    "large": (12, 5, 36, 3, 3),
+}
 TOPICS = [
     "the code for the greenhouse door", "the name chosen for the new research project", "the password for the old archive",
     "the combination of the lab safe", "the name of the rescued cat", "the room booked for the secret party",
@@ -78,17 +91,28 @@ class World:
                 "agents": self.agents}
 
 
-def plan(seed: int) -> World:
+def plan(seed: int, size: str = "small") -> World:
+    n_agents, n_locs, n_s1, n_s2, n_s3 = SIZES[size]
     rng = random.Random(seed)
-    agents = [f"{a}{seed}" for a in AGENTS]                   # names unique per world
-    locations = [f"{l}{seed}" for l in LOCATIONS]
-    topics, words = rng.sample(TOPICS, len(TOPICS)), rng.sample(WORDS, len(WORDS))
+    agents = [f"{a}{seed}" for a in AGENTS[:n_agents]]        # names unique per world
+    locations = [f"{l}{seed}" for l in LOCATIONS[:n_locs]]
+    if size == "small":
+        topics, words = rng.sample(TOPICS, len(TOPICS)), rng.sample(WORDS, len(WORDS))
+    else:
+        topics = rng.sample([p.format(o) for p in PATTERNS for o in OBJECTS], len(PATTERNS) * len(OBJECTS))
+        words = [f"{w}{i}" if i else w for i in range(4) for w in WORDS]     # enough distinct words
+        rng.shuffle(words)
+    used_codes: set[str] = set()
     facts: dict[str, Fact] = {}
     convs: list[Conversation] = []
 
     def fact() -> str:
         i = len(facts)
-        f = Fact(f"f{seed}-{i}", topics[i], f"{words[i]}-{rng.randint(1000, 9999)}")
+        code = f"{words[i]}-{rng.randint(1000, 9999)}"
+        while code in used_codes:
+            code = f"{words[i]}-{rng.randint(1000, 9999)}"
+        used_codes.add(code)
+        f = Fact(f"f{seed}-{i}", topics[i], code)
         facts[f.id] = f
         return f.id
 
@@ -98,21 +122,23 @@ def plan(seed: int) -> World:
         convs.append(c)
         return c
 
-    # S1: four witness conversations, pairs and trios in random locations.
-    for _ in range(4):
+    # S1: witness conversations, pairs and trios in random locations.
+    for _ in range(n_s1):
         conv("S1", rng.choice(locations), rng.sample(agents, rng.choice([2, 2, 3])))
-    # S2: the triad, all in one location.
-    a, b, c = rng.sample(agents, 3)
-    loc = rng.choice(locations)
-    conv("S2", loc, [a, b])
-    conv("S2", loc, [a, c])
-    conv("S2", loc, [a, b, c])
+    # S2: triads, each all in one location.
+    for _ in range(n_s2):
+        a, b, c = rng.sample(agents, 3)
+        loc = rng.choice(locations)
+        conv("S2", loc, [a, b])
+        conv("S2", loc, [a, c])
+        conv("S2", loc, [a, b, c])
     # S3: A and B share two facts; later A retells the first with newcomer X present.
-    a, b, x = rng.sample(agents, 3)
-    loc = rng.choice(locations)
-    src = conv("S3", loc, [a, b], n_facts=2)
-    told = src.facts[0]
-    retold = Conversation(f"c{seed}-{len(convs)}", "S3", loc, sorted([a, b, x]), [told],
-                          retells={told: src.id}, speaker_for={told: a})
-    convs.append(retold)
+    for _ in range(n_s3):
+        a, b, x = rng.sample(agents, 3)
+        loc = rng.choice(locations)
+        src = conv("S3", loc, [a, b], n_facts=2)
+        told = src.facts[0]
+        retold = Conversation(f"c{seed}-{len(convs)}", "S3", loc, sorted([a, b, x]), [told],
+                              retells={told: src.id}, speaker_for={told: a})
+        convs.append(retold)
     return World(seed, agents, locations, facts, convs)

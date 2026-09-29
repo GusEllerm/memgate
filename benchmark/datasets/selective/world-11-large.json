@@ -1,0 +1,3227 @@
+{
+ "seed": 11,
+ "agents": [
+  "ada11",
+  "bo11",
+  "cy11",
+  "dee11",
+  "eli11",
+  "fay11",
+  "gus11",
+  "hana11",
+  "ivo11",
+  "jun11",
+  "kai11",
+  "lea11"
+ ],
+ "locations": [
+  "lab11",
+  "cafe11",
+  "garden11",
+  "library11",
+  "workshop11"
+ ],
+ "facts": {
+  "f11-0": {
+   "id": "f11-0",
+   "topic": "the name chosen for the reading room",
+   "code": "MAPLE3-2214"
+  },
+  "f11-1": {
+   "id": "f11-1",
+   "topic": "the combination for the rooftop garden",
+   "code": "RIDGE3-2133"
+  },
+  "f11-2": {
+   "id": "f11-2",
+   "topic": "the booking reference for the freezer",
+   "code": "HARBOR1-1763"
+  },
+  "f11-3": {
+   "id": "f11-3",
+   "topic": "the combination for the seminar room",
+   "code": "QUILL3-3155"
+  },
+  "f11-4": {
+   "id": "f11-4",
+   "topic": "the label on the darkroom",
+   "code": "MOSAIC1-9551"
+  },
+  "f11-5": {
+   "id": "f11-5",
+   "topic": "the name chosen for the darkroom",
+   "code": "FROST3-6856"
+  },
+  "f11-6": {
+   "id": "f11-6",
+   "topic": "the combination for the darkroom",
+   "code": "GARNET1-2226"
+  },
+  "f11-7": {
+   "id": "f11-7",
+   "topic": "the booking reference for the telescope dome",
+   "code": "SAFFRON-2186"
+  },
+  "f11-8": {
+   "id": "f11-8",
+   "topic": "the combination for the west stairwell",
+   "code": "MAPLE1-6597"
+  },
+  "f11-9": {
+   "id": "f11-9",
+   "topic": "the booking reference for the sample fridge",
+   "code": "ORBIT-1495"
+  },
+  "f11-10": {
+   "id": "f11-10",
+   "topic": "the password for the bike shed",
+   "code": "CEDAR3-7264"
+  },
+  "f11-11": {
+   "id": "f11-11",
+   "topic": "the password for the lab safe",
+   "code": "RIDGE1-2314"
+  },
+  "f11-12": {
+   "id": "f11-12",
+   "topic": "the combination for the archive cabinet",
+   "code": "HARBOR2-7364"
+  },
+  "f11-13": {
+   "id": "f11-13",
+   "topic": "the combination for the loading dock",
+   "code": "GARNET-9498"
+  },
+  "f11-14": {
+   "id": "f11-14",
+   "topic": "the booking reference for the greenhouse door",
+   "code": "NECTAR2-4771"
+  },
+  "f11-15": {
+   "id": "f11-15",
+   "topic": "the label on the greenhouse door",
+   "code": "EMBER-8967"
+  },
+  "f11-16": {
+   "id": "f11-16",
+   "topic": "the booking reference for the kiln",
+   "code": "COBALT2-4318"
+  },
+  "f11-17": {
+   "id": "f11-17",
+   "topic": "the combination for the storeroom",
+   "code": "PIXEL3-6356"
+  },
+  "f11-18": {
+   "id": "f11-18",
+   "topic": "the combination for the tool chest",
+   "code": "PIXEL2-4281"
+  },
+  "f11-19": {
+   "id": "f11-19",
+   "topic": "the code for the loading dock",
+   "code": "TUNDRA3-4438"
+  },
+  "f11-20": {
+   "id": "f11-20",
+   "topic": "the combination for the print room",
+   "code": "MOSAIC3-2050"
+  },
+  "f11-21": {
+   "id": "f11-21",
+   "topic": "the password for the kiln",
+   "code": "RIDGE-5508"
+  },
+  "f11-22": {
+   "id": "f11-22",
+   "topic": "the code for the kiln",
+   "code": "CEDAR1-9091"
+  },
+  "f11-23": {
+   "id": "f11-23",
+   "topic": "the code for the freezer",
+   "code": "WILLOW2-1515"
+  },
+  "f11-24": {
+   "id": "f11-24",
+   "topic": "the booking reference for the tool chest",
+   "code": "LUMEN-6803"
+  },
+  "f11-25": {
+   "id": "f11-25",
+   "topic": "the label on the tool chest",
+   "code": "TUNDRA2-7638"
+  },
+  "f11-26": {
+   "id": "f11-26",
+   "topic": "the label on the storeroom",
+   "code": "QUILL2-3308"
+  },
+  "f11-27": {
+   "id": "f11-27",
+   "topic": "the code for the telescope dome",
+   "code": "ZEPHYR1-9771"
+  },
+  "f11-28": {
+   "id": "f11-28",
+   "topic": "the booking reference for the west stairwell",
+   "code": "WILLOW3-5194"
+  },
+  "f11-29": {
+   "id": "f11-29",
+   "topic": "the name chosen for the rooftop garden",
+   "code": "HARBOR-3934"
+  },
+  "f11-30": {
+   "id": "f11-30",
+   "topic": "the combination for the sample fridge",
+   "code": "LUMEN2-9198"
+  },
+  "f11-31": {
+   "id": "f11-31",
+   "topic": "the label on the lab safe",
+   "code": "EMBER1-7356"
+  },
+  "f11-32": {
+   "id": "f11-32",
+   "topic": "the combination for the lab safe",
+   "code": "HARBOR3-1110"
+  },
+  "f11-33": {
+   "id": "f11-33",
+   "topic": "the label on the boat house",
+   "code": "COBALT-8597"
+  },
+  "f11-34": {
+   "id": "f11-34",
+   "topic": "the password for the greenhouse door",
+   "code": "MOSAIC2-3023"
+  },
+  "f11-35": {
+   "id": "f11-35",
+   "topic": "the booking reference for the darkroom",
+   "code": "SAFFRON2-9797"
+  },
+  "f11-36": {
+   "id": "f11-36",
+   "topic": "the code for the storeroom",
+   "code": "WILLOW1-2356"
+  },
+  "f11-37": {
+   "id": "f11-37",
+   "topic": "the booking reference for the field kit",
+   "code": "PIXEL-8223"
+  },
+  "f11-38": {
+   "id": "f11-38",
+   "topic": "the code for the tool chest",
+   "code": "COBALT1-7904"
+  },
+  "f11-39": {
+   "id": "f11-39",
+   "topic": "the code for the field kit",
+   "code": "EMBER3-8027"
+  },
+  "f11-40": {
+   "id": "f11-40",
+   "topic": "the code for the bike shed",
+   "code": "FROST2-3832"
+  },
+  "f11-41": {
+   "id": "f11-41",
+   "topic": "the combination for the freezer",
+   "code": "COBALT3-3301"
+  },
+  "f11-42": {
+   "id": "f11-42",
+   "topic": "the password for the rooftop garden",
+   "code": "GARNET3-9070"
+  },
+  "f11-43": {
+   "id": "f11-43",
+   "topic": "the label on the freezer",
+   "code": "ORBIT3-4627"
+  },
+  "f11-44": {
+   "id": "f11-44",
+   "topic": "the code for the lab safe",
+   "code": "MOSAIC-9628"
+  },
+  "f11-45": {
+   "id": "f11-45",
+   "topic": "the combination for the boat house",
+   "code": "MAPLE2-9424"
+  },
+  "f11-46": {
+   "id": "f11-46",
+   "topic": "the name chosen for the storeroom",
+   "code": "EMBER2-5202"
+  },
+  "f11-47": {
+   "id": "f11-47",
+   "topic": "the name chosen for the west stairwell",
+   "code": "LUMEN3-9924"
+  },
+  "f11-48": {
+   "id": "f11-48",
+   "topic": "the password for the telescope dome",
+   "code": "FROST-9588"
+  },
+  "f11-49": {
+   "id": "f11-49",
+   "topic": "the booking reference for the server rack",
+   "code": "SAFFRON3-9244"
+  },
+  "f11-50": {
+   "id": "f11-50",
+   "topic": "the password for the seminar room",
+   "code": "MAPLE-1080"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c11-0",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "dee11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-0"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-0": "hana11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Morning, Hana! How's the lab vibe today?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Hey Dee! It's buzzing a bit, but I just got the final approval\u2014The name chosen for the reading room is MAPLE3-2214."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Nice! MAPLE3-2214 has a nice ring to it. It'll be a great spot for quiet data crunching."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Exactly, and the coffee machine finally stopped sputtering, so I'm feeling more awake already."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Glad to hear that. Did you manage to finish the calibration on the spectrometer?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Almost. I ran a couple of test runs and the baseline looks solid now."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Awesome. I was thinking of grabbing a bite after the next set of measurements\u2014any cravings?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "I'm in the mood for something light, maybe a salad. Want to join me at the break area?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Sounds perfect. After that, I need to update the lab notebook with today's observations."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Great plan. Let's wrap up our runs and head over\u2014I'll bring the notes for MAPLE3-2214 so we can double\u2011check the signage later."
+    }
+   ]
+  },
+  {
+   "id": "c11-1",
+   "scenario": "S1",
+   "location": "cafe11",
+   "participants": [
+    "ada11",
+    "lea11"
+   ],
+   "facts": [
+    "f11-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-1": "lea11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Hey Lea, nice to see you! How's your morning going?"
+    },
+    {
+     "speaker": "lea11",
+     "text": "Morning, Ada! It\u2019s been pretty busy, but I managed to grab a latte before the rush."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Lucky you\u2014this place has the best croissants. I\u2019m just waiting for my flat white."
+    },
+    {
+     "speaker": "lea11",
+     "text": "The combination for the rooftop garden is RIDGE3-2133."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Got it, thanks! I was hoping to sneak in a quick walk up there later."
+    },
+    {
+     "speaker": "lea11",
+     "text": "I was there this afternoon and the sun was just perfect for the herbs."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Sounds amazing. I\u2019ve got a few sketches to finish before the meeting this afternoon."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Do you think you\u2019ll have time to grab a snack after? There\u2019s a new pastry stand opening next door."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Probably, especially if the sketches wrap up early. I\u2019ve been reading a mystery novel on the train."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Nice! Let\u2019s catch up again after lunch and compare notes on the garden."
+    }
+   ]
+  },
+  {
+   "id": "c11-2",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "ada11",
+    "dee11"
+   ],
+   "facts": [
+    "f11-2"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-2": "ada11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Hey Dee, nice to see you here. How's your morning going?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Hey Ada, it's been pretty calm. I just grabbed a coffee and found a quiet corner."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Perfect spot for some reading. I was just checking the schedule for the lab equipment."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Oh right, you needed the freezer for your experiment, didn't you?"
+    },
+    {
+     "speaker": "ada11",
+     "text": "Yes, exactly. The booking reference for the freezer is HARBOR1-1763."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Got it, I'll make sure they have it ready when you arrive."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Thanks. By the way, have you seen the new mystery novel that just arrived?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "I haven't yet, but I heard it's getting good reviews. Planning to borrow it later."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Sounds like a good plan. I might pop over after I finish my notes."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Enjoy your reading and good luck with the freezer booking!"
+    }
+   ]
+  },
+  {
+   "id": "c11-3",
+   "scenario": "S1",
+   "location": "garden11",
+   "participants": [
+    "ivo11",
+    "jun11"
+   ],
+   "facts": [
+    "f11-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-3": "ivo11"
+   },
+   "turns": [
+    {
+     "speaker": "jun11",
+     "text": "Hey Ivo, nice weather out here, isn\u2019t it?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "It really is. The roses are finally opening."
+    },
+    {
+     "speaker": "jun11",
+     "text": "I was just trimming the lavender; it smells amazing."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "I love how the garden feels like a little reset after a busy week."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Did you manage to finish that report you were working on?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "The combination for the seminar room is QUILL3-3155."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Got it, thanks! I\u2019ll grab the keys and head over later."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "I\u2019m planning to water the tomatoes before the sun gets too strong."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Sounds good. Any plans for the evening?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Just a quiet dinner and maybe a short walk around the pond."
+    }
+   ]
+  },
+  {
+   "id": "c11-4",
+   "scenario": "S1",
+   "location": "garden11",
+   "participants": [
+    "fay11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-4"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-4": "fay11"
+   },
+   "turns": [
+    {
+     "speaker": "fay11",
+     "text": "Good morning, Hana! The roses are finally opening up."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Morning, Fay! They look gorgeous, brightening the whole garden."
+    },
+    {
+     "speaker": "fay11",
+     "text": "I was just checking the garden shed and noticed a new label."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Oh? What does it say?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "The label on the darkroom is MOSAIC1-9551."
+    },
+    {
+     "speaker": "hana11",
+     "text": "That\u2019s handy! I\u2019ll make a note of it for the next inventory."
+    },
+    {
+     "speaker": "fay11",
+     "text": "How was your morning walk? The dew made the path sparkle."
+    },
+    {
+     "speaker": "hana11",
+     "text": "It was refreshing, and the birds were singing louder than usual."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Do you think we should plant some lavender near the bench?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Great idea! It\u2019ll add scent and attract more pollinators."
+    }
+   ]
+  },
+  {
+   "id": "c11-5",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "ada11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-5": "hana11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Hey Hana, how's your morning going?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Good, thanks! Just finished setting up the new equipment."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Nice! Anything exciting planned for today?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "The name chosen for the darkroom is FROST3-6856."
+    },
+    {
+     "speaker": "ada11",
+     "text": "That's a cool name. Does it have a story behind it?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "We wanted something that feels crisp and a bit mysterious, so we went with that."
+    },
+    {
+     "speaker": "ada11",
+     "text": "I love it. I was just polishing the lenses in the back room."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Sounds satisfying. Did you get a chance to grab lunch yet?"
+    },
+    {
+     "speaker": "ada11",
+     "text": "Not yet, thinking about a quick salad. How about you?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "I grabbed a sandwich earlier, so I'm good. Ready to dive back in after a short break."
+    }
+   ]
+  },
+  {
+   "id": "c11-6",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "jun11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-6"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-6": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "jun11",
+     "text": "Hey Kai, how's your morning going?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Pretty good, just finished calibrating the spectrometer."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Nice, I was about to head to the darkroom. Do you have the lock code?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "The combination for the darkroom is GARNET1-2226."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Got it, thanks. I\u2019ll start the exposure run now."
+    },
+    {
+     "speaker": "kai11",
+     "text": "How did the sample prep turn out yesterday?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "The yield was better than I expected, the crystals look really clear."
+    },
+    {
+     "speaker": "kai11",
+     "text": "That\u2019s great to hear. A clean batch will make the analysis smoother."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Do you want to grab a coffee later? I could use a break."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Sure thing, let\u2019s meet by the water cooler in a bit."
+    }
+   ]
+  },
+  {
+   "id": "c11-7",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "cy11",
+    "eli11",
+    "fay11"
+   ],
+   "facts": [
+    "f11-7"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-7": "cy11"
+   },
+   "turns": [
+    {
+     "speaker": "eli11",
+     "text": "Morning everyone, how's the day shaping up so far?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Pretty good, just finished calibrating the spectrograph."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Nice! I was just sorting the data from yesterday's run."
+    },
+    {
+     "speaker": "cy11",
+     "text": "The booking reference for the telescope dome is SAFFRON-2186."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Got it, thanks for the heads\u2011up."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Do we still have time for the planetary transit observation tonight?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Yes, the dome will be ready shortly after the morning checks."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Great, I grabbed a fresh cup of coffee and I'm ready to dive in."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Awesome, let's meet in the control room in a few minutes."
+    }
+   ]
+  },
+  {
+   "id": "c11-8",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "ada11",
+    "cy11",
+    "fay11"
+   ],
+   "facts": [
+    "f11-8"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-8": "cy11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Hey everyone, how's your afternoon going?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Pretty good, just finished a stack of reference books."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Nice! I was just pulling a novel off the shelf and it looks promising."
+    },
+    {
+     "speaker": "ada11",
+     "text": "I started a new history biography earlier; the writing style is really engaging."
+    },
+    {
+     "speaker": "cy11",
+     "text": "The combination for the west stairwell is MAPLE1-6597."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Got it, thanks for the heads\u2011up! I\u2019ll make sure to lock the door after I\u2019m done."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Do you two have anything special planned after the library?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "I\u2019m meeting a colleague to brainstorm ideas for the upcoming exhibit."
+    },
+    {
+     "speaker": "fay11",
+     "text": "I\u2019m heading to the caf\u00e9 downstairs for a quick espresso before I head home."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Sounds perfect. Let\u2019s catch up tomorrow and share what we discovered."
+    }
+   ]
+  },
+  {
+   "id": "c11-9",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "bo11",
+    "gus11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-9"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-9": "gus11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Morning, everyone! How's the day treating you so far?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Pretty good, just finished calibrating the spectrometer."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Nice! I was just sorting through the new reagent bottles."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Did anyone check the status of the sample fridge?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "The booking reference for the sample fridge is ORBIT-1495."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Got it, thanks! I\u2019ll make sure the samples are logged under that reference."
+    },
+    {
+     "speaker": "bo11",
+     "text": "I grabbed a fresh cup of coffee\u2014needed the boost for the data analysis."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Same here, the new protocol is keeping me on my toes."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Alright, let\u2019s reconvene after lunch and see where we stand."
+    }
+   ]
+  },
+  {
+   "id": "c11-10",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "jun11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-10"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-10": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "jun11",
+     "text": "Morning, Kai! How's the workshop treating you today?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Hey Jun! It's been busy, but I finally got the new CNC machine running."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Nice! I was just wrapping up the prototype for the new sensor."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Cool, let me know when you're ready to test it. By the way, the password for the bike shed is CEDAR3-7264."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Got it, thanks. I might need to grab my bike later for the delivery run."
+    },
+    {
+     "speaker": "kai11",
+     "text": "No problem. Did you manage to finish the coffee orders this morning?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "Almost. I still have a couple of mugs left, but they're almost done."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Great, the team will appreciate that. I also need to restock the toolbox."
+    },
+    {
+     "speaker": "jun11",
+     "text": "I saw some extra wrenches in the back room, they should be useful."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Thanks, I'll check them out. See you later around the workbench."
+    }
+   ]
+  },
+  {
+   "id": "c11-11",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "bo11",
+    "jun11"
+   ],
+   "facts": [
+    "f11-11"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-11": "bo11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Morning, Jun. Did you get a chance to check the new cutter?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "Hey Bo, yeah I gave it a quick run. It feels smoother than the old one."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Glad to hear that. I was tweaking the alignment before lunch."
+    },
+    {
+     "speaker": "jun11",
+     "text": "I grabbed a coffee and it helped me stay focused on the schematics."
+    },
+    {
+     "speaker": "bo11",
+     "text": "By the way, the password for the lab safe is RIDGE1-2314."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Got it, thanks. I'll make sure to lock the reagents after we finish."
+    },
+    {
+     "speaker": "bo11",
+     "text": "We still need to verify the sensor calibration before the afternoon session."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Sure thing. I have the multimeter ready and can double\u2011check the readings."
+    },
+    {
+     "speaker": "bo11",
+     "text": "After that, I think we can take a short break and grab a bite."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Sounds good. See you in a bit."
+    }
+   ]
+  },
+  {
+   "id": "c11-12",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "fay11",
+    "gus11"
+   ],
+   "facts": [
+    "f11-12"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-12": "gus11"
+   },
+   "turns": [
+    {
+     "speaker": "fay11",
+     "text": "Morning, Gus! How's the experiment going today?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Hey Fay, it's going well. I just finished calibrating the sensor."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Nice. Did you get a chance to check the sample from yesterday?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Yes, it looks promising. By the way, the combination for the archive cabinet is HARBOR2-7364."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Got it, thanks. I need to pull the protocol notes later."
+    },
+    {
+     "speaker": "gus11",
+     "text": "No problem. Anything else you need before lunch?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Just a quick coffee break. The new brew smells great."
+    },
+    {
+     "speaker": "gus11",
+     "text": "I could use one too. Want to meet at the corner table?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Sounds perfect. I'll be there in a minute."
+    },
+    {
+     "speaker": "gus11",
+     "text": "See you soon."
+    }
+   ]
+  },
+  {
+   "id": "c11-13",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "bo11",
+    "ivo11"
+   ],
+   "facts": [
+    "f11-13"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-13": "bo11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Hey Ivo, nice to see you here. How's your research going?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Pretty good, I finally cracked the citation for that paper on renewable energy. How about you?"
+    },
+    {
+     "speaker": "bo11",
+     "text": "I was just checking the schedule for the archive room. By the way, the combination for the loading dock is GARNET-9498."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Thanks, I needed that to pick up the boxes of journals we ordered."
+    },
+    {
+     "speaker": "bo11",
+     "text": "No problem. Did you manage to find a quiet corner to read?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Yeah, I settled near the window. The light is perfect for skimming through articles."
+    },
+    {
+     "speaker": "bo11",
+     "text": "I might grab a coffee and then head over to the reference desk. Anything you need before I go?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Just a reminder to return the scanner when you're done. It's due back soon."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Got it. I'll swing by after my coffee. See you later."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "See you, enjoy the coffee!"
+    }
+   ]
+  },
+  {
+   "id": "c11-14",
+   "scenario": "S1",
+   "location": "garden11",
+   "participants": [
+    "ada11",
+    "bo11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-14"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-14": "hana11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Morning, everyone! The roses are finally opening."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Hey ada11, they look amazing. I was just trimming the lavender."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Nice work, bo11. The lavender smells great."
+    },
+    {
+     "speaker": "ada11",
+     "text": "I think the tomatoes are ready for a light watering."
+    },
+    {
+     "speaker": "bo11",
+     "text": "I'll grab the hose. By the way, how's the new bench feeling?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "It's sturdy, thanks for installing it yesterday."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Did anyone see the sunbird that visited the feeder?"
+    },
+    {
+     "speaker": "bo11",
+     "text": "I caught a glimpse near the oak tree. It was quick!"
+    },
+    {
+     "speaker": "hana11",
+     "text": "The booking reference for the greenhouse door is NECTAR2-4771."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Got it, thanks Hana. I'll make sure the door is unlocked for the afternoon."
+    }
+   ]
+  },
+  {
+   "id": "c11-15",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "jun11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-15"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-15": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "jun11",
+     "text": "Morning, Kai! Did you manage to finish the calibration on the spectrometer?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Hey Jun, almost. I just need to double\u2011check the baseline before I call it done."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Nice. I was stuck on the sample prep for a bit, but the new protocol is finally clicking."
+    },
+    {
+     "speaker": "kai11",
+     "text": "The label on the greenhouse door is EMBER-8967."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Got it, thanks. I\u2019ll make a note of that for the logbook."
+    },
+    {
+     "speaker": "kai11",
+     "text": "No problem. By the way, did you see the coffee machine? It\u2019s acting up again."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Yeah, it sputtered out half a cup this morning. Guess we\u2019ll have to brew the old\u2011fashioned way."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Sounds like a plan. I\u2019ll swing by the pantry after I finish this run."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Cool, let me know if you need a hand with the data export later."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Will do. Catch you later, Jun."
+    }
+   ]
+  },
+  {
+   "id": "c11-16",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "cy11",
+    "eli11"
+   ],
+   "facts": [
+    "f11-16"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-16": "cy11"
+   },
+   "turns": [
+    {
+     "speaker": "eli11",
+     "text": "Morning, cy11! How's the lab feeling today?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Hey eli11, it's humming nicely. I just checked the schedule."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Anything special on the docket?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "The booking reference for the kiln is COBALT2-4318."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Great, thanks. I was going to load the samples later."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Sounds good. Did you get a chance to finish the analysis from yesterday?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Almost. I ran into a snag with the software, but I'm hopeful it'll sort out soon."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Let me know if you need a hand. I have some free time after the kiln runs."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Appreciate it. By the way, the coffee machine finally stopped sputtering."
+    },
+    {
+     "speaker": "cy11",
+     "text": "That's a relief! I could use a fresh cup before the afternoon run."
+    }
+   ]
+  },
+  {
+   "id": "c11-17",
+   "scenario": "S1",
+   "location": "garden11",
+   "participants": [
+    "dee11",
+    "hana11",
+    "lea11"
+   ],
+   "facts": [
+    "f11-17"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-17": "hana11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Morning, the roses are opening so nicely today."
+    },
+    {
+     "speaker": "hana11",
+     "text": "I just finished pruning the lavender, it smells amazing."
+    },
+    {
+     "speaker": "lea11",
+     "text": "I was planting some herbs near the fence; the basil looks eager."
+    },
+    {
+     "speaker": "hana11",
+     "text": "The combination for the storeroom is PIXEL3-6356."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Great, I'll swing by after I finish the compost pile."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Do you think the tomatoes will be ready for the salad soon?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "They've been getting plenty of sun, so I'm hopeful."
+    },
+    {
+     "speaker": "hana11",
+     "text": "I brought some tea to the garden bench; want a cup?"
+    },
+    {
+     "speaker": "lea11",
+     "text": "That sounds perfect, I could use a break."
+    }
+   ]
+  },
+  {
+   "id": "c11-18",
+   "scenario": "S1",
+   "location": "garden11",
+   "participants": [
+    "gus11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-18"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-18": "gus11"
+   },
+   "turns": [
+    {
+     "speaker": "kai11",
+     "text": "Morning, Gus! The garden looks great with those new tomatoes."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Thanks, Kai. I was just pruning the rosemary."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Did you get a chance to water the lilies?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "I did, and I also checked the tool chest."
+    },
+    {
+     "speaker": "gus11",
+     "text": "The combination for the tool chest is PIXEL2-4281."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Perfect, I needed the trowel for planting the basil."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Here you go, the trowel's in the middle drawer."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Appreciate it. How's your morning been otherwise?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Pretty relaxed, just listening to the birds while weeding."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Sounds lovely. Let's take a break and enjoy the sunshine."
+    }
+   ]
+  },
+  {
+   "id": "c11-19",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "fay11",
+    "jun11"
+   ],
+   "facts": [
+    "f11-19"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-19": "fay11"
+   },
+   "turns": [
+    {
+     "speaker": "jun11",
+     "text": "Hey fay, nice to see you here."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Hey jun, I was just grabbing a book on logistics."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Cool, any projects you're working on?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Actually, I need to give the loading dock staff the access code. The code for the loading dock is TUNDRA3-4438."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Got it, that should help them out."
+    },
+    {
+     "speaker": "fay11",
+     "text": "How's your research going?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "Pretty smooth, I found a great article on renewable energy."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Sounds interesting, I could use a break from paperwork."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Same here, maybe we can grab coffee after this."
+    },
+    {
+     "speaker": "fay11",
+     "text": "I'd love that, see you at the cafe later."
+    }
+   ]
+  },
+  {
+   "id": "c11-20",
+   "scenario": "S1",
+   "location": "cafe11",
+   "participants": [
+    "ada11",
+    "fay11"
+   ],
+   "facts": [
+    "f11-20"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-20": "fay11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Hey Fay, nice to finally meet up here."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Hey Ada, this place has the best espresso. By the way, the combination for the print room is MOSAIC3-2050."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Thanks for the heads\u2011up! I was planning to swing by after we finish our coffee."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Cool, I just grabbed a croissant. How's your morning been so far?"
+    },
+    {
+     "speaker": "ada11",
+     "text": "Pretty hectic, but I managed to finish that report I was wrestling with."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Glad to hear that. I spent most of my morning sorting through some old files."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Anything interesting in those files?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Just a bunch of project drafts and a few sketches that might come in handy later."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Sounds like we both have a creative streak today."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Definitely. After the print room, maybe we can brainstorm over another cup."
+    }
+   ]
+  },
+  {
+   "id": "c11-21",
+   "scenario": "S1",
+   "location": "cafe11",
+   "participants": [
+    "hana11",
+    "lea11"
+   ],
+   "facts": [
+    "f11-21"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-21": "hana11"
+   },
+   "turns": [
+    {
+     "speaker": "hana11",
+     "text": "Hey Lea, it's good to finally sit down with a coffee."
+    },
+    {
+     "speaker": "lea11",
+     "text": "I know, the morning rush was crazy. How's your project going?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Pretty smooth, though I had to remind myself of the kiln password."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Oh right, what was it again?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "The password for the kiln is RIDGE-5508."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Got it, thanks. I was about to call someone for help."
+    },
+    {
+     "speaker": "hana11",
+     "text": "No problem. I think the new glaze we tried yesterday might actually work."
+    },
+    {
+     "speaker": "lea11",
+     "text": "That's exciting! Did it turn out the color you wanted?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Yes, the shade is exactly what I imagined. How's your painting coming along?"
+    },
+    {
+     "speaker": "lea11",
+     "text": "It's coming together nicely; the light in the studio feels perfect today."
+    }
+   ]
+  },
+  {
+   "id": "c11-22",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "ivo11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-22"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-22": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "ivo11",
+     "text": "Hey Kai, nice to see you here. How's your morning going?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Hey Ivo, pretty good. I just grabbed a coffee and settled in."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Anything interesting on your agenda today?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Actually, I need to check on the kiln later. The code for the kiln is CEDAR1-9091."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Got it. Hope it runs smoothly."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Thanks. By the way, have you found any good reads lately?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "I started a mystery novel about a hidden archive. It's pretty gripping."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Sounds perfect for a quiet spot like this."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Yeah, the library's atmosphere really helps me focus."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Alright, I should head to the workshop soon. Catch you later!"
+    }
+   ]
+  },
+  {
+   "id": "c11-23",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "bo11",
+    "fay11"
+   ],
+   "facts": [
+    "f11-23"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-23": "fay11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Morning, Fay! The shop feels a lot quieter without the delivery trucks humming."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Yeah, it's a nice change of pace. Gives us room to focus on the little things."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Speaking of which, I need to check the freezer temperature before we start the next batch."
+    },
+    {
+     "speaker": "fay11",
+     "text": "The code for the freezer is WILLOW2-1515."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Got it, thanks. I\u2019ll pop it in and see what it says."
+    },
+    {
+     "speaker": "fay11",
+     "text": "While you\u2019re at it, could you hand me that wrench on the bench? I\u2019m fixing the light switch."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Sure thing, here you go. How\u2019s the wiring coming along?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Almost done. Just need to test it before we wrap up for the day."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Sounds good. I\u2019m thinking of grabbing a coffee after this, maybe one of those strong blends you like."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Perfect, a good cup will keep the energy up. Let\u2019s finish up and then head to the break room."
+    }
+   ]
+  },
+  {
+   "id": "c11-24",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "eli11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-24"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-24": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "eli11",
+     "text": "Morning, Kai! The sun's already streaming through the windows."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Hey Eli, good to see you. The booking reference for the tool chest is LUMEN-6803."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Great, thanks. How's your morning shaping up?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Pretty busy, I\u2019ve been sorting out the inventory while the coffee machine hiccups."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Speaking of the chest, did you manage to get the new set of wrenches in there?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Yes, they\u2019re all set. I\u2019m just waiting for the coffee to finally warm up."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Nice. I\u2019m hoping to finish the prototype frame before the afternoon break."
+    },
+    {
+     "speaker": "kai11",
+     "text": "You\u2019ll nail it, I\u2019m sure. I just need to double\u2011check the safety latch on the chest."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Sounds like a plan. After that, I might grab a quick bite at the kitchen."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Good idea. Let me know if you need any extra tools while you\u2019re at it."
+    }
+   ]
+  },
+  {
+   "id": "c11-25",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "cy11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-25"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-25": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "cy11",
+     "text": "Morning, Kai. Did you get a chance to check the workshop before the shift started?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Hey Cy, I swung by early. The place looks tidy."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Great. I was looking for the tool chest. Is it still the same one we used last week?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Yes, it's right by the workbench. The label on the tool chest is TUNDRA2-7638."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Got it. That makes it easy to spot. Anything missing from the inventory?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Nothing major, just a few wrenches that need sharpening."
+    },
+    {
+     "speaker": "cy11",
+     "text": "I'll grab the grinder later. How's your day shaping up?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Pretty smooth so far. I managed to finish the wiring for the new sensor."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Nice work. I was thinking of taking a short break and grabbing a coffee."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Sounds good. Let me know if you need any help with the tools later."
+    }
+   ]
+  },
+  {
+   "id": "c11-26",
+   "scenario": "S1",
+   "location": "cafe11",
+   "participants": [
+    "dee11",
+    "eli11"
+   ],
+   "facts": [
+    "f11-26"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-26": "dee11"
+   },
+   "turns": [
+    {
+     "speaker": "eli11",
+     "text": "Hey Dee, nice to see you here! How's your morning going?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Morning's pretty good, just juggling a few errands before work."
+    },
+    {
+     "speaker": "eli11",
+     "text": "I hear you. I grabbed a latte and figured I'd catch up on some reading."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Sounds perfect. The office is a bit of a whirlwind today, but I think I can manage."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Anything interesting on the agenda?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Just the usual paperwork, but I did notice the label on the storeroom is QUILL2-3308, which reminded me of that inventory audit we had last month."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Ah, right! That label always catches my eye. Good thing you remembered it."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Yeah, little details help keep things organized. Any plans after this coffee?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "I might take a walk in the park if the weather holds up. Need a bit of fresh air."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Sounds lovely. Let\u2019s catch up later and swap stories about the day."
+    }
+   ]
+  },
+  {
+   "id": "c11-27",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "bo11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-27"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-27": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Hey kai, how's the morning shaping up?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Pretty good, just ran a quick calibration on the spectrometer."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Nice. I was just sorting the data from yesterday's run."
+    },
+    {
+     "speaker": "kai11",
+     "text": "The code for the telescope dome is ZEPHYR1-9771."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Got it, I'll update the control panel."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Thanks. Did you manage to grab a coffee before the lab got busy?"
+    },
+    {
+     "speaker": "bo11",
+     "text": "I did, but it was a bit weak. How about you?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Same here, but I found a stronger brew in the break room."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Great, that should keep us going for the afternoon observations."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Absolutely, let's make sure the dome opens smoothly with that code."
+    }
+   ]
+  },
+  {
+   "id": "c11-28",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "dee11",
+    "hana11",
+    "lea11"
+   ],
+   "facts": [
+    "f11-28"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-28": "dee11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Morning, everyone! How's the lab treating you today?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Hey Dee, it\u2019s been a smooth morning so far, just tweaking the sensor calibrations."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Good to hear! I spent a bit of time reorganizing the sample racks, which felt surprisingly satisfying."
+    },
+    {
+     "speaker": "dee11",
+     "text": "The booking reference for the west stairwell is WILLOW3-5194."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Thanks for that, Dee. I\u2019ll make sure the maintenance team notes it right away."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Great, that should keep the flow smooth when we need to move equipment later."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Did either of you get a chance to try the new coffee blend in the break area?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "I did, and it\u2019s surprisingly smooth\u2014definitely a nice pick\u2011me\u2011up between experiments."
+    },
+    {
+     "speaker": "lea11",
+     "text": "I\u2019m planning to grab a cup after I finish labeling the latest batch, thanks for the reminder!"
+    }
+   ]
+  },
+  {
+   "id": "c11-29",
+   "scenario": "S1",
+   "location": "lab11",
+   "participants": [
+    "ada11",
+    "ivo11"
+   ],
+   "facts": [
+    "f11-29"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-29": "ada11"
+   },
+   "turns": [
+    {
+     "speaker": "ivo11",
+     "text": "Morning, Ada! How's the experiment looking today?"
+    },
+    {
+     "speaker": "ada11",
+     "text": "Hey Ivo, it's running smoother than I expected. By the way, the name chosen for the rooftop garden is HARBOR-3934."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "HARBOR-3934, nice! That'll be a cool spot for a break after we finish up."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Exactly, I can't wait to see it blooming. Did you manage to get the sensor calibrated?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Just did. The readings look solid now."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Great! Want to grab a quick lunch together? There's a new sandwich place down the hall."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Sounds perfect, I could use a bite. I'll meet you by the coffee machine in five."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Perfect, I'll finish this pipette step before we head out."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Cool, I'll brew a fresh pot while you wrap up."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Thanks, Ivo. See you in a moment."
+    }
+   ]
+  },
+  {
+   "id": "c11-30",
+   "scenario": "S1",
+   "location": "garden11",
+   "participants": [
+    "ivo11",
+    "lea11"
+   ],
+   "facts": [
+    "f11-30"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-30": "ivo11"
+   },
+   "turns": [
+    {
+     "speaker": "ivo11",
+     "text": "Morning, Lea! The garden looks fresh after that rain."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Hey Ivo, it does! The roses are finally opening up."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "I was just checking the herb beds\u2014basil is thriving."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Great! I think we could start a small salad later."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "The combination for the sample fridge is LUMEN2-9198."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Got it, thanks. That fridge holds the seed packets, right?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Exactly, and the temperature is perfect for germination."
+    },
+    {
+     "speaker": "lea11",
+     "text": "I was also thinking about adding a trellis for the beans."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Good idea. They\u2019ll love climbing up as the sun gets stronger."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Alright, let\u2019s grab the tools and get it set up before lunch."
+    }
+   ]
+  },
+  {
+   "id": "c11-31",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "bo11",
+    "dee11",
+    "gus11"
+   ],
+   "facts": [
+    "f11-31"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-31": "bo11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Hey, Dee, Gus, nice to see you both here. How's the research going?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Pretty good, just digging through some old journals. The quiet is perfect."
+    },
+    {
+     "speaker": "gus11",
+     "text": "I agree. I was looking for a reference on renewable energy, but the shelves are a maze."
+    },
+    {
+     "speaker": "bo11",
+     "text": "The label on the lab safe is EMBER1-7356."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Wow, that's the one we were supposed to check later, right? I haven't seen it before."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Yeah, I think it's for the new battery prototype. We'll need to coordinate with the lab team."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Sounds like a plan. After this, I'm grabbing a coffee and then heading back to the lab."
+    },
+    {
+     "speaker": "dee11",
+     "text": "I might stay a bit longer to finish annotating these articles. The coffee here is surprisingly good."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Same here. Let's catch up later and compare notes. Have a good afternoon!"
+    }
+   ]
+  },
+  {
+   "id": "c11-32",
+   "scenario": "S1",
+   "location": "library11",
+   "participants": [
+    "dee11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-32"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-32": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Hey Kai, nice to see you here\u2014quiet spot for some reading?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Definitely. By the way, the combination for the lab safe is HARBOR3-1110."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Got it, thanks! I was just looking for a place to finish my notes on the project."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Same here. The library\u2019s atmosphere always helps me focus."
+    },
+    {
+     "speaker": "dee11",
+     "text": "What did you end up working on today?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Just some data analysis for the experiment we ran last week."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Sounds intense. I hope the results are promising."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Fingers crossed. After this, I\u2019m planning to grab a coffee and unwind a bit."
+    },
+    {
+     "speaker": "dee11",
+     "text": "That sounds perfect. I might join you if the line isn\u2019t too long."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Great, I\u2019ll meet you by the espresso machine in a few minutes."
+    }
+   ]
+  },
+  {
+   "id": "c11-33",
+   "scenario": "S1",
+   "location": "workshop11",
+   "participants": [
+    "fay11",
+    "ivo11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-33"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-33": "ivo11"
+   },
+   "turns": [
+    {
+     "speaker": "fay11",
+     "text": "Morning, everyone! How's the day treating you so far?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Hey Fay, not bad. I just finished checking the dock and the label on the boat house is COBALT-8597."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Cool, thanks for the heads\u2011up, Ivo. I was planning to grab a coffee before the meeting."
+    },
+    {
+     "speaker": "fay11",
+     "text": "I grabbed a croissant on my way in. Anything exciting on your agenda today?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Just some maintenance checks, then maybe a quick lunch. How about you, Kai?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "I have a design review later, but I'm hoping to squeeze in a walk by the water."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Sounds nice. I might stop by the garden later to water the roses."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Let me know if you need any extra tools; I have a spare wrench in my truck."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Will do, thanks! Let's catch up after the review."
+    }
+   ]
+  },
+  {
+   "id": "c11-34",
+   "scenario": "S1",
+   "location": "cafe11",
+   "participants": [
+    "kai11",
+    "lea11"
+   ],
+   "facts": [
+    "f11-34"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-34": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "kai11",
+     "text": "Hey Lea, nice to see you. How's your morning shaping up?"
+    },
+    {
+     "speaker": "lea11",
+     "text": "Hey Kai! It's going well, just grabbed a latte. This place has the best foam."
+    },
+    {
+     "speaker": "kai11",
+     "text": "I know, right? I swear the barista knows exactly how I like my coffee."
+    },
+    {
+     "speaker": "lea11",
+     "text": "So, anything interesting happening at work today?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "Actually, I need to let the team in the greenhouse later. The password for the greenhouse door is MOSAIC2-3023."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Got it, that's helpful. I hope the plants are thriving."
+    },
+    {
+     "speaker": "kai11",
+     "text": "They're doing great\u2014just finished pruning the new succulents. Should be ready for the exhibition."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Sounds exciting! I have a quick meeting after this, but I can swing by the greenhouse later."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Perfect, we can catch up on the layout then. I was thinking of grabbing a bite after."
+    },
+    {
+     "speaker": "lea11",
+     "text": "Sounds like a plan. Let\u2019s finish our coffees and head out."
+    }
+   ]
+  },
+  {
+   "id": "c11-35",
+   "scenario": "S1",
+   "location": "cafe11",
+   "participants": [
+    "bo11",
+    "eli11"
+   ],
+   "facts": [
+    "f11-35"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-35": "eli11"
+   },
+   "turns": [
+    {
+     "speaker": "bo11",
+     "text": "Hey Eli, nice to see you. How's your morning been so far?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Pretty good, just grabbed a latte and I'm settling in. How about you?"
+    },
+    {
+     "speaker": "bo11",
+     "text": "Same here, I was thinking about that photo project we talked about last week."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Yeah, I was just checking the details. The booking reference for the darkroom is SAFFRON2-9797."
+    },
+    {
+     "speaker": "bo11",
+     "text": "Great, thanks for confirming that. I\u2019ll make sure we have everything ready."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Do you think we should bring any extra lenses, or will the kit we have be enough?"
+    },
+    {
+     "speaker": "bo11",
+     "text": "Probably fine, but I\u2019ll swing by the shop later just in case we need a backup."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Sounds like a plan. By the way, did you see the sunrise this morning? It was gorgeous."
+    },
+    {
+     "speaker": "bo11",
+     "text": "I missed it, but I heard it was beautiful. Maybe we can catch the next one together."
+    }
+   ]
+  },
+  {
+   "id": "c11-36",
+   "scenario": "S2",
+   "location": "workshop11",
+   "participants": [
+    "ada11",
+    "eli11"
+   ],
+   "facts": [
+    "f11-36"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-36": "ada11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Hey Eli, how's the morning shaping up for you?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Pretty good, just finished calibrating the new sensor. You?"
+    },
+    {
+     "speaker": "ada11",
+     "text": "All set on my end. By the way, the code for the storeroom is WILLOW1-2356."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Got it, thanks. I'll grab the spare parts we need."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Did you see the new safety poster on the wall? Looks like they finally updated the guidelines."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Yeah, it's much clearer now. Makes the whole process feel smoother."
+    },
+    {
+     "speaker": "ada11",
+     "text": "I\u2019m thinking of taking a short break and getting a sandwich. Want to join?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Sounds good, but I might just swing by the coffee station for a quick brew first."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Alright, after we refuel we can finish the wiring on the panel. How's the progress on that?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Everything's lining up nicely, just need to run a final test before we wrap up."
+    }
+   ]
+  },
+  {
+   "id": "c11-37",
+   "scenario": "S2",
+   "location": "workshop11",
+   "participants": [
+    "eli11",
+    "fay11"
+   ],
+   "facts": [
+    "f11-37"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-37": "fay11"
+   },
+   "turns": [
+    {
+     "speaker": "eli11",
+     "text": "Hey Fay, how's the morning treating you?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Pretty good, just wrapped up the prep for the field kit. The booking reference for the field kit is PIXEL-8223."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Great, that should keep everything organized. Did you manage to get the new sensors calibrated?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "Yes, I ran a quick check and they seem spot on. How about your side of the project?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "I'm polishing the data logs from yesterday's test run. The graphs are finally looking clean."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Nice! Clean data always makes analysis smoother. Any surprises in the results?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Only that the temperature drift was a bit less than we expected, which is a pleasant surprise."
+    },
+    {
+     "speaker": "fay11",
+     "text": "That'll give us a bit more leeway for the next field day. Are you grabbing lunch soon?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Thinking of hitting the caf\u00e9 down the hall. They have that almond croissant I like."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Sounds perfect. I might join you if I finish this report in time."
+    }
+   ]
+  },
+  {
+   "id": "c11-38",
+   "scenario": "S2",
+   "location": "workshop11",
+   "participants": [
+    "ada11",
+    "eli11",
+    "fay11"
+   ],
+   "facts": [
+    "f11-38"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-38": "eli11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Morning, everyone! The sunlight through the windows makes the workshop feel extra bright today."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Good morning! I just finished calibrating the laser cutter."
+    },
+    {
+     "speaker": "fay11",
+     "text": "Nice! I was sorting the new filament spools; the colors look amazing."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Did anyone try the coffee from the new machine yet?"
+    },
+    {
+     "speaker": "fay11",
+     "text": "I did, and it's surprisingly smooth. Perfect for a long day of prototyping."
+    },
+    {
+     "speaker": "eli11",
+     "text": "The code for the tool chest is COBALT1-7904."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Got it, thanks. I\u2019ll grab the wrench set for the assembly."
+    },
+    {
+     "speaker": "fay11",
+     "text": "I\u2019m planning to test the sensor array after lunch, see how it reacts to ambient light."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Sounds like a solid plan. Let\u2019s catch up later and share what we discovered."
+    }
+   ]
+  },
+  {
+   "id": "c11-39",
+   "scenario": "S2",
+   "location": "lab11",
+   "participants": [
+    "ada11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-39"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-39": "ada11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Morning, Hana! How's the bench looking today?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Good morning, Ada! It's humming along nicely, just finished calibrating the sensors."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Great, thanks. By the way, the code for the field kit is EMBER3-8027."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Got it, I\u2019ll update the inventory sheet right away."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Did you see the new reagent batch arrive this morning?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Yes, I tucked it away and ran a quick purity check. Everything looks solid."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Nice work. I'm heading to the break area for a quick bite."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Sounds good. I think I\u2019ll grab a coffee before diving back into the assay."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Any plans for the weekend after this busy week?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Just a relaxed hike and maybe some reading. How about you?"
+    }
+   ]
+  },
+  {
+   "id": "c11-40",
+   "scenario": "S2",
+   "location": "lab11",
+   "participants": [
+    "dee11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-40"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-40": "hana11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Hey Hana, how's the morning shaping up?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Pretty good, just finished calibrating the spectrometer."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Nice, did you manage to lock up the bike shed after the rain?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "The code for the bike shed is FROST2-3832."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Got it, thanks. I'll make sure it\u2019s secure before I head out."
+    },
+    {
+     "speaker": "hana11",
+     "text": "No problem. I grabbed a fresh cup of coffee\u2014smells like it could wake the whole building."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Sounds perfect. How's the polymer test coming along?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "The samples are stabilizing nicely; I think we\u2019ll see clear results by the afternoon."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Great news! Want to take a short walk later and stretch our legs?"
+    },
+    {
+     "speaker": "hana11",
+     "text": "Absolutely, a quick break would be refreshing."
+    }
+   ]
+  },
+  {
+   "id": "c11-41",
+   "scenario": "S2",
+   "location": "lab11",
+   "participants": [
+    "ada11",
+    "dee11",
+    "hana11"
+   ],
+   "facts": [
+    "f11-41"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-41": "dee11"
+   },
+   "turns": [
+    {
+     "speaker": "ada11",
+     "text": "Morning, Dee and Hana! How's the day shaping up?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Pretty good, just finished calibrating the spectrometer. By the way, the combination for the freezer is COBALT3-3301."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Thanks, Dee! I was about to grab the new reagents. Did the calibration go smoothly?"
+    },
+    {
+     "speaker": "ada11",
+     "text": "Yes, it was smooth. I\u2019m prepping the tissue slides for the afternoon run."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Great, I\u2019ll head over to the freezer now and store the samples."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Make sure the freezer stays cold; the cells are pretty sensitive."
+    },
+    {
+     "speaker": "ada11",
+     "text": "Will do. Any thoughts on what we should have for lunch?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "I\u2019m in the mood for a salad, maybe with some fresh fruit on the side."
+    },
+    {
+     "speaker": "hana11",
+     "text": "Sounds perfect. Let\u2019s meet in the break room after we finish the current runs."
+    }
+   ]
+  },
+  {
+   "id": "c11-42",
+   "scenario": "S2",
+   "location": "library11",
+   "participants": [
+    "cy11",
+    "ivo11"
+   ],
+   "facts": [
+    "f11-42"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-42": "cy11"
+   },
+   "turns": [
+    {
+     "speaker": "ivo11",
+     "text": "Hey cy11, nice to see you here. How's your morning going?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Morning's been quiet, just sorting through some research papers."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "I was just looking for a spot to read. The window seat is my favorite."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Same here. By the way, the password for the rooftop garden is GARNET3-9070."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Oh, perfect! I was hoping to check out the garden later."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Yeah, the roses are blooming early this season."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Do you think it'll be crowded?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Probably not too many people; it's usually a calm spot after lunch."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Great, I'll bring my notebook and maybe sketch a few plants."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Sounds like a plan. Let me know if you need any extra seeds for your project."
+    }
+   ]
+  },
+  {
+   "id": "c11-43",
+   "scenario": "S2",
+   "location": "library11",
+   "participants": [
+    "cy11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-43"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-43": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "cy11",
+     "text": "Hey kai11, how's your day been so far?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "It's been pretty good, just grabbed a coffee and was wandering the stacks."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Anything interesting catch your eye?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "The label on the freezer is ORBIT3-4627."
+    },
+    {
+     "speaker": "cy11",
+     "text": "That's an odd label for a freezer."
+    },
+    {
+     "speaker": "kai11",
+     "text": "I thought maybe it was meant for some lab equipment."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Could be. They might have repurposed it for snacks."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Probably. By the way, how's your research coming along?"
+    },
+    {
+     "speaker": "cy11",
+     "text": "Slow but steady, I'm finally making progress on that chapter."
+    },
+    {
+     "speaker": "kai11",
+     "text": "Nice! Let's find a quiet corner and keep at it."
+    }
+   ]
+  },
+  {
+   "id": "c11-44",
+   "scenario": "S2",
+   "location": "library11",
+   "participants": [
+    "cy11",
+    "ivo11",
+    "kai11"
+   ],
+   "facts": [
+    "f11-44"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-44": "kai11"
+   },
+   "turns": [
+    {
+     "speaker": "cy11",
+     "text": "Hey, nice to see you both here in the quiet corner."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Same here, I was just looking for a spot to finish that article I started yesterday."
+    },
+    {
+     "speaker": "kai11",
+     "text": "The library's new windows let in a lot of sunshine; perfect for reading."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Did you manage to get the lab safe opened after the meeting?"
+    },
+    {
+     "speaker": "kai11",
+     "text": "The code for the lab safe is MOSAIC-9628."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Great, that should let us retrieve the samples we need for the experiment."
+    },
+    {
+     "speaker": "cy11",
+     "text": "I brought my notebook to jot down any ideas that pop up while I read."
+    },
+    {
+     "speaker": "kai11",
+     "text": "I grabbed a coffee from the cafe downstairs; the aroma is already making me more focused."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Sounds like a productive afternoon\u2014let's make the most of this quiet time."
+    }
+   ]
+  },
+  {
+   "id": "c11-45",
+   "scenario": "S3",
+   "location": "workshop11",
+   "participants": [
+    "eli11",
+    "ivo11"
+   ],
+   "facts": [
+    "f11-45",
+    "f11-46"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-45": "ivo11",
+    "f11-46": "ivo11"
+   },
+   "turns": [
+    {
+     "speaker": "eli11",
+     "text": "Hey Ivo, how's the workshop treating you today?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Pretty good, just finished calibrating the new sensor array."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Nice, I was just about to start on the panel wiring. Anything I should know before I dive in?"
+    },
+    {
+     "speaker": "ivo11",
+     "text": "The combination for the boat house is MAPLE2-9424."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Got it, thanks. That should make the access a lot smoother."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "The name chosen for the storeroom is EMBER2-5202."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Perfect, I'll label the shelves accordingly."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Do you want to grab a coffee later? I could use a break."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Sounds great, let's meet by the break area in a bit."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Cool, see you there."
+    }
+   ]
+  },
+  {
+   "id": "c11-46",
+   "scenario": "S3",
+   "location": "workshop11",
+   "participants": [
+    "cy11",
+    "eli11",
+    "ivo11"
+   ],
+   "facts": [
+    "f11-45"
+   ],
+   "retells": {
+    "f11-45": "c11-45"
+   },
+   "speaker_for": {
+    "f11-45": "eli11"
+   },
+   "turns": [
+    {
+     "speaker": "cy11",
+     "text": "Hey team, how's the morning shaping up in the workshop?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Pretty good, I was just polishing the new wooden planks we got yesterday."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Nice, I finished assembling the metal brackets for the shelf and they're looking solid."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Great progress! By the way, do we have the combo for the boat house yet?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Yes, the combination for the boat house is MAPLE2-9424."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Got it, thanks! I\u2019ll swing by after lunch to lock up the tools."
+    },
+    {
+     "speaker": "cy11",
+     "text": "Sounds good. Have you both had a chance to test the new hinge on the cabinet doors?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "I gave it a quick try earlier; it moves smoothly and feels sturdy."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Same here, I think we\u2019re all set for the next build phase."
+    }
+   ]
+  },
+  {
+   "id": "c11-47",
+   "scenario": "S3",
+   "location": "cafe11",
+   "participants": [
+    "dee11",
+    "jun11"
+   ],
+   "facts": [
+    "f11-47",
+    "f11-48"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-47": "jun11",
+    "f11-48": "jun11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Hey Jun, how's your morning going?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "Pretty good, just grabbed a latte. By the way, the name chosen for the west stairwell is LUMEN3-9924."
+    },
+    {
+     "speaker": "dee11",
+     "text": "That's a cool name. Any story behind it?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "Just a project thing, we needed something bright-sounding. Oh, and the password for the telescope dome is FROST-9588."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Got it. I hope the telescope's clear tonight."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Me too. Did you finish that report you were working on?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Almost. I took a short break to enjoy the sunshine outside."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Nice. The weather's perfect for a walk after this."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Definitely. I might swing by the park later."
+    },
+    {
+     "speaker": "jun11",
+     "text": "Sounds like a plan. Let me know if you need anything else."
+    }
+   ]
+  },
+  {
+   "id": "c11-48",
+   "scenario": "S3",
+   "location": "cafe11",
+   "participants": [
+    "dee11",
+    "eli11",
+    "jun11"
+   ],
+   "facts": [
+    "f11-47"
+   ],
+   "retells": {
+    "f11-47": "c11-47"
+   },
+   "speaker_for": {
+    "f11-47": "jun11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Hey, how's your day going so far?"
+    },
+    {
+     "speaker": "eli11",
+     "text": "Pretty hectic, but the coffee here is keeping me afloat."
+    },
+    {
+     "speaker": "jun11",
+     "text": "By the way, the name chosen for the west stairwell is LUMEN3-9924."
+    },
+    {
+     "speaker": "dee11",
+     "text": "LUMEN3-9924? That's a sleek sounding name for a stairwell."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Did they give it a backstory or just pick something futuristic?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "I think it came up in the planning meeting this morning."
+    },
+    {
+     "speaker": "dee11",
+     "text": "I was just diving into a novel while waiting for my latte."
+    },
+    {
+     "speaker": "eli11",
+     "text": "Nice! Any good books on your radar right now?"
+    },
+    {
+     "speaker": "jun11",
+     "text": "Probably just a quiet evening with a walk in the park later."
+    }
+   ]
+  },
+  {
+   "id": "c11-49",
+   "scenario": "S3",
+   "location": "lab11",
+   "participants": [
+    "dee11",
+    "gus11"
+   ],
+   "facts": [
+    "f11-49",
+    "f11-50"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f11-49": "gus11",
+    "f11-50": "dee11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Morning, Gus! How's the experiment coming along?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Hey Dee, it's going well. Just finished calibrating the sensors."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Nice. I was just checking the schedule for the seminar later."
+    },
+    {
+     "speaker": "gus11",
+     "text": "The booking reference for the server rack is SAFFRON3-9244."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Got it, thanks. By the way, the password for the seminar room is MAPLE-1080."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Perfect, that'll save us a lot of hassle."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Did you manage to get the samples from the freezer?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Yes, they're ready for analysis. How's the data processing going?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Smooth so far, just waiting on the final plots."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Great. Let me know if you need any help with the visualization."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Will do. Thanks for the support!"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Anytime, Dee."
+    }
+   ]
+  },
+  {
+   "id": "c11-50",
+   "scenario": "S3",
+   "location": "lab11",
+   "participants": [
+    "dee11",
+    "gus11",
+    "ivo11"
+   ],
+   "facts": [
+    "f11-49"
+   ],
+   "retells": {
+    "f11-49": "c11-49"
+   },
+   "speaker_for": {
+    "f11-49": "dee11"
+   },
+   "turns": [
+    {
+     "speaker": "dee11",
+     "text": "Morning, guys. Did you get a chance to look at the data from yesterday?"
+    },
+    {
+     "speaker": "gus11",
+     "text": "Hey Dee, I skimmed it. The trends look promising, though I think we need to rerun the calibration."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "I agree. I also ran a quick check on the temperature sensors; they seem stable."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Great. By the way, the booking reference for the server rack is SAFFRON3-9244."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Thanks, Dee. I'll add that to the inventory sheet."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Good call. I was about to ask you for it. Did you manage to get coffee yet?"
+    },
+    {
+     "speaker": "dee11",
+     "text": "Just grabbed a cup. The espresso machine finally worked after the cleaning."
+    },
+    {
+     "speaker": "gus11",
+     "text": "Nice! I need a caffeine boost too. My brain feels a bit sluggish after the long simulation."
+    },
+    {
+     "speaker": "ivo11",
+     "text": "Same here. Maybe we should take a short walk to the break area and stretch."
+    },
+    {
+     "speaker": "dee11",
+     "text": "Sounds like a plan. Let's reconvene after a quick break."
+    }
+   ]
+  }
+ ]
+}

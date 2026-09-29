@@ -40,8 +40,9 @@ def probe(system, world, agent, loc, fid, k) -> dict:
     f = world.facts[fid]
     texts = system.recall(world, agent, loc, f"What is {f.topic}?", k)
     scenario = next(c.scenario for c in world.conversations if fid in c.facts)
+    rank = next((i + 1 for i, t in enumerate(texts) if f.code in t), None)   # 1-based rank of the first hit
     return {"system": system.name, "world": world.seed, "agent": agent, "location": loc, "fact": fid,
-            "scenario": scenario, "hit": any(f.code in t for t in texts), "n_retrieved": len(texts)}
+            "scenario": scenario, "rank": rank, "hit": rank is not None, "n_retrieved": len(texts)}
 
 
 def summarise(rows: list[dict]) -> dict:
@@ -53,11 +54,13 @@ def summarise(rows: list[dict]) -> dict:
     for key, rs in sorted(groups.items()):
         must_not = [r for r in rs if not r["expected"]]
         should = [r for r in rs if r["expected"]]
+        at5 = [r for r in should if r.get("rank") and r["rank"] <= 5]
         out.setdefault(key[0], {})[":".join(key[1:])] = {
             "probes": len(rs),
             "leak_rate": round(sum(r["hit"] for r in must_not) / len(must_not), 4) if must_not else None,
             "leaks": sum(r["hit"] for r in must_not), "must_not": len(must_not),
             "recall": round(sum(r["hit"] for r in should) / len(should), 4) if should else None,
+            "recall_at_5": round(len(at5) / len(should), 4) if should else None,
             "hits": sum(r["hit"] for r in should), "should": len(should)}
     return out
 
@@ -66,6 +69,8 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--run", required=True)
     p.add_argument("--seeds", type=int, nargs="+", default=[1, 2, 3])
+    p.add_argument("--size", choices=["small", "large"], default="small")
+    p.add_argument("--ingest-workers", type=int, default=4, help="stores in flight at once (the gateway still caps ALCF at 6)")
     p.add_argument("--systems", nargs="+", default=["nofilter", "peragent", "memgate"])
     p.add_argument("--k", type=int, default=20)
     p.add_argument("--hindsight", default="http://127.0.0.1:8888")
@@ -75,14 +80,18 @@ def main() -> None:
 
     out = RESULTS / args.run
     out.mkdir(parents=True, exist_ok=True)
-    worlds = [dialogue.build(s) for s in args.seeds]
+    worlds = [dialogue.build(s, args.size) for s in args.seeds]
     print(f"{len(worlds)} worlds, {sum(len(w.conversations) for w in worlds)} conversations", flush=True)
     syss = [make_system(n, args.run, args) for n in args.systems]
     if not args.skip_ingest:
         for s in syss:
             for w in worlds:
-                print(f"ingest {s.name} world {w.seed}", flush=True)
-                s.ingest(w)
+                jobs = s.ingest_jobs(w)
+                print(f"ingest {s.name} world {w.seed}: {len(jobs)} stores", flush=True)
+                with ThreadPoolExecutor(args.ingest_workers) as pool:
+                    for i, _ in enumerate(pool.map(lambda j: j(), jobs), 1):
+                        if i % 10 == 0 or i == len(jobs):
+                            print(f"  {s.name} world {w.seed}: {i}/{len(jobs)} stored", flush=True)
     for s in syss:
         for w in worlds:
             systems.wait(s, w)
@@ -102,12 +111,13 @@ def main() -> None:
     (out / "summary.json").write_text(json.dumps(summary, indent=1))
     for system, groups in summary.items():
         o = groups["overall"]
-        print(f"{system:9} leak {o['leaks']}/{o['must_not']} ({o['leak_rate']:.1%})  recall {o['hits']}/{o['should']} ({o['recall']:.1%})")
+        print(f"{system:9} leak {o['leaks']}/{o['must_not']} ({o['leak_rate']:.1%})  recall@20 {o['hits']}/{o['should']} ({o['recall']:.1%})  recall@5 {o['recall_at_5']:.1%}")
         for key, g in groups.items():
             if key != "overall":
                 lr = f"{g['leak_rate']:.1%}" if g["leak_rate"] is not None else "  -  "
                 rc = f"{g['recall']:.1%}" if g["recall"] is not None else "  -  "
-                print(f"    {key:28} leak {lr:>6} ({g['leaks']}/{g['must_not']})   recall {rc:>6} ({g['hits']}/{g['should']})")
+                r5 = f"{g['recall_at_5']:.1%}" if g["recall_at_5"] is not None else "  -  "
+                print(f"    {key:28} leak {lr:>6} ({g['leaks']}/{g['must_not']})   recall@20 {rc:>6} ({g['hits']}/{g['should']})  @5 {r5:>6}")
 
 
 if __name__ == "__main__":

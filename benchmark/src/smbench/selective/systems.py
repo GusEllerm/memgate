@@ -66,10 +66,11 @@ class NoFilter:
     def _bank(self, world: World) -> str:
         return f"{self.run}-nofilter-w{world.seed}"
 
-    def ingest(self, world: World) -> None:
+    def ingest_jobs(self, world: World) -> list:
+        """Create the banks, then return one zero-argument job per store (run in parallel by the runner)."""
         self.h.bank(self._bank(world))
-        for c in world.conversations:
-            self.h.retain(self._bank(world), transcript(world, c), when(world, c), c.id)
+        return [lambda c=c: self.h.retain(self._bank(world), transcript(world, c), when(world, c), c.id)
+                for c in world.conversations]
 
     def banks(self, world: World) -> list[str]:
         return [self._bank(world)]
@@ -87,12 +88,11 @@ class PerAgent(NoFilter):
     def _agent_bank(self, world: World, agent: str) -> str:
         return f"{self.run}-peragent-{agent}"
 
-    def ingest(self, world: World) -> None:
+    def ingest_jobs(self, world: World) -> list:
         for a in world.agents:
             self.h.bank(self._agent_bank(world, a))
-        for c in world.conversations:
-            for a in c.participants:
-                self.h.retain(self._agent_bank(world, a), transcript(world, c), when(world, c), f"{c.id}-{a}")
+        return [lambda c=c, a=a: self.h.retain(self._agent_bank(world, a), transcript(world, c), when(world, c), f"{c.id}-{a}")
+                for c in world.conversations for a in c.participants]
 
     def banks(self, world: World) -> list[str]:
         return [self._agent_bank(world, a) for a in world.agents]
@@ -114,11 +114,11 @@ class Memgate:
             self._mem[world.seed] = self._cls(self.gate, bank=f"{self.run}-memgate-w{world.seed}", base_url=self.url)
         return self._mem[world.seed]
 
-    def ingest(self, world: World) -> None:
+    def ingest_jobs(self, world: World) -> list:
         m = self._m(world)
         m.create_bank()
-        for c in world.conversations:
-            m.remember(c.participants[0], c.location, c.participants, transcript(world, c), when=when(world, c))
+        return [lambda c=c: m.remember(c.participants[0], c.location, c.participants, transcript(world, c), when=when(world, c))
+                for c in world.conversations]
 
     def pending(self, world: World) -> int:
         return self._m(world).pending_operations()

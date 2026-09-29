@@ -8,6 +8,7 @@ the released dataset (the benchmark never regenerates a saved world).
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from openai import OpenAI
@@ -59,15 +60,20 @@ def write_dialogue(llm: OpenAI, world: World, conv, attempts: int = 4) -> list[d
     raise RuntimeError(f"could not write a valid dialogue for {conv.id}")
 
 
-def build(seed: int, gateway: str = "http://127.0.0.1:8411/v1") -> World:
-    path = DATASETS / f"world-{seed}.json"
+def dataset_path(seed: int, size: str = "small") -> Path:
+    return DATASETS / (f"world-{seed}.json" if size == "small" else f"world-{seed}-{size}.json")
+
+
+def build(seed: int, size: str = "small", gateway: str = "http://127.0.0.1:8411/v1") -> World:
+    path = dataset_path(seed, size)
     if path.exists():
         return World.from_json(json.loads(path.read_text()))
-    world = plan(seed)
+    world = plan(seed, size)
     llm = OpenAI(base_url=gateway, api_key="gateway", timeout=600,
-                 default_headers={"X-Run-Id": f"selective-world-{seed}", "X-System": "selective-dialogue"})
-    for conv in world.conversations:
-        conv.turns = write_dialogue(llm, world, conv)
+                 default_headers={"X-Run-Id": f"selective-world-{seed}-{size}", "X-System": "selective-dialogue"})
+    with ThreadPoolExecutor(6) as pool:                     # the gateway still caps ALCF at 6
+        for conv, turns in zip(world.conversations, pool.map(lambda c: write_dialogue(llm, world, c), world.conversations)):
+            conv.turns = turns
     DATASETS.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(world.to_json(), indent=1))
     return world
