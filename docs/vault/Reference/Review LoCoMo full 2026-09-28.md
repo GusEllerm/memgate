@@ -70,7 +70,7 @@ Per conversation, Hindsight ranges from 60.5% to 75.3% and Mem0 from 65.3% to 76
 | **Ours, Mem0** | OSS 2.2.0, k=20 | gpt-oss-120b / Nemotron Ultra | **69.4** | 45.0 | 77.0 | 54.2 | 76.3 |
 | **Ours, Hindsight** | 0.10.1, recall, k=20 | gpt-oss-120b / Nemotron Ultra | **69.5** | 49.7 | 74.5 | 56.3 | 75.7 |
 | [Mem0 paper](https://arxiv.org/abs/2504.19413) (2025), Mem0 | OSS (then), top-k memories | GPT-4o-mini / stronger LLM, 10 runs | 66.9 | 67.1 | 55.5 | 51.2 | 72.9 |
-| [Hindsight paper](https://arxiv.org/abs/2512.12818), Hindsight | recall + **reflect** | **gpt-oss-120b** / gpt-oss-120b | 85.7 | 76.8 | 79.4 | 62.5 | 93.7 |
+| [Hindsight paper](https://arxiv.org/abs/2512.12818), Hindsight | recall, budget high, 4,096 fact tokens + 8,192 raw-transcript tokens | **gpt-oss-120b** / gpt-oss-120b, lenient prompt | 85.7 | 76.8 | 79.4 | 62.5 | 93.7 |
 | [Mem0 docs](https://docs.mem0.ai/core-concepts/memory-evaluation) (current) | **Platform** v3, top-200 (~7k tokens per query) | not stated | 92.5 | – | – | – | – |
 | [Hindsight benchmarks site](https://benchmarks.hindsight.vectorize.io/) | not stated | not stated | 92 | – | – | – | – |
 
@@ -83,12 +83,21 @@ Other points of reference, all self-reported:
 
 **Reading it.**
 - **Our Mem0 matches its paper.** 69.4% against 66.9% with GPT-4o-mini: the harness is sound. Our temporal score is much higher (77.0 vs 55.5), plausibly thanks to the session-date fix and a reasoning model, and our multi-hop score lower (45.0 vs 67.1).
-- **Our Hindsight trails its paper by 16 points on the same backbone** (69.5% vs 85.7% with gpt-oss-120b). Three differences, all on the answering side, are candidates:
-  1. **Answering.** Their paper answers through **reflect**, an agentic loop that can retrieve again. We do one retrieval and one answer.
-  2. **Budget.** Their retrieval budget is not stated; ours is 20 memories. Mem0's current headline uses 200.
-  3. **Judge.** Theirs is gpt-oss-120b judging its own answers; ours is a different model family.
+- **Our Hindsight trails its paper by 16 points on the same backbone** (69.5% vs 85.7% with gpt-oss-120b). An investigation on 2026-09-29 read Hindsight's paper-era evaluation code (vectorize-io/hindsight @ fa554b89) and **found no bug in our pipeline**. The gap is protocol:
+  1. **The judge prompt.** Theirs marks an answer correct "as long as it touches on the same topic". Ours asks for the same thing.
+  2. **Retrieval volume.** They recall with budget high, 4,096 tokens of facts, **plus 8,192 tokens of raw transcript and 2,048 of entities**. We take 20 memories, about 700 tokens.
+  3. **The answer step.** They ask for "say them all", with high reasoning effort and no length cap. We use a 10-word cap.
+  4. **Denominator.** They drop errored questions.
 
-  The biggest gaps are on single-hop (75.7 vs 93.7) and multi-hop (49.7 vs 76.8), which fits (1) and (2).
+  **Correction:** the paper answered via recall, not reflect. Their own reflect run scored lower (77.24% vs 79.61%).
+
+  In about two-thirds of our Hindsight misses, the evidence was at least partly retrieved (62% had half or more of the gold's content). So answering and grading dominate the gap. By eye, about 4 in 30 wrong answers were judge errors on our side (e.g. "January 1, 2022" vs gold "2022").
+
+  **Minor issues found:**
+  - year-only facts render as [YYYY-01-01];
+  - observations and the facts they came from both appear in the 20 slots, about 12% near-duplicates. Fix with types=["world","experience"] or prefer_observations.
+
+  Re-grades running on 2026-09-29 measure the judge's share.
 - **Headline numbers of 92% or more** (Mem0 Platform v3, Hindsight's site) use the vendor's own pipeline, large retrieval budgets and unstated models. They aren't comparable to a fixed-protocol run.
 - **What would attribute the gaps:** a small ablation on one or two conversations:
   - Hindsight answering via reflect;
