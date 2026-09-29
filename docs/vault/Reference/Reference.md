@@ -19,3 +19,4 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Cognee]]
 - [[Review LoCoMo pilot 2026-09-28]]
 - [[Review LoCoMo full 2026-09-28]]
+- [[Review Selective S1-S3 2026-09-29]]

@@ -1,0 +1,251 @@
+{
+ "memgate": {
+  "kind:non-witness": {
+   "probes": 279,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 279,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:retold-to-newcomer": {
+   "probes": 3,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "hits": 3,
+   "should": 3
+  },
+  "kind:untold-to-newcomer": {
+   "probes": 9,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 9,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-elsewhere": {
+   "probes": 132,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 132,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-here": {
+   "probes": 63,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "hits": 63,
+   "should": 63
+  },
+  "overall": {
+   "probes": 486,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 420,
+   "recall": 1.0,
+   "hits": 66,
+   "should": 66
+  },
+  "scenario:S1": {
+   "probes": 216,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 186,
+   "recall": 1.0,
+   "hits": 30,
+   "should": 30
+  },
+  "scenario:S2": {
+   "probes": 162,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 141,
+   "recall": 1.0,
+   "hits": 21,
+   "should": 21
+  },
+  "scenario:S3": {
+   "probes": 108,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 93,
+   "recall": 1.0,
+   "hits": 15,
+   "should": 15
+  }
+ },
+ "nofilter": {
+  "kind:non-witness": {
+   "probes": 279,
+   "leak_rate": 1.0,
+   "leaks": 279,
+   "must_not": 279,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:retold-to-newcomer": {
+   "probes": 3,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "hits": 3,
+   "should": 3
+  },
+  "kind:untold-to-newcomer": {
+   "probes": 9,
+   "leak_rate": 1.0,
+   "leaks": 9,
+   "must_not": 9,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-elsewhere": {
+   "probes": 132,
+   "leak_rate": 1.0,
+   "leaks": 132,
+   "must_not": 132,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-here": {
+   "probes": 63,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "hits": 63,
+   "should": 63
+  },
+  "overall": {
+   "probes": 486,
+   "leak_rate": 1.0,
+   "leaks": 420,
+   "must_not": 420,
+   "recall": 1.0,
+   "hits": 66,
+   "should": 66
+  },
+  "scenario:S1": {
+   "probes": 216,
+   "leak_rate": 1.0,
+   "leaks": 186,
+   "must_not": 186,
+   "recall": 1.0,
+   "hits": 30,
+   "should": 30
+  },
+  "scenario:S2": {
+   "probes": 162,
+   "leak_rate": 1.0,
+   "leaks": 141,
+   "must_not": 141,
+   "recall": 1.0,
+   "hits": 21,
+   "should": 21
+  },
+  "scenario:S3": {
+   "probes": 108,
+   "leak_rate": 1.0,
+   "leaks": 93,
+   "must_not": 93,
+   "recall": 1.0,
+   "hits": 15,
+   "should": 15
+  }
+ },
+ "peragent": {
+  "kind:non-witness": {
+   "probes": 279,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 279,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:retold-to-newcomer": {
+   "probes": 3,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "hits": 3,
+   "should": 3
+  },
+  "kind:untold-to-newcomer": {
+   "probes": 9,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 9,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-elsewhere": {
+   "probes": 132,
+   "leak_rate": 1.0,
+   "leaks": 132,
+   "must_not": 132,
+   "recall": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-here": {
+   "probes": 63,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "hits": 63,
+   "should": 63
+  },
+  "overall": {
+   "probes": 486,
+   "leak_rate": 0.3143,
+   "leaks": 132,
+   "must_not": 420,
+   "recall": 1.0,
+   "hits": 66,
+   "should": 66
+  },
+  "scenario:S1": {
+   "probes": 216,
+   "leak_rate": 0.3226,
+   "leaks": 60,
+   "must_not": 186,
+   "recall": 1.0,
+   "hits": 30,
+   "should": 30
+  },
+  "scenario:S2": {
+   "probes": 162,
+   "leak_rate": 0.2979,
+   "leaks": 42,
+   "must_not": 141,
+   "recall": 1.0,
+   "hits": 21,
+   "should": 21
+  },
+  "scenario:S3": {
+   "probes": 108,
+   "leak_rate": 0.3226,
+   "leaks": 30,
+   "must_not": 93,
+   "recall": 1.0,
+   "hits": 15,
+   "should": 15
+  }
+ }
+}
