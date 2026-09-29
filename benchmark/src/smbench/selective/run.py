@@ -69,7 +69,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--run", required=True)
     p.add_argument("--seeds", type=int, nargs="+", default=[1, 2, 3])
-    p.add_argument("--size", choices=["small", "large"], default="small")
+    p.add_argument("--size", choices=["small", "large", "env"], default="small")
     p.add_argument("--ingest-workers", type=int, default=4, help="stores in flight at once (the gateway still caps ALCF at 6)")
     p.add_argument("--systems", nargs="+", default=["nofilter", "peragent", "memgate"])
     p.add_argument("--k", type=int, default=20)
@@ -95,18 +95,34 @@ def main() -> None:
     for s in syss:
         for w in worlds:
             systems.wait(s, w)
-    rows = []
+    rows, audit = [], []
     for w in worlds:
         exp = oracle.expected(w)
         for s in syss:
-            jobs = list(exp)
-            with ThreadPoolExecutor(6) as pool:
-                for (a, l, f), row in zip(jobs, pool.map(lambda j: probe(s, w, *j, args.k), jobs)):
-                    row["expected"] = exp[(a, l, f)]
-                    row["kind"] = oracle.probe_kind(w, a, l, f)
-                    rows.append(row)
-            print(f"probed {s.name} world {w.seed}: {len(jobs)} probes", flush=True)
+            # High-assurance probes first, bracketed by snapshots: recall there must change nothing.
+            ha = [j for j in exp if j[1] in w.high_assurance]
+            rest = [j for j in exp if j[1] not in w.high_assurance]
+            before = s.snapshot(w) if ha and hasattr(s, "snapshot") else None
+            for batch in (ha, rest):
+                with ThreadPoolExecutor(6) as pool:
+                    for (a, l, f), row in zip(batch, pool.map(lambda j: probe(s, w, *j, args.k), batch)):
+                        row["expected"] = exp[(a, l, f)]
+                        row["kind"] = oracle.probe_kind(w, a, l, f)
+                        rows.append(row)
+                if batch is ha and before is not None:
+                    after = s.snapshot(w)
+                    changed = {b: {k: (before[b][k], after[b][k]) for k in before[b] if before[b][k] != after[b][k]}
+                               for b in before if before[b] != after[b]}
+                    audit.append({"system": s.name, "world": w.seed, "ha_probes": len(ha), "changed": changed})
+                    print(f"side-effect audit {s.name} world {w.seed}: {len(ha)} high-assurance recalls, "
+                          f"{'no change' if not changed else changed}", flush=True)
+            print(f"probed {s.name} world {w.seed}: {len(exp)} probes", flush=True)
+        for s in syss:
+            if getattr(s, "refused", None):
+                print(f"{s.name} refused {len(s.refused)} carry-outs in world {w.seed}", flush=True)
     (out / "probes.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
+    if audit:
+        (out / "side_effects.json").write_text(json.dumps(audit, indent=1))
     summary = summarise(rows)
     (out / "summary.json").write_text(json.dumps(summary, indent=1))
     for system, groups in summary.items():

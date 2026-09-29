@@ -1,0 +1,725 @@
+{
+ "seed": 21,
+ "agents": [
+  "ada21",
+  "bo21",
+  "cy21",
+  "dee21",
+  "eli21",
+  "fay21"
+ ],
+ "locations": [
+  "lab21",
+  "cafe21",
+  "gallery21",
+  "macrodata21",
+  "vault21"
+ ],
+ "facts": {
+  "f21-0": {
+   "id": "f21-0",
+   "topic": "the password for the storeroom",
+   "code": "HARBOR-3269",
+   "kind": "fact"
+  },
+  "f21-1": {
+   "id": "f21-1",
+   "topic": "the name chosen for the print room",
+   "code": "GARNET1-3187",
+   "kind": "opinion"
+  },
+  "f21-2": {
+   "id": "f21-2",
+   "topic": "the label on the tool chest",
+   "code": "FROST-2539",
+   "kind": "fact"
+  },
+  "f21-3": {
+   "id": "f21-3",
+   "topic": "the combination for the kiln",
+   "code": "NECTAR3-4058",
+   "kind": "opinion"
+  },
+  "f21-4": {
+   "id": "f21-4",
+   "topic": "the label on the storeroom",
+   "code": "COBALT1-3307",
+   "kind": "fact"
+  },
+  "f21-5": {
+   "id": "f21-5",
+   "topic": "the password for the west stairwell",
+   "code": "WILLOW-2177",
+   "kind": "opinion"
+  },
+  "f21-6": {
+   "id": "f21-6",
+   "topic": "the booking reference for the storeroom",
+   "code": "GARNET-3073",
+   "kind": "fact"
+  },
+  "f21-7": {
+   "id": "f21-7",
+   "topic": "the combination for the field kit",
+   "code": "ORBIT2-5981",
+   "kind": "opinion"
+  },
+  "f21-8": {
+   "id": "f21-8",
+   "topic": "the password for the field kit",
+   "code": "QUILL2-7492",
+   "kind": "fact"
+  },
+  "f21-9": {
+   "id": "f21-9",
+   "topic": "the combination for the storeroom",
+   "code": "LUMEN1-3721",
+   "kind": "fact"
+  },
+  "f21-10": {
+   "id": "f21-10",
+   "topic": "the booking reference for the greenhouse door",
+   "code": "CEDAR2-3974",
+   "kind": "opinion"
+  },
+  "f21-11": {
+   "id": "f21-11",
+   "topic": "the combination for the lab safe",
+   "code": "COBALT3-1756",
+   "kind": "fact"
+  },
+  "f21-12": {
+   "id": "f21-12",
+   "topic": "the booking reference for the telescope dome",
+   "code": "RIDGE-9271",
+   "kind": "opinion"
+  },
+  "f21-13": {
+   "id": "f21-13",
+   "topic": "the password for the lab safe",
+   "code": "QUILL3-8600",
+   "kind": "fact"
+  },
+  "f21-14": {
+   "id": "f21-14",
+   "topic": "the booking reference for the bike shed",
+   "code": "PIXEL-2040",
+   "kind": "opinion"
+  },
+  "f21-15": {
+   "id": "f21-15",
+   "topic": "the booking reference for the field kit",
+   "code": "MAPLE1-4822",
+   "kind": "fact"
+  },
+  "f21-16": {
+   "id": "f21-16",
+   "topic": "the password for the rooftop garden",
+   "code": "NECTAR1-5143",
+   "kind": "opinion"
+  },
+  "f21-17": {
+   "id": "f21-17",
+   "topic": "the combination for the greenhouse door",
+   "code": "HARBOR2-1686",
+   "kind": "fact"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c21-0",
+   "scenario": "S4",
+   "location": "lab21",
+   "participants": [
+    "cy21",
+    "dee21"
+   ],
+   "facts": [
+    "f21-0",
+    "f21-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-0": "cy21",
+    "f21-1": "cy21"
+   },
+   "turns": [
+    {
+     "speaker": "dee21",
+     "text": "Morning, cy21! How's your day shaping up in the lab?"
+    },
+    {
+     "speaker": "cy21",
+     "text": "Hey Dee, it's been a full morning\u2014lots of samples to run and the equipment humming."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Got any trouble getting into the storeroom? I heard the lock was acting up."
+    },
+    {
+     "speaker": "cy21",
+     "text": "The password for the storeroom is HARBOR-3269."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Thanks, that should sort it out. I need to grab some fresh plates for the next batch."
+    },
+    {
+     "speaker": "cy21",
+     "text": "In my view, the name chosen for the print room should be GARNET1-3187."
+    },
+    {
+     "speaker": "dee21",
+     "text": "GARNET1-3187 has a nice ring to it\u2014definitely more memorable than the old label."
+    },
+    {
+     "speaker": "cy21",
+     "text": "Do you think the new naming will help us keep the workflow smoother?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "Absolutely, clear names cut down on mix\u2011ups, especially when the bench gets busy."
+    },
+    {
+     "speaker": "cy21",
+     "text": "Great, I'll note that down and we can update the signage after lunch."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "cy21",
+     "fact": "f21-0"
+    },
+    {
+     "agent": "cy21",
+     "fact": "f21-1"
+    }
+   ]
+  },
+  {
+   "id": "c21-1",
+   "scenario": "S4",
+   "location": "gallery21",
+   "participants": [
+    "ada21",
+    "dee21"
+   ],
+   "facts": [
+    "f21-2",
+    "f21-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-2": "ada21",
+    "f21-3": "ada21"
+   },
+   "turns": [
+    {
+     "speaker": "dee21",
+     "text": "Morning, Ada! The light in the gallery feels different today."
+    },
+    {
+     "speaker": "ada21",
+     "text": "Hey Dee, I noticed the label on the tool chest is FROST-2539."
+    },
+    {
+     "speaker": "dee21",
+     "text": "That's the one we moved last week, right? It looks sturdy."
+    },
+    {
+     "speaker": "ada21",
+     "text": "In my view, the combination for the kiln should be NECTAR3-4058."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Got it. Have you had a chance to test the new glaze on the north wall?"
+    },
+    {
+     "speaker": "ada21",
+     "text": "I tried a bit this afternoon, and the colors seemed to settle nicely."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Nice. My morning was spent cataloguing the new sculptures."
+    },
+    {
+     "speaker": "ada21",
+     "text": "Sounds productive. I also stopped by the caf\u00e9 for a quick coffee."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Did you see the visitor who asked about the interactive piece?"
+    },
+    {
+     "speaker": "ada21",
+     "text": "Yes, I gave them a quick tour and they seemed thrilled."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Great. Let's meet later by the central installation to review the schedule."
+    },
+    {
+     "speaker": "ada21",
+     "text": "Perfect, I'll be there after I finish checking the tool chest again."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "ada21",
+     "fact": "f21-2"
+    },
+    {
+     "agent": "ada21",
+     "fact": "f21-3"
+    }
+   ]
+  },
+  {
+   "id": "c21-2",
+   "scenario": "S4",
+   "location": "macrodata21",
+   "participants": [
+    "dee21",
+    "fay21"
+   ],
+   "facts": [
+    "f21-4",
+    "f21-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-4": "dee21",
+    "f21-5": "fay21"
+   },
+   "turns": [
+    {
+     "speaker": "dee21",
+     "text": "Hey Fay, how's your morning going?"
+    },
+    {
+     "speaker": "fay21",
+     "text": "Pretty good, just finished sorting through the inbox. How about you?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "I was just checking the storage area and noticed the label on the storeroom is COBALT1-3307."
+    },
+    {
+     "speaker": "fay21",
+     "text": "Nice, that helps keep things organized. I always appreciate clear labeling."
+    },
+    {
+     "speaker": "fay21",
+     "text": "In my view, the password for the west stairwell should be WILLOW-2177."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Got it, thanks for the heads\u2011up. I\u2019ll make a note of that."
+    },
+    {
+     "speaker": "fay21",
+     "text": "Are you up for a quick coffee break? I could use a refill."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Sounds perfect. I have a meeting later, but a short pause will do me good."
+    },
+    {
+     "speaker": "fay21",
+     "text": "After the meeting, do you have any plans for the evening?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "Just a quiet night at home, maybe catch up on a book. Have a great rest of your day!"
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay21",
+     "fact": "f21-4"
+    },
+    {
+     "agent": "fay21",
+     "fact": "f21-5"
+    }
+   ]
+  },
+  {
+   "id": "c21-3",
+   "scenario": "S5",
+   "location": "vault21",
+   "participants": [
+    "cy21",
+    "fay21"
+   ],
+   "facts": [
+    "f21-6",
+    "f21-7"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-6": "fay21",
+    "f21-7": "fay21"
+   },
+   "turns": [
+    {
+     "speaker": "cy21",
+     "text": "Morning, Fay. How's your day shaping up?"
+    },
+    {
+     "speaker": "fay21",
+     "text": "Pretty smooth so far, just running through the usual checks."
+    },
+    {
+     "speaker": "cy21",
+     "text": "Anything I should know before I head to the storeroom?"
+    },
+    {
+     "speaker": "fay21",
+     "text": "The booking reference for the storeroom is GARNET-3073."
+    },
+    {
+     "speaker": "cy21",
+     "text": "Got it, thanks. Did you get a chance to look at the field kit lock?"
+    },
+    {
+     "speaker": "fay21",
+     "text": "In my view, the combination for the field kit should be ORBIT2-5981."
+    },
+    {
+     "speaker": "cy21",
+     "text": "I'll set that right away."
+    },
+    {
+     "speaker": "fay21",
+     "text": "Appreciate it. By the way, how's the coffee this morning?"
+    },
+    {
+     "speaker": "cy21",
+     "text": "Strong as usual, just the way I like it."
+    },
+    {
+     "speaker": "fay21",
+     "text": "Great, let's wrap up before lunch."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay21",
+     "fact": "f21-7"
+    }
+   ]
+  },
+  {
+   "id": "c21-4",
+   "scenario": "S4",
+   "location": "lab21",
+   "participants": [
+    "bo21",
+    "dee21"
+   ],
+   "facts": [
+    "f21-9",
+    "f21-10"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-9": "bo21",
+    "f21-10": "dee21"
+   },
+   "turns": [
+    {
+     "speaker": "bo21",
+     "text": "Morning, Dee! How's the experiment going?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "Hey Bo, pretty good, just finished calibrating the sensors."
+    },
+    {
+     "speaker": "bo21",
+     "text": "The combination for the storeroom is LUMEN1-3721."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Got it, thanks. I was also thinking about the greenhouse schedule."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Anything specific?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "In my view, the booking reference for the greenhouse door should be CEDAR2-3974."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Got it, thanks. Did you manage to get that report printed?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "Yes, I printed it after lunch. How's your coffee?"
+    },
+    {
+     "speaker": "bo21",
+     "text": "Strong as always, needed it after the early meeting."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Glad to hear. Let's catch up later and compare notes."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "dee21",
+     "fact": "f21-9"
+    },
+    {
+     "agent": "dee21",
+     "fact": "f21-10"
+    }
+   ]
+  },
+  {
+   "id": "c21-5",
+   "scenario": "S4",
+   "location": "gallery21",
+   "participants": [
+    "bo21",
+    "dee21"
+   ],
+   "facts": [
+    "f21-11",
+    "f21-12"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-11": "bo21",
+    "f21-12": "dee21"
+   },
+   "turns": [
+    {
+     "speaker": "bo21",
+     "text": "Morning, Dee! The new abstract piece over there caught my eye."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Good morning, Bo! Yeah, the colors are really striking. How's your day going so far?"
+    },
+    {
+     "speaker": "bo21",
+     "text": "Pretty busy, I had to check the lab safe earlier. The combination for the lab safe is COBALT3-1756."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Ah, got it. I was just finishing up a reservation. In my view, the booking reference for the telescope dome should be RIDGE-9271."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Thanks for letting me know. Did you get a chance to see the sculpture in the corner?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "I did, and I think the lighting really brings out the texture. It reminds me of the early evenings back at the observatory."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Exactly, the shadows add depth. I\u2019m planning to grab a coffee after this."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Sounds good. I might join you; the gallery caf\u00e9 has a new pastry I\u2019ve been wanting to try."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Great, we can compare notes on the exhibition while we wait."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Looking forward to it. See you in a few minutes."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "dee21",
+     "fact": "f21-11"
+    },
+    {
+     "agent": "dee21",
+     "fact": "f21-12"
+    }
+   ]
+  },
+  {
+   "id": "c21-6",
+   "scenario": "S4",
+   "location": "macrodata21",
+   "participants": [
+    "ada21",
+    "dee21"
+   ],
+   "facts": [
+    "f21-13",
+    "f21-14"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-13": "dee21",
+    "f21-14": "ada21"
+   },
+   "turns": [
+    {
+     "speaker": "ada21",
+     "text": "Hey Dee, how's your morning going?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "Pretty good, just finished the experiment. You?"
+    },
+    {
+     "speaker": "ada21",
+     "text": "I grabbed a coffee and checked the schedule."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Speaking of schedules, the password for the lab safe is QUILL3-8600."
+    },
+    {
+     "speaker": "ada21",
+     "text": "Got it, thanks. By the way, I was looking at the bike shed reservation."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Anything I can help with?"
+    },
+    {
+     "speaker": "ada21",
+     "text": "In my view, the booking reference for the bike shed should be PIXEL-2040."
+    },
+    {
+     "speaker": "dee21",
+     "text": "Sounds reasonable. I\u2019ll update the system."
+    },
+    {
+     "speaker": "ada21",
+     "text": "Great. Anything interesting happen today?"
+    },
+    {
+     "speaker": "dee21",
+     "text": "Just the usual, but I\u2019m glad we got the admin stuff sorted."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "ada21",
+     "fact": "f21-13"
+    },
+    {
+     "agent": "ada21",
+     "fact": "f21-14"
+    }
+   ]
+  },
+  {
+   "id": "c21-7",
+   "scenario": "S5",
+   "location": "vault21",
+   "participants": [
+    "bo21",
+    "eli21"
+   ],
+   "facts": [
+    "f21-15",
+    "f21-16"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f21-15": "eli21",
+    "f21-16": "eli21"
+   },
+   "turns": [
+    {
+     "speaker": "bo21",
+     "text": "Hey Eli, how's your shift going?"
+    },
+    {
+     "speaker": "eli21",
+     "text": "Not bad, just finished inventory. By the way, the booking reference for the field kit is MAPLE1-4822."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Got it, thanks. Anything interesting today?"
+    },
+    {
+     "speaker": "eli21",
+     "text": "Just the usual. In my view, the password for the rooftop garden should be NECTAR1-5143."
+    },
+    {
+     "speaker": "bo21",
+     "text": "That's a good suggestion. I was thinking about the garden too."
+    },
+    {
+     "speaker": "eli21",
+     "text": "Yeah, the plants are thriving. Did you get a chance to check the water system?"
+    },
+    {
+     "speaker": "bo21",
+     "text": "I did, everything looks fine. I also spotted a new mural in the hallway."
+    },
+    {
+     "speaker": "eli21",
+     "text": "Oh, I love murals. They brighten up the vault."
+    },
+    {
+     "speaker": "bo21",
+     "text": "Absolutely. After this, I'm grabbing a coffee. Want to join?"
+    },
+    {
+     "speaker": "eli21",
+     "text": "Sure, let's go. See you in the break room."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "eli21",
+     "fact": "f21-16"
+    }
+   ]
+  }
+ ],
+ "environments": {
+  "campus21": [
+   "fact",
+   "opinion",
+   "skill",
+   "episode"
+  ],
+  "studio21": [
+   "opinion",
+   "skill"
+  ],
+  "severed21": []
+ },
+ "location_env": {
+  "lab21": "campus21",
+  "cafe21": "campus21",
+  "vault21": "campus21",
+  "gallery21": "studio21",
+  "macrodata21": "severed21"
+ },
+ "high_assurance": [
+  "vault21"
+ ],
+ "notes": [
+  {
+   "agent": "cy21",
+   "location": "vault21",
+   "fact": "f21-8"
+  },
+  {
+   "agent": "bo21",
+   "location": "vault21",
+   "fact": "f21-17"
+  }
+ ]
+}

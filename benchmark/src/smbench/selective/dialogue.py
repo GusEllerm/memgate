@@ -35,6 +35,8 @@ def _fact_lines(world: World, conv) -> str:
         who = conv.speaker_for.get(fid, conv.participants[0])
         if fid in conv.retells:
             lines.append(f"{who} passes on something told to them earlier: {f.sentence}")
+        elif f.kind == "opinion":
+            lines.append(f"{who} gives a personal opinion: {f.sentence}")
         else:
             lines.append(f"{who} says: {f.sentence}")
     return "\n".join(lines)

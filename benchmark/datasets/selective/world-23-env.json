@@ -1,0 +1,717 @@
+{
+ "seed": 23,
+ "agents": [
+  "ada23",
+  "bo23",
+  "cy23",
+  "dee23",
+  "eli23",
+  "fay23"
+ ],
+ "locations": [
+  "lab23",
+  "cafe23",
+  "gallery23",
+  "macrodata23",
+  "vault23"
+ ],
+ "facts": {
+  "f23-0": {
+   "id": "f23-0",
+   "topic": "the combination for the kiln",
+   "code": "ZEPHYR2-9833",
+   "kind": "fact"
+  },
+  "f23-1": {
+   "id": "f23-1",
+   "topic": "the label on the darkroom",
+   "code": "LUMEN3-3910",
+   "kind": "opinion"
+  },
+  "f23-2": {
+   "id": "f23-2",
+   "topic": "the password for the reading room",
+   "code": "TUNDRA2-4710",
+   "kind": "fact"
+  },
+  "f23-3": {
+   "id": "f23-3",
+   "topic": "the combination for the boat house",
+   "code": "CEDAR1-2019",
+   "kind": "opinion"
+  },
+  "f23-4": {
+   "id": "f23-4",
+   "topic": "the combination for the server rack",
+   "code": "FROST2-8484",
+   "kind": "fact"
+  },
+  "f23-5": {
+   "id": "f23-5",
+   "topic": "the code for the rooftop garden",
+   "code": "TUNDRA-7747",
+   "kind": "opinion"
+  },
+  "f23-6": {
+   "id": "f23-6",
+   "topic": "the code for the archive cabinet",
+   "code": "COBALT1-7674",
+   "kind": "fact"
+  },
+  "f23-7": {
+   "id": "f23-7",
+   "topic": "the booking reference for the sample fridge",
+   "code": "RIDGE3-6724",
+   "kind": "opinion"
+  },
+  "f23-8": {
+   "id": "f23-8",
+   "topic": "the password for the darkroom",
+   "code": "NECTAR3-5484",
+   "kind": "fact"
+  },
+  "f23-9": {
+   "id": "f23-9",
+   "topic": "the name chosen for the boat house",
+   "code": "LUMEN1-7349",
+   "kind": "fact"
+  },
+  "f23-10": {
+   "id": "f23-10",
+   "topic": "the name chosen for the tool chest",
+   "code": "QUILL2-1701",
+   "kind": "opinion"
+  },
+  "f23-11": {
+   "id": "f23-11",
+   "topic": "the booking reference for the field kit",
+   "code": "ZEPHYR1-5185",
+   "kind": "fact"
+  },
+  "f23-12": {
+   "id": "f23-12",
+   "topic": "the name chosen for the telescope dome",
+   "code": "COBALT3-9827",
+   "kind": "opinion"
+  },
+  "f23-13": {
+   "id": "f23-13",
+   "topic": "the code for the west stairwell",
+   "code": "NECTAR-7291",
+   "kind": "fact"
+  },
+  "f23-14": {
+   "id": "f23-14",
+   "topic": "the label on the loading dock",
+   "code": "CEDAR2-4559",
+   "kind": "opinion"
+  },
+  "f23-15": {
+   "id": "f23-15",
+   "topic": "the password for the bike shed",
+   "code": "PIXEL3-7079",
+   "kind": "fact"
+  },
+  "f23-16": {
+   "id": "f23-16",
+   "topic": "the password for the boat house",
+   "code": "HARBOR3-2808",
+   "kind": "opinion"
+  },
+  "f23-17": {
+   "id": "f23-17",
+   "topic": "the name chosen for the west stairwell",
+   "code": "MOSAIC1-2981",
+   "kind": "fact"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c23-0",
+   "scenario": "S4",
+   "location": "lab23",
+   "participants": [
+    "dee23",
+    "eli23"
+   ],
+   "facts": [
+    "f23-0",
+    "f23-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-0": "eli23",
+    "f23-1": "dee23"
+   },
+   "turns": [
+    {
+     "speaker": "dee23",
+     "text": "Morning, Eli. Did you get a chance to calibrate the spectrometer yesterday?"
+    },
+    {
+     "speaker": "eli23",
+     "text": "Hey Dee, yeah I did. It was a bit finicky, but I think it's good now."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Great. By the way, I was thinking about the darkroom signage; in my view, the label on the darkroom should be LUMEN3-3910."
+    },
+    {
+     "speaker": "eli23",
+     "text": "Got it. That makes sense. I'll update the inventory sheet later."
+    },
+    {
+     "speaker": "dee23",
+     "text": "How's the new sample looking under the microscope? Any interesting patterns?"
+    },
+    {
+     "speaker": "eli23",
+     "text": "Actually, the crystal formation is pretty clear. Oh, and the combination for the kiln is ZEPHYR2-9833."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Thanks for the heads up. I'll make sure it's set before the afternoon run."
+    },
+    {
+     "speaker": "eli23",
+     "text": "No problem. Did you manage to grab a coffee before the meeting?"
+    },
+    {
+     "speaker": "dee23",
+     "text": "I did, but it was a bit weak. I might need a refill later."
+    },
+    {
+     "speaker": "eli23",
+     "text": "Same here. Let's catch up after the data analysis and see how the day's going."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "dee23",
+     "fact": "f23-0"
+    },
+    {
+     "agent": "dee23",
+     "fact": "f23-1"
+    }
+   ]
+  },
+  {
+   "id": "c23-1",
+   "scenario": "S4",
+   "location": "gallery23",
+   "participants": [
+    "ada23",
+    "cy23"
+   ],
+   "facts": [
+    "f23-2",
+    "f23-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-2": "cy23",
+    "f23-3": "cy23"
+   },
+   "turns": [
+    {
+     "speaker": "ada23",
+     "text": "Hey Cy, how's your morning at the gallery?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "Pretty good, just finished checking the new exhibit. By the way, the password for the reading room is TUNDRA2-4710."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Thanks! I was hoping to look up some references for my project. Did you see the new abstract paintings yet?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "Yes, they really bring a fresh vibe. In my view, the combination for the boat house should be CEDAR1-2019."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Interesting! I hadn't thought about the boat house today. Speaking of, I'm planning to grab a coffee later. Want to join?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "I wish I could, but I have a quick meeting with the curator. Maybe next time."
+    },
+    {
+     "speaker": "ada23",
+     "text": "No problem. Let me know when you're free, and we can compare notes on the installations."
+    },
+    {
+     "speaker": "cy23",
+     "text": "Will do. I also need to rearrange the lighting on the west wall. It's a bit tricky."
+    },
+    {
+     "speaker": "ada23",
+     "text": "If you need a hand, just shout. I was just about to head to the sculpture hall."
+    },
+    {
+     "speaker": "cy23",
+     "text": "Appreciate it! I'll catch up with you there soon."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "cy23",
+     "fact": "f23-2"
+    },
+    {
+     "agent": "cy23",
+     "fact": "f23-3"
+    }
+   ]
+  },
+  {
+   "id": "c23-2",
+   "scenario": "S4",
+   "location": "macrodata23",
+   "participants": [
+    "ada23",
+    "dee23"
+   ],
+   "facts": [
+    "f23-4",
+    "f23-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-4": "dee23",
+    "f23-5": "dee23"
+   },
+   "turns": [
+    {
+     "speaker": "ada23",
+     "text": "Hey Dee, how's your day going so far?"
+    },
+    {
+     "speaker": "dee23",
+     "text": "Pretty good, thanks! By the way, the combination for the server rack is FROST2-8484."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Got it, thanks for the heads\u2011up. Have you heard anything about the rooftop garden access?"
+    },
+    {
+     "speaker": "dee23",
+     "text": "In my view, the code for the rooftop garden should be TUNDRA-7747."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Nice, that clears things up. I grabbed a coffee this morning and it was exactly what I needed."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Same here, a quick bite and a walk outside really helped me reset."
+    },
+    {
+     "speaker": "ada23",
+     "text": "I have a brief sync later, but I\u2019m hoping to keep it relaxed."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Sounds good. I\u2019m polishing up the draft for the new project after this."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Looking forward to seeing how it turns out."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Me too. Catch you later!"
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "dee23",
+     "fact": "f23-4"
+    },
+    {
+     "agent": "dee23",
+     "fact": "f23-5"
+    }
+   ]
+  },
+  {
+   "id": "c23-3",
+   "scenario": "S5",
+   "location": "vault23",
+   "participants": [
+    "cy23",
+    "fay23"
+   ],
+   "facts": [
+    "f23-6",
+    "f23-7"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-6": "fay23",
+    "f23-7": "fay23"
+   },
+   "turns": [
+    {
+     "speaker": "cy23",
+     "text": "Morning, Fay! The vault feels quieter than usual today."
+    },
+    {
+     "speaker": "fay23",
+     "text": "Hey Cy! Yeah, it's a nice change of pace."
+    },
+    {
+     "speaker": "cy23",
+     "text": "Did you manage to finish the inventory check for the archive section?"
+    },
+    {
+     "speaker": "fay23",
+     "text": "I did, and by the way, the code for the archive cabinet is COBALT1-7674."
+    },
+    {
+     "speaker": "cy23",
+     "text": "Got it, thanks. That should make the rest of the work smoother."
+    },
+    {
+     "speaker": "fay23",
+     "text": "In my view, the booking reference for the sample fridge should be RIDGE3-6724."
+    },
+    {
+     "speaker": "cy23",
+     "text": "Interesting, I\u2019ll note that and let the logistics team know."
+    },
+    {
+     "speaker": "fay23",
+     "text": "How's your day been otherwise? Anything exciting in the research wing?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "Pretty good, just ran a couple of calibrations and caught up on some reports."
+    },
+    {
+     "speaker": "fay23",
+     "text": "Sounds productive. Let\u2019s keep an eye on the temperature logs and meet later for a quick debrief."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay23",
+     "fact": "f23-7"
+    }
+   ]
+  },
+  {
+   "id": "c23-4",
+   "scenario": "S4",
+   "location": "lab23",
+   "participants": [
+    "bo23",
+    "cy23"
+   ],
+   "facts": [
+    "f23-9",
+    "f23-10"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-9": "cy23",
+    "f23-10": "cy23"
+   },
+   "turns": [
+    {
+     "speaker": "bo23",
+     "text": "Morning, Cy! How's the lab vibe today?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "Hey Bo, pretty smooth. I just wrapped up the calibration on the spectrometer."
+    },
+    {
+     "speaker": "bo23",
+     "text": "Nice work. By the way, did you hear what they settled on for the boat house name?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "The name chosen for the boat house is LUMEN1-7349."
+    },
+    {
+     "speaker": "bo23",
+     "text": "That's a sleek sounding label. It fits the new design nicely."
+    },
+    {
+     "speaker": "cy23",
+     "text": "In my view, the name chosen for the tool chest should be QUILL2-1701."
+    },
+    {
+     "speaker": "bo23",
+     "text": "I like that suggestion; it gives the chest a bit of character."
+    },
+    {
+     "speaker": "cy23",
+     "text": "Thanks! I think it\u2019ll make the inventory logs a bit more fun, too."
+    },
+    {
+     "speaker": "bo23",
+     "text": "Speaking of logs, the temperature data from yesterday looks solid. Ready to start the next batch?"
+    },
+    {
+     "speaker": "cy23",
+     "text": "Absolutely. Let\u2019s grab a coffee and dive in."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "cy23",
+     "fact": "f23-9"
+    },
+    {
+     "agent": "cy23",
+     "fact": "f23-10"
+    }
+   ]
+  },
+  {
+   "id": "c23-5",
+   "scenario": "S4",
+   "location": "gallery23",
+   "participants": [
+    "dee23",
+    "fay23"
+   ],
+   "facts": [
+    "f23-11",
+    "f23-12"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-11": "fay23",
+    "f23-12": "fay23"
+   },
+   "turns": [
+    {
+     "speaker": "dee23",
+     "text": "Hey Fay, nice to see you here in the gallery today."
+    },
+    {
+     "speaker": "fay23",
+     "text": "Hi Dee! I was just admiring the new sculpture. How's your day been so far?"
+    },
+    {
+     "speaker": "dee23",
+     "text": "Pretty good, just finished a meeting and thought I'd swing by for some inspiration."
+    },
+    {
+     "speaker": "fay23",
+     "text": "The booking reference for the field kit is ZEPHYR1-5185."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Got it, thanks for that. I'll make sure it\u2019s logged correctly."
+    },
+    {
+     "speaker": "fay23",
+     "text": "In my view, the name chosen for the telescope dome should be COBALT3-9827."
+    },
+    {
+     "speaker": "dee23",
+     "text": "That's a striking name\u2014definitely fits the sleek design of the dome."
+    },
+    {
+     "speaker": "fay23",
+     "text": "I agree, and it also feels a bit mysterious, like the night sky itself."
+    },
+    {
+     "speaker": "dee23",
+     "text": "Speaking of the night sky, have you checked out the new planetary exhibit yet?"
+    },
+    {
+     "speaker": "fay23",
+     "text": "Not yet, but I\u2019m planning to after we finish here. It should be a nice way to wrap up the afternoon."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay23",
+     "fact": "f23-11"
+    },
+    {
+     "agent": "fay23",
+     "fact": "f23-12"
+    }
+   ]
+  },
+  {
+   "id": "c23-6",
+   "scenario": "S4",
+   "location": "macrodata23",
+   "participants": [
+    "ada23",
+    "fay23"
+   ],
+   "facts": [
+    "f23-13",
+    "f23-14"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-13": "fay23",
+    "f23-14": "fay23"
+   },
+   "turns": [
+    {
+     "speaker": "ada23",
+     "text": "Hey Fay, how's your day going so far?"
+    },
+    {
+     "speaker": "fay23",
+     "text": "Pretty good, just finished the morning walk around the site. By the way, the code for the west stairwell is NECTAR-7291."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Thanks! I was about to double\u2011check that. Anything else I should look at today?"
+    },
+    {
+     "speaker": "fay23",
+     "text": "In my view, the label on the loading dock should be CEDAR2-4559."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Got it, that makes sense. I\u2019ll update the sign later."
+    },
+    {
+     "speaker": "fay23",
+     "text": "I\u2019m planning to grab a quick bite at the cafe later, want to join?"
+    },
+    {
+     "speaker": "ada23",
+     "text": "Sure, I could use a coffee. After that I have to finish the inventory list."
+    },
+    {
+     "speaker": "fay23",
+     "text": "Sounds like a solid plan. I\u2019ll meet you by the kitchen area."
+    },
+    {
+     "speaker": "ada23",
+     "text": "Great, see you in a bit. Thanks for the info earlier."
+    },
+    {
+     "speaker": "fay23",
+     "text": "No problem, see you soon!"
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay23",
+     "fact": "f23-13"
+    },
+    {
+     "agent": "fay23",
+     "fact": "f23-14"
+    }
+   ]
+  },
+  {
+   "id": "c23-7",
+   "scenario": "S5",
+   "location": "vault23",
+   "participants": [
+    "bo23",
+    "eli23"
+   ],
+   "facts": [
+    "f23-15",
+    "f23-16"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f23-15": "eli23",
+    "f23-16": "bo23"
+   },
+   "turns": [
+    {
+     "speaker": "bo23",
+     "text": "Hey Eli, how's your morning shaping up?"
+    },
+    {
+     "speaker": "eli23",
+     "text": "Not bad, just grabbed a coffee and headed out to check the garden."
+    },
+    {
+     "speaker": "bo23",
+     "text": "Nice, I was thinking of taking the kayak later. Any plans after work?"
+    },
+    {
+     "speaker": "eli23",
+     "text": "The password for the bike shed is PIXEL3-7079."
+    },
+    {
+     "speaker": "bo23",
+     "text": "In my view, the password for the boat house should be HARBOR3-2808."
+    },
+    {
+     "speaker": "eli23",
+     "text": "Got it, I\u2019ll make a note of that."
+    },
+    {
+     "speaker": "bo23",
+     "text": "Did you manage to finish that report you were working on?"
+    },
+    {
+     "speaker": "eli23",
+     "text": "Almost, just polishing the conclusions. How about you, any progress on the maintenance log?"
+    },
+    {
+     "speaker": "bo23",
+     "text": "Yeah, I updated the inventory list and cleared a few old entries."
+    },
+    {
+     "speaker": "eli23",
+     "text": "Great, we\u2019ll be all set for the upcoming inspection then."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "bo23",
+     "fact": "f23-16"
+    }
+   ]
+  }
+ ],
+ "environments": {
+  "campus23": [
+   "fact",
+   "opinion",
+   "skill",
+   "episode"
+  ],
+  "studio23": [
+   "opinion",
+   "skill"
+  ],
+  "severed23": []
+ },
+ "location_env": {
+  "lab23": "campus23",
+  "cafe23": "campus23",
+  "vault23": "campus23",
+  "gallery23": "studio23",
+  "macrodata23": "severed23"
+ },
+ "high_assurance": [
+  "vault23"
+ ],
+ "notes": [
+  {
+   "agent": "cy23",
+   "location": "vault23",
+   "fact": "f23-8"
+  },
+  {
+   "agent": "eli23",
+   "location": "vault23",
+   "fact": "f23-17"
+  }
+ ]
+}

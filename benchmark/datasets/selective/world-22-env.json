@@ -1,0 +1,717 @@
+{
+ "seed": 22,
+ "agents": [
+  "ada22",
+  "bo22",
+  "cy22",
+  "dee22",
+  "eli22",
+  "fay22"
+ ],
+ "locations": [
+  "lab22",
+  "cafe22",
+  "gallery22",
+  "macrodata22",
+  "vault22"
+ ],
+ "facts": {
+  "f22-0": {
+   "id": "f22-0",
+   "topic": "the combination for the west stairwell",
+   "code": "ORBIT2-5362",
+   "kind": "fact"
+  },
+  "f22-1": {
+   "id": "f22-1",
+   "topic": "the code for the reading room",
+   "code": "SAFFRON1-2068",
+   "kind": "opinion"
+  },
+  "f22-2": {
+   "id": "f22-2",
+   "topic": "the password for the freezer",
+   "code": "HARBOR1-1930",
+   "kind": "fact"
+  },
+  "f22-3": {
+   "id": "f22-3",
+   "topic": "the code for the lab safe",
+   "code": "FROST3-1491",
+   "kind": "opinion"
+  },
+  "f22-4": {
+   "id": "f22-4",
+   "topic": "the booking reference for the kiln",
+   "code": "WILLOW2-5587",
+   "kind": "fact"
+  },
+  "f22-5": {
+   "id": "f22-5",
+   "topic": "the name chosen for the reading room",
+   "code": "FROST2-1692",
+   "kind": "opinion"
+  },
+  "f22-6": {
+   "id": "f22-6",
+   "topic": "the password for the lab safe",
+   "code": "CEDAR1-5539",
+   "kind": "fact"
+  },
+  "f22-7": {
+   "id": "f22-7",
+   "topic": "the label on the seminar room",
+   "code": "GARNET-1066",
+   "kind": "opinion"
+  },
+  "f22-8": {
+   "id": "f22-8",
+   "topic": "the code for the sample fridge",
+   "code": "LUMEN2-8421",
+   "kind": "fact"
+  },
+  "f22-9": {
+   "id": "f22-9",
+   "topic": "the label on the boat house",
+   "code": "SAFFRON2-8258",
+   "kind": "fact"
+  },
+  "f22-10": {
+   "id": "f22-10",
+   "topic": "the label on the lab safe",
+   "code": "FROST1-9758",
+   "kind": "opinion"
+  },
+  "f22-11": {
+   "id": "f22-11",
+   "topic": "the name chosen for the bike shed",
+   "code": "COBALT1-6608",
+   "kind": "fact"
+  },
+  "f22-12": {
+   "id": "f22-12",
+   "topic": "the combination for the storeroom",
+   "code": "TUNDRA-5243",
+   "kind": "opinion"
+  },
+  "f22-13": {
+   "id": "f22-13",
+   "topic": "the code for the rooftop garden",
+   "code": "NECTAR1-2756",
+   "kind": "fact"
+  },
+  "f22-14": {
+   "id": "f22-14",
+   "topic": "the password for the seminar room",
+   "code": "MOSAIC3-3875",
+   "kind": "opinion"
+  },
+  "f22-15": {
+   "id": "f22-15",
+   "topic": "the password for the boat house",
+   "code": "RIDGE1-5310",
+   "kind": "fact"
+  },
+  "f22-16": {
+   "id": "f22-16",
+   "topic": "the code for the server rack",
+   "code": "QUILL3-4085",
+   "kind": "opinion"
+  },
+  "f22-17": {
+   "id": "f22-17",
+   "topic": "the name chosen for the greenhouse door",
+   "code": "WILLOW1-5550",
+   "kind": "fact"
+  }
+ },
+ "conversations": [
+  {
+   "id": "c22-0",
+   "scenario": "S4",
+   "location": "lab22",
+   "participants": [
+    "ada22",
+    "bo22"
+   ],
+   "facts": [
+    "f22-0",
+    "f22-1"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-0": "ada22",
+    "f22-1": "bo22"
+   },
+   "turns": [
+    {
+     "speaker": "ada22",
+     "text": "Morning, Bo. Did you manage to finish the sample prep yesterday?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "Hey Ada, yeah, I wrapped it up after lunch. How about you?"
+    },
+    {
+     "speaker": "ada22",
+     "text": "I was stuck on the west stairwell lock all morning. The combination for the west stairwell is ORBIT2-5362."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Good thing you got that sorted. I was checking the reading room lock earlier."
+    },
+    {
+     "speaker": "bo22",
+     "text": "In my view, the code for the reading room should be SAFFRON1-2068."
+    },
+    {
+     "speaker": "ada22",
+     "text": "Nice, that should keep the extra paperwork safe. Any plans after the shift?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "Thinking of grabbing a coffee at the break room, maybe catch up on that new paper you mentioned."
+    },
+    {
+     "speaker": "ada22",
+     "text": "Sounds perfect. I heard the lab's new ventilation system is finally up and running."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Yeah, I noticed the airflow feels smoother. Should help with the next experiment."
+    },
+    {
+     "speaker": "ada22",
+     "text": "Definitely. Let's touch base later and see how the data looks."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "bo22",
+     "fact": "f22-0"
+    },
+    {
+     "agent": "bo22",
+     "fact": "f22-1"
+    }
+   ]
+  },
+  {
+   "id": "c22-1",
+   "scenario": "S4",
+   "location": "gallery22",
+   "participants": [
+    "bo22",
+    "cy22"
+   ],
+   "facts": [
+    "f22-2",
+    "f22-3"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-2": "cy22",
+    "f22-3": "bo22"
+   },
+   "turns": [
+    {
+     "speaker": "bo22",
+     "text": "Hey Cy, nice to see you here. The new exhibit really brightens up the space."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Yeah, I love how the lighting plays off the paintings. How's your morning been?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "Pretty good, I grabbed a coffee before coming. What about you?"
+    },
+    {
+     "speaker": "cy22",
+     "text": "I stopped by the studio to drop off some sketches. By the way, the password for the freezer is HARBOR1-1930."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Got it, thanks. I was also thinking about the lab safe. In my view, the code for the lab safe should be FROST3-1491."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Good to know. Did you catch the talk about modern sculpture earlier?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "I missed it, but I heard the curator mentioned some surprising influences."
+    },
+    {
+     "speaker": "cy22",
+     "text": "It was fascinating, especially the part about the blend of natural forms."
+    },
+    {
+     "speaker": "bo22",
+     "text": "We should check out the new installation after lunch."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Sounds like a plan. Let's meet near the abstract wing."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "bo22",
+     "fact": "f22-2"
+    },
+    {
+     "agent": "bo22",
+     "fact": "f22-3"
+    }
+   ]
+  },
+  {
+   "id": "c22-2",
+   "scenario": "S4",
+   "location": "macrodata22",
+   "participants": [
+    "bo22",
+    "eli22"
+   ],
+   "facts": [
+    "f22-4",
+    "f22-5"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-4": "eli22",
+    "f22-5": "bo22"
+   },
+   "turns": [
+    {
+     "speaker": "bo22",
+     "text": "Morning Eli! Did you catch the sunrise on your walk?"
+    },
+    {
+     "speaker": "eli22",
+     "text": "The booking reference for the kiln is WILLOW2-5587."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Thanks, I\u2019ll note that. By the way, I\u2019ve been mulling over the reading room name."
+    },
+    {
+     "speaker": "eli22",
+     "text": "Oh? What are you leaning toward?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "In my view, the name chosen for the reading room should be FROST2-1692."
+    },
+    {
+     "speaker": "eli22",
+     "text": "That sounds crisp and inviting, I like it."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Glad you think so. How's your project coming along?"
+    },
+    {
+     "speaker": "eli22",
+     "text": "Making progress, just polishing the final section."
+    },
+    {
+     "speaker": "bo22",
+     "text": "If you need a fresh set of eyes, just give me a shout."
+    },
+    {
+     "speaker": "eli22",
+     "text": "Will do. Any plans after work?"
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "bo22",
+     "fact": "f22-4"
+    },
+    {
+     "agent": "bo22",
+     "fact": "f22-5"
+    }
+   ]
+  },
+  {
+   "id": "c22-3",
+   "scenario": "S5",
+   "location": "vault22",
+   "participants": [
+    "ada22",
+    "fay22"
+   ],
+   "facts": [
+    "f22-6",
+    "f22-7"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-6": "ada22",
+    "f22-7": "fay22"
+   },
+   "turns": [
+    {
+     "speaker": "ada22",
+     "text": "Morning, Fay! Did you get a chance to grab coffee before the shift?"
+    },
+    {
+     "speaker": "fay22",
+     "text": "Hey Ada, I did\u2014still a bit sleepy though. How's your morning going?"
+    },
+    {
+     "speaker": "ada22",
+     "text": "Pretty good, just finished checking the inventory list."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Nice. I was thinking about the seminar room signage. In my view, the label on the seminar room should be GARNET-1066."
+    },
+    {
+     "speaker": "ada22",
+     "text": "Got it, I'll note that. By the way, I need to open the lab safe later. The password for the lab safe is CEDAR1-5539."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Thanks for the heads up. Anything else on your to\u2011do list?"
+    },
+    {
+     "speaker": "ada22",
+     "text": "Just need to run the calibration on the spectrometer and then I can head to the break room."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Sounds like a plan. I might join you for a quick snack after I finish updating the schedule."
+    },
+    {
+     "speaker": "ada22",
+     "text": "Great, I'll bring some of those granola bars we liked yesterday."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Perfect, see you in a bit!"
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay22",
+     "fact": "f22-7"
+    }
+   ]
+  },
+  {
+   "id": "c22-4",
+   "scenario": "S4",
+   "location": "lab22",
+   "participants": [
+    "bo22",
+    "fay22"
+   ],
+   "facts": [
+    "f22-9",
+    "f22-10"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-9": "fay22",
+    "f22-10": "fay22"
+   },
+   "turns": [
+    {
+     "speaker": "bo22",
+     "text": "Morning, Fay. How's the experiment going?"
+    },
+    {
+     "speaker": "fay22",
+     "text": "Hey Bo, it's going well. I just noticed the label on the boat house is SAFFRON2-8258."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Good to know. I was checking the inventory and everything seems in order."
+    },
+    {
+     "speaker": "fay22",
+     "text": "In my view, the label on the lab safe should be FROST1-9758."
+    },
+    {
+     "speaker": "bo22",
+     "text": "That's a solid suggestion. I think it would make it easier to find the right supplies."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Exactly. I also grabbed a coffee, feeling a bit more awake now."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Same here. The new grinder makes a big difference."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Do you have any plans for the afternoon?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "I want to finish the calibration and then maybe catch up on some reading."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Sounds like a good plan. Let me know if you need a hand with anything."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay22",
+     "fact": "f22-9"
+    },
+    {
+     "agent": "fay22",
+     "fact": "f22-10"
+    }
+   ]
+  },
+  {
+   "id": "c22-5",
+   "scenario": "S4",
+   "location": "gallery22",
+   "participants": [
+    "bo22",
+    "cy22"
+   ],
+   "facts": [
+    "f22-11",
+    "f22-12"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-11": "bo22",
+    "f22-12": "bo22"
+   },
+   "turns": [
+    {
+     "speaker": "cy22",
+     "text": "Hey bo22, how's your morning been at the gallery?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "Pretty good, thanks! By the way, the name chosen for the bike shed is COBALT1-6608."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Nice, that sounds sleek. Did you get a chance to see the new installation yet?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "I did, and it really brightens the space. Also, in my view, the combination for the storeroom should be TUNDRA-5243."
+    },
+    {
+     "speaker": "cy22",
+     "text": "I agree, the colors are striking. The lighting makes the pieces pop."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Totally. I grabbed a quick espresso from the cafe; it was just the boost I needed."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Sounds perfect. Have you heard any feedback about the bike shed name?"
+    },
+    {
+     "speaker": "bo22",
+     "text": "People seem to like it; they think COBALT1-6608 has a nice modern vibe."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Cool, I\u2019ll remember that when we talk to the maintenance crew."
+    },
+    {
+     "speaker": "bo22",
+     "text": "Great, let\u2019s catch up later and see how the afternoon crowd flows."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "bo22",
+     "fact": "f22-11"
+    },
+    {
+     "agent": "bo22",
+     "fact": "f22-12"
+    }
+   ]
+  },
+  {
+   "id": "c22-6",
+   "scenario": "S4",
+   "location": "macrodata22",
+   "participants": [
+    "dee22",
+    "fay22"
+   ],
+   "facts": [
+    "f22-13",
+    "f22-14"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-13": "fay22",
+    "f22-14": "fay22"
+   },
+   "turns": [
+    {
+     "speaker": "dee22",
+     "text": "Hey Fay, how's your morning going?"
+    },
+    {
+     "speaker": "fay22",
+     "text": "Pretty good, just finished a quick walk around the office courtyard."
+    },
+    {
+     "speaker": "dee22",
+     "text": "Nice! Have you had a chance to check the rooftop garden setup yet?"
+    },
+    {
+     "speaker": "fay22",
+     "text": "The code for the rooftop garden is NECTAR1-2756."
+    },
+    {
+     "speaker": "dee22",
+     "text": "Great, that should let us get the irrigation system online."
+    },
+    {
+     "speaker": "fay22",
+     "text": "In my view, the password for the seminar room should be MOSAIC3-3875."
+    },
+    {
+     "speaker": "dee22",
+     "text": "Got it, I'll update the access list right away."
+    },
+    {
+     "speaker": "fay22",
+     "text": "Thanks! I think we should grab a coffee later and go over the agenda."
+    },
+    {
+     "speaker": "dee22",
+     "text": "Sounds perfect. Anything special you want to cover?"
+    },
+    {
+     "speaker": "fay22",
+     "text": "Just a quick review of the upcoming workshop and maybe some brainstorming for the next project."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "fay22",
+     "fact": "f22-13"
+    },
+    {
+     "agent": "fay22",
+     "fact": "f22-14"
+    }
+   ]
+  },
+  {
+   "id": "c22-7",
+   "scenario": "S5",
+   "location": "vault22",
+   "participants": [
+    "cy22",
+    "eli22"
+   ],
+   "facts": [
+    "f22-15",
+    "f22-16"
+   ],
+   "retells": {},
+   "speaker_for": {
+    "f22-15": "eli22",
+    "f22-16": "cy22"
+   },
+   "turns": [
+    {
+     "speaker": "cy22",
+     "text": "Morning, Eli. Did you get a chance to check the supplies today?"
+    },
+    {
+     "speaker": "eli22",
+     "text": "Hey Cy, yeah, I restocked the pantry. The water filters are looking good."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Nice. I was thinking about the server rack\u2014In my view, the code for the server rack should be QUILL3-4085."
+    },
+    {
+     "speaker": "eli22",
+     "text": "Got it. By the way, the password for the boat house is RIDGE1-5310."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Thanks. I need to double\u2011check the ventilation system later."
+    },
+    {
+     "speaker": "eli22",
+     "text": "Sure thing. I also noticed the lights in the east wing flicker sometimes."
+    },
+    {
+     "speaker": "cy22",
+     "text": "I'll take a look after the server work. Anything else on your radar?"
+    },
+    {
+     "speaker": "eli22",
+     "text": "Just making sure the backup generator is humming smoothly."
+    },
+    {
+     "speaker": "cy22",
+     "text": "Sounds good. Let me know if you run into anything odd."
+    },
+    {
+     "speaker": "eli22",
+     "text": "Will do. See you in the control room later."
+    }
+   ],
+   "carry_outs": [
+    {
+     "agent": "cy22",
+     "fact": "f22-16"
+    }
+   ]
+  }
+ ],
+ "environments": {
+  "campus22": [
+   "fact",
+   "opinion",
+   "skill",
+   "episode"
+  ],
+  "studio22": [
+   "opinion",
+   "skill"
+  ],
+  "severed22": []
+ },
+ "location_env": {
+  "lab22": "campus22",
+  "cafe22": "campus22",
+  "vault22": "campus22",
+  "gallery22": "studio22",
+  "macrodata22": "severed22"
+ },
+ "high_assurance": [
+  "vault22"
+ ],
+ "notes": [
+  {
+   "agent": "ada22",
+   "location": "vault22",
+   "fact": "f22-8"
+  },
+  {
+   "agent": "eli22",
+   "location": "vault22",
+   "fact": "f22-17"
+  }
+ ]
+}

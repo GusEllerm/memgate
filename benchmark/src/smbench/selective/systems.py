@@ -27,6 +27,31 @@ def when(world: World, conv) -> datetime:
     return BASE + timedelta(days=world.conversations.index(conv))
 
 
+def personal_text(world: World, agent: str, fact_id: str) -> str:
+    """What an agent writes into its personal memory when it carries a fact or opinion out (S4/S5)."""
+    return f"{agent}'s personal memory: {world.facts[fact_id].sentence}"
+
+
+def note_text(world: World, note: dict) -> str:
+    place = note["location"].rstrip("0123456789")
+    return f"{note['agent']}'s private note, kept in the {place}: {world.facts[note['fact']].sentence}"
+
+
+def extras(world: World) -> list[tuple[str, str, str, datetime, str]]:
+    """(kind, agent, text, time, key) for every carry-out attempt and note in the world."""
+    out = []
+    for c in world.conversations:
+        for co in c.carry_outs:
+            out.append(("carry", co["agent"], personal_text(world, co["agent"], co["fact"]),
+                        when(world, c) + timedelta(hours=1), f"{c.id}-carry-{co['fact']}"))
+    for i, n in enumerate(world.notes):
+        out.append(("note", n["agent"], note_text(world, n), BASE + timedelta(days=len(world.conversations) + i), f"note-{n['fact']}"))
+    return out
+
+
+STAT_FIELDS = ("total_nodes", "total_links", "total_documents", "total_observations", "last_memory_write_at")
+
+
 class RawHindsight:
     """Minimal ungated Hindsight client (thread-safe; the official client runs its own event loop)."""
 
@@ -56,6 +81,12 @@ class RawHindsight:
         ops = ops.get("operations", ops if isinstance(ops, list) else [])
         return sum(o.get("status") not in ("completed", "failed", "cancelled") for o in ops)
 
+    def snapshot(self, bank: str) -> dict:
+        st = self.call("GET", f"/v1/default/banks/{bank}/stats")
+        ops = self.call("GET", f"/v1/default/banks/{bank}/operations")
+        ops = ops.get("operations", ops if isinstance(ops, list) else [])
+        return {**{k: st.get(k) for k in STAT_FIELDS}, "operations": len(ops)}
+
 
 class NoFilter:
     name = "nofilter"
@@ -69,8 +100,11 @@ class NoFilter:
     def ingest_jobs(self, world: World) -> list:
         """Create the banks, then return one zero-argument job per store (run in parallel by the runner)."""
         self.h.bank(self._bank(world))
-        return [lambda c=c: self.h.retain(self._bank(world), transcript(world, c), when(world, c), c.id)
+        jobs = [lambda c=c: self.h.retain(self._bank(world), transcript(world, c), when(world, c), c.id)
                 for c in world.conversations]
+        # No permission check: every carry-out attempt and note is simply stored.
+        jobs += [lambda e=e: self.h.retain(self._bank(world), e[2], e[3], e[4]) for e in extras(world)]
+        return jobs
 
     def banks(self, world: World) -> list[str]:
         return [self._bank(world)]
@@ -80,6 +114,9 @@ class NoFilter:
 
     def recall(self, world: World, agent: str, location: str, query: str, k: int) -> list[str]:
         return self.h.recall(self._bank(world), query, k)
+
+    def snapshot(self, world: World) -> dict:
+        return {b: self.h.snapshot(b) for b in self.banks(world)}
 
 
 class PerAgent(NoFilter):
@@ -91,8 +128,11 @@ class PerAgent(NoFilter):
     def ingest_jobs(self, world: World) -> list:
         for a in world.agents:
             self.h.bank(self._agent_bank(world, a))
-        return [lambda c=c, a=a: self.h.retain(self._agent_bank(world, a), transcript(world, c), when(world, c), f"{c.id}-{a}")
+        jobs = [lambda c=c, a=a: self.h.retain(self._agent_bank(world, a), transcript(world, c), when(world, c), f"{c.id}-{a}")
                 for c in world.conversations for a in c.participants]
+        # No permission check: carry-outs and notes go into the agent's own bank.
+        jobs += [lambda e=e: self.h.retain(self._agent_bank(world, e[1]), e[2], e[3], e[4]) for e in extras(world)]
+        return jobs
 
     def banks(self, world: World) -> list[str]:
         return [self._agent_bank(world, a) for a in world.agents]
@@ -115,16 +155,37 @@ class Memgate:
         return self._mem[world.seed]
 
     def ingest_jobs(self, world: World) -> list:
+        from memgate.derivation import conversation_labels
         m = self._m(world)
         m.create_bank()
-        return [lambda c=c: m.remember(c.participants[0], c.location, c.participants, transcript(world, c), when=when(world, c))
+        jobs = [lambda c=c: m.remember(c.participants[0], c.location, c.participants, transcript(world, c), when=when(world, c))
                 for c in world.conversations]
+        self.refused: list[str] = getattr(self, "refused", [])
+
+        def carry(c, co):
+            try:
+                m.carry_out(co["agent"], c.location, conversation_labels(c.location, c.participants),
+                            personal_text(world, co["agent"], co["fact"]), world.facts[co["fact"]].kind,
+                            when=when(world, c))
+            except PermissionError:
+                self.refused.append(co["fact"])            # memgate refused it: nothing is stored
+
+        jobs += [lambda c=c, co=co: carry(c, co) for c in world.conversations for co in c.carry_outs]
+        jobs += [lambda n=n: m.keep_note(n["agent"], n["location"], note_text(world, n)) for n in world.notes]
+        return jobs
 
     def pending(self, world: World) -> int:
         return self._m(world).pending_operations()
 
     def recall(self, world: World, agent: str, location: str, query: str, k: int) -> list[str]:
         return [r.text for r in self._m(world).recall(agent, location, query, k=k)]
+
+    def snapshot(self, world: World) -> dict:
+        m = self._m(world)
+        st = m._call("GET", f"/v1/default/banks/{m.bank}/stats", None, role="admin")
+        ops = m._call("GET", f"/v1/default/banks/{m.bank}/operations", None, role="admin")
+        ops = ops.get("operations", ops if isinstance(ops, list) else [])
+        return {m.bank: {**{k: st.get(k) for k in STAT_FIELDS}, "operations": len(ops)}}
 
 
 def wait(system, world: World, timeout: float = 1800) -> None:
