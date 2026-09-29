@@ -39,9 +39,12 @@ class Gate:
     registry: Registry
     secret: str
 
+    def __post_init__(self) -> None:
+        self._policy = Policy(self.world, self.registry)   # one instance, so its decision cache survives
+
     @property
     def policy(self) -> Policy:
-        return Policy(self.world, self.registry)
+        return self._policy
 
     @classmethod
     def from_env(cls, prefix: str = "MEMGATE") -> "Gate":

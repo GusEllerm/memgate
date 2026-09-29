@@ -24,14 +24,18 @@ tags: [module, memgate, permissions]
   - `Environment` lists the memory types that may be carried out: all (open), some (selective) or none (*Severance*).
   - `Location` can be high-assurance.
   - `carry_out_types` gives the types every location in a set allows.
-- **Registry** (`memgate/src/memgate/registry.py`): `Registry` is a SQLite table of every label set in use, and `register` is idempotent.
+- **Registry** (`memgate/src/memgate/registry.py`): `Registry` is a SQLite table of every label set in use, and `register` is idempotent. It also keeps one indexed row per label (a `label` table, backfilled for older registries). `select_ids` runs a compiled filter, optionally only over label sets registered after a given row: the registry is append-only.
 - **Policies** (`memgate/src/memgate/policies/memgate.cedar` and `memgate.cedarschema`):
   - read: identity and location labels held, and the reader among the participants;
   - the high-assurance seal;
   - carry-out only as far as every environment allows, and never out of high assurance.
   - Derived attributes (`haLocs`, `carryTypes`) are computed from the world on every decision, because Cedar can't loop over set members.
 - **Decisions** (`memgate/src/memgate/policy.py`):
-  - `Policy.allowed_ids` checks every registered label set in one Cedar batch and returns the IDs a context may read.
+  - `Policy.allowed_ids` returns the label sets a context may read, in four steps:
+    1. Cedar partially evaluates the policies with the agent and location known and the label set unknown.
+    2. `Compiler` (`memgate/src/memgate/residual.py`) turns the residual into one SQL filter over the registry. It handles the operators our policies use; anything else raises `Unsupported` and falls back to `Policy.allowed_ids_exact`, which checks each label set with Cedar.
+    3. The result is cached per agent and location, keyed on `World.fingerprint`, and later calls check only label sets registered since.
+    4. `memgate/tests/test_residual.py` checks the compiled answer against Cedar's exact answer for every agent and location in 300 random worlds, with and without an over-broad grant.
   - `Policy.may_carry_out` checks a write into personal memory.
   - `Policy.validate` checks the policies against the schema.
 - **Derivation** (`memgate/src/memgate/derivation.py`):
@@ -66,9 +70,19 @@ tags: [module, memgate, permissions]
   | 10k | 263k / 43 MB | 4,100 events/s | 0.3 ms | 4 / 87 ms | 15 ms | 3 ms | 123 ms | 0.8 s |
   | 100k | 2.6M / 411 MB | 2,600 events/s | 0.3 ms | 4 / 167 ms | 22 ms | 34 ms | 351 ms | **7.9 s** |
 
-  **The trail's cost is `Policy.allowed_ids`, not the log.** It checks every registered label set through Cedar, and random 2–4-agent groups gave 88,670 label sets. Recall uses the same step, so **the residual-to-query compiler is now needed** (see Not yet).
+  **The trail's cost was `Policy.allowed_ids`, not the log.** It checked every registered label set through Cedar, and random 2–4-agent groups gave 88,670 label sets.
 
-## Tests (28)
+  **Fixed the same day with the compiled filter and cache.** At 100k turns the trail now takes **11 ms**, down from 7.9 s. `Policy.allowed_ids` at 100k label sets:
+
+  | Method | Time |
+  | --- | --- |
+  | Exact (Cedar per label set) | 8.9 s |
+  | Compiled, first call | 86–120 ms |
+  | **Compiled, cached (later calls)** | **0.01 ms** |
+
+  The compiled answer is identical to Cedar's at every size.
+
+## Tests (32)
 
 `memgate/tests/`:
 - **Recall:**
@@ -83,6 +97,6 @@ tags: [module, memgate, permissions]
 
 ## Not yet
 
-- **The allowed-ID resolver checks every label set, and that no longer scales.** At 88,670 label sets it takes about 8 s per recall or trail. **Next:** compile Cedar's residual into a registry query, with an equivalence test against Cedar, and cache per (agent, location) so only new label sets are checked.
+- **Changing the world file needs a restart** of processes that loaded it (e.g. the Hindsight validator). The cache follows the in-memory `World`.
 - **The SMT proof of the seal** needs the Cedar CLI with its analysis feature, plus cvc5; neither is installed yet.
 - **Provenance and audit are built** (2026-09-29) and wired into [[memgate Hindsight Adapter]].

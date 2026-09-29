@@ -39,7 +39,7 @@ Every request carries the gate secret plus the agent and location headers, from 
 Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` is loaded by Hindsight from HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION.
 
 - **Identity:** trusts only the caller's identity. A request without the memgate secret is refused, and Hindsight's own background work (consolidation) passes as internal.
-- **`validate_recall`:** recomputes the allowed IDs with the same world and registry, and **overwrites** the request's tags. Forged tags are ignored.
+- **`validate_recall`:** recomputes the allowed IDs with the same world and registry, and **overwrites** the request's tags. Forged tags are ignored. `Gate` keeps a single `Policy`, so the compiled per-context cache ([[memgate Core]]) survives across requests: a repeat recall costs about 0.01 ms at 100k label sets.
 - **`validate_retain`:** each item needs exactly one registered label-set tag that the writer may write (a participant or owner, in that location). Observation scopes wider than "combined" are refused.
 - **Side doors closed:**
   - reflect is refused, because its scope can't be enforced;

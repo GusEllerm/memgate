@@ -42,7 +42,7 @@ tags: [agentic-memory, design, permissions, memgate]
 | --- | --- |
 | Label-set registry | Canonicalises a label combination to one stable ID; records the high-assurance locations it contains (Cedar can't loop over set members, so this is precomputed) |
 | Policies | The Cedar schema and policies: the read rule (identity and location held, reader among the participants), the high-assurance seal, environment write rules (open, selective, *Severance*) |
-| Allowed-ID resolver | Context → allowed label-set IDs. Start by checking every label set with Cedar (fine at simulation scale). Later, compile Cedar's residual into a query over the table; Cedar ships no such translator |
+| Allowed-ID resolver | Context → allowed label-set IDs. Cedar's residual is compiled into one SQL filter over the table (Cedar ships no translator; memgate has one for the constructs our policies use), with an exact Cedar fallback and a per-context cache. Built 2026-09-29 once 88k label sets made checking each one take 8 s |
 | Write labeller | A new memory's labels come from the context: location, participants, and the author for personal memory. Writes into personal memory go through Cedar's writePersonal rule |
 | Derivation guard | Consolidation, merging and dedup stay within one label set. The only way across is an explicit, environment-approved relaxation into personal memory, which is logged |
 | Provenance log | When an agent speaks, records which memories it recalled, so memories formed from what it said can cite them. No memory system does this across agents |
@@ -104,6 +104,6 @@ The benchmark imports memgate; memgate never imports the benchmark.
 
 ## Open questions
 
-- [ ] How many label sets a long simulation produces, which decides when the residual-to-query compiler is needed.
+- [x] When the residual compiler was needed: at tens of thousands of label sets. It's built; see [[memgate Core]].
 - [ ] The API for recording which memories an agent recalled when speaking: in memgate, or in the host application (CHORUS)?
 - [ ] Hindsight's reflect: the validator can't force reflect's tag scope, so the adapter must always pass it (or reflect is disabled).

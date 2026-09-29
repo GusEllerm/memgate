@@ -203,7 +203,7 @@ sig = "daf3e29cc567875f"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/policy.py#Policy"
-sig = "77a3659af1d4821d"
+sig = "54fc77902e222138"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -218,7 +218,17 @@ sig = "65805f5240e82863"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/registry.py#Registry"
-sig = "ef7f2799fcce8a95"
+sig = "673377e2fbd1bae6"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/residual.py#Compiler"
+sig = "eecba0a530cce2dd"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/residual.py#Unsupported"
+sig = "3dece13395a66e15"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -233,7 +243,7 @@ sig = "623f110511650fcf"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/world.py#World"
-sig = "e1b9c98f30245abd"
+sig = "80d643aa4a33130d"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -263,7 +273,7 @@ sig = "f43ea7531077e0d8"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/context.py#Gate"
-sig = "9f7a9861a666d04a"
+sig = "8b9b221fd37aa897"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -273,7 +283,7 @@ sig = "0323221357c95a17"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/policy.py#Policy"
-sig = "77a3659af1d4821d"
+sig = "54fc77902e222138"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"

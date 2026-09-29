@@ -46,6 +46,12 @@ class World:
     def add_agents(self, *ids: str) -> None:
         self.agents.update(ids)
 
+    def fingerprint(self) -> tuple:
+        """Changes whenever anything the policies read changes (for caching decisions)."""
+        return (tuple(sorted((e.id, tuple(sorted(e.carry_out))) for e in self.environments.values())),
+                tuple(sorted((l.id, l.environment, l.high_assurance) for l in self.locations.values())),
+                tuple(sorted(self.agents)))
+
     def high_assurance(self, loc: str) -> bool:
         return self.locations[loc].high_assurance
 

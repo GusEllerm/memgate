@@ -1,9 +1,10 @@
 """Cedar decisions over label sets.
 
-`allowed_ids` answers "which label sets may this agent read here?" by checking every registered
-label set in one Cedar batch. That is exact and fast enough at simulation scale (thousands of label
-sets). At larger scale, Cedar's partial evaluation gives a residual condition that can be compiled
-into a query over the registry instead (docs/vault/Reference/Cedar.md); the answer is the same.
+`allowed_ids` answers "which label sets may this agent read here?". Cedar partially evaluates the
+policies with the agent and location known and the label set unknown; memgate.residual compiles the
+residual into a SQL filter over the registry, so the answer costs one indexed query however many
+label sets exist. If a policy uses something the compiler doesn't handle, it falls back to
+`allowed_ids_exact`, which checks every registered label set in one Cedar batch (same answer, slower).
 """
 
 from __future__ import annotations
@@ -11,6 +12,8 @@ from __future__ import annotations
 from importlib.resources import files
 
 import cedarpy
+
+from memgate.residual import Compiler, Unsupported
 
 from memgate.labels import LabelSet
 from memgate.registry import Registry
@@ -31,6 +34,8 @@ def _ref(type_: str, id_: str) -> str:
 class Policy:
     def __init__(self, world: World, registry: Registry, policies: str = POLICIES, schema: str = SCHEMA):
         self.world, self.registry, self.policies, self.schema = world, registry, policies, schema
+        # (agent, location) -> (world fingerprint, compiled filter, allowed IDs, newest registry row seen)
+        self._cache: dict[tuple[str, str], tuple] = {}
 
     def validate(self) -> list[str]:
         result = cedarpy.validate_policies(self.policies, self.schema)
@@ -60,7 +65,40 @@ class Policy:
         ents += [self._label_set_entity(i, ls) for i, ls in label_sets.items()]
         return ents
 
+    def _residual_where(self, agent: str, location: str) -> tuple[str, list]:
+        request = {"principal": _ref("Agent", agent), "action": _ref("Action", "read"), "resource": None,
+                   "context": {"location": _uid("Location", location)}}
+        result = cedarpy.is_authorized_partial(request, self.policies, self._entities({}), self.schema)
+        if result.diagnostics.errors:
+            raise Unsupported("partial evaluation reported errors")
+        if result.decision == cedarpy.Decision.Allow:      # decided without looking at the label set
+            return "1", []
+        if result.decision == cedarpy.Decision.Deny:
+            return "0", []
+        return Compiler(self.world).where(result.residuals)
+
     def allowed_ids(self, agent: str, location: str) -> set[str]:
+        """Label sets `agent` may read at `location`, via the compiled residual (exact fallback).
+
+        Cached per (agent, location): the registry only grows, so a repeat call checks only label sets
+        registered since the last one. A change to the world invalidates the cache."""
+        key, fp = (agent, location), self.world.fingerprint()
+        cached = self._cache.get(key)
+        if cached and cached[0] == fp:
+            _, where, params, allowed, newest = cached
+        else:
+            try:
+                where, params = self._residual_where(agent, location)
+            except Unsupported:
+                return self.allowed_ids_exact(agent, location)
+            allowed, newest = set(), 0
+        new, newest = self.registry.select_ids(where, params, after=newest)
+        allowed = allowed | new
+        self._cache[key] = (fp, where, params, allowed, newest)
+        return set(allowed)
+
+    def allowed_ids_exact(self, agent: str, location: str) -> set[str]:
+        """Check every registered label set with Cedar (the reference answer)."""
         label_sets = self.registry.all()
         if not label_sets:
             return set()
