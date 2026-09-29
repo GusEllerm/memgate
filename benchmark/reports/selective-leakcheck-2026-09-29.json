@@ -1,0 +1,429 @@
+{
+ "answers": {
+  "control:peragent": {
+   "kind:carry-refused-fact": {
+    "must_not": 3,
+    "response_has_code": 3,
+    "answer_has_code": 3,
+    "VALUE": 3,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:carry-refused-ha": {
+    "must_not": 1,
+    "response_has_code": 1,
+    "answer_has_code": 1,
+    "VALUE": 1,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:carry-refused-opinion": {
+    "must_not": 1,
+    "response_has_code": 1,
+    "answer_has_code": 1,
+    "VALUE": 1,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:ha-witness-outside": {
+    "must_not": 3,
+    "response_has_code": 3,
+    "answer_has_code": 3,
+    "VALUE": 3,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:witness-elsewhere": {
+    "must_not": 92,
+    "response_has_code": 92,
+    "answer_has_code": 90,
+    "VALUE": 90,
+    "HINT": 0,
+    "NONE": 2,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "overall": {
+    "must_not": 100,
+    "response_has_code": 100,
+    "answer_has_code": 98,
+    "VALUE": 98,
+    "HINT": 0,
+    "NONE": 2,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "run:sel-2026-09-29": {
+    "must_not": 12,
+    "response_has_code": 12,
+    "answer_has_code": 12,
+    "VALUE": 12,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "run:sel-env-2026-09-29": {
+    "must_not": 17,
+    "response_has_code": 17,
+    "answer_has_code": 17,
+    "VALUE": 17,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "run:sel-large-2026-09-29": {
+    "must_not": 71,
+    "response_has_code": 71,
+    "answer_has_code": 69,
+    "VALUE": 69,
+    "HINT": 0,
+    "NONE": 2,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   }
+  },
+  "memgate": {
+   "kind:carried-fact": {
+    "must_not": 0,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 24,
+    "answer_recall": 1.0
+   },
+   "kind:carried-opinion": {
+    "must_not": 0,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 48,
+    "answer_recall": 0.9583
+   },
+   "kind:carry-refused-fact": {
+    "must_not": 48,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 48,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:carry-refused-ha": {
+    "must_not": 24,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 24,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:carry-refused-opinion": {
+    "must_not": 24,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 24,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:ha-witness-inside": {
+    "must_not": 0,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 24,
+    "answer_recall": 1.0
+   },
+   "kind:ha-witness-outside": {
+    "must_not": 72,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 72,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:non-witness": {
+    "must_not": 1739,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 1739,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:note-elsewhere": {
+    "must_not": 24,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 24,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:note-here": {
+    "must_not": 0,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 6,
+    "answer_recall": 1.0
+   },
+   "kind:note-other-agent": {
+    "must_not": 150,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 150,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:retold-to-newcomer": {
+    "must_not": 0,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 9,
+    "answer_recall": 0.8889
+   },
+   "kind:untold-to-newcomer": {
+    "must_not": 39,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 39,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:witness-elsewhere": {
+    "must_not": 1192,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 1192,
+    "unjudged": 0,
+    "should": 0,
+    "answer_recall": null
+   },
+   "kind:witness-here": {
+    "must_not": 0,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 0,
+    "unjudged": 0,
+    "should": 358,
+    "answer_recall": 0.9972
+   },
+   "overall": {
+    "must_not": 3312,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 3312,
+    "unjudged": 0,
+    "should": 469,
+    "answer_recall": 0.9915
+   },
+   "run:sel-2026-09-29": {
+    "must_not": 420,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 420,
+    "unjudged": 0,
+    "should": 66,
+    "answer_recall": 0.9848
+   },
+   "run:sel-env-2026-09-29": {
+    "must_not": 1446,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 1446,
+    "unjudged": 0,
+    "should": 174,
+    "answer_recall": 0.9885
+   },
+   "run:sel-large-2026-09-29": {
+    "must_not": 1446,
+    "response_has_code": 0,
+    "answer_has_code": 0,
+    "VALUE": 0,
+    "HINT": 0,
+    "NONE": 1446,
+    "unjudged": 0,
+    "should": 229,
+    "answer_recall": 0.9956
+   }
+  }
+ },
+ "lineage": [
+  {
+   "bank": "sel-2026-09-29-memgate-w1",
+   "documents": 9,
+   "units": {
+    "observation": 53,
+    "observation_sources": 55,
+    "world": 51
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-2026-09-29-memgate-w2",
+   "documents": 9,
+   "units": {
+    "observation": 62,
+    "observation_sources": 66,
+    "world": 63
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-2026-09-29-memgate-w3",
+   "documents": 9,
+   "units": {
+    "observation": 53,
+    "observation_sources": 54,
+    "world": 53
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-large-2026-09-29-memgate-w11",
+   "documents": 51,
+   "units": {
+    "observation": 328,
+    "observation_sources": 332,
+    "world": 328
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-large-2026-09-29-memgate-w12",
+   "documents": 51,
+   "units": {
+    "observation": 319,
+    "observation_sources": 321,
+    "world": 318
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-env-2026-09-29-memgate-w21",
+   "documents": 16,
+   "units": {
+    "observation": 57,
+    "observation_sources": 57,
+    "world": 57
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-env-2026-09-29-memgate-w22",
+   "documents": 16,
+   "units": {
+    "observation": 59,
+    "observation_sources": 61,
+    "world": 60
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "sel-env-2026-09-29-memgate-w23",
+   "documents": 16,
+   "units": {
+    "observation": 55,
+    "observation_sources": 55,
+    "world": 55
+   },
+   "violations": 0,
+   "examples": []
+  },
+  {
+   "bank": "labels-2026-09-29-shared",
+   "documents": 272,
+   "units": {
+    "observation": 1840,
+    "observation_sources": 2511,
+    "world": 2516
+   },
+   "violations": 0,
+   "examples": []
+  }
+ ],
+ "settings": {
+  "answer_model": "openai/gpt-oss-120b",
+  "judge_model": "nemotron-3-ultra",
+  "large_nonwitness_sample": 500,
+  "controls": 100,
+  "recall_include": [
+   "entities",
+   "chunks",
+   "source_facts",
+   "trace"
+  ]
+ }
+}

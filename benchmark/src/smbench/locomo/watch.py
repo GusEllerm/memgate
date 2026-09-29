@@ -36,14 +36,14 @@ def _tail_error(log: Path) -> str:
     return lines[-1][:90] if lines else ""
 
 
-def render(prefix: str, gateway: str, started: float, totals: dict) -> str:
+def render(prefix: str, gateway: str, started: float, totals: dict, systems=("hindsight", "mem0")) -> str:
     out = [f"LoCoMo run {prefix!r}   {time.strftime('%H:%M:%S')}   elapsed {int(time.time() - started) // 60} min", ""]
     g = _gateway(gateway)
     out.append("gateway: " + (f"{g['in_flight']}/{g['max_concurrency']} in flight, {g['waiting']} queued, "
                               f"{g['completed']} done, {g['failed']} failed" if g else "NOT REACHABLE"))
     out.append("")
     grand: dict[str, list[int]] = {}
-    for system in ("hindsight", "mem0"):
+    for system in systems:
         rows = []
         for conv, (n_sess, n_q) in totals.items():
             d = RESULTS / f"{prefix}-{system}-{conv}"
@@ -78,14 +78,15 @@ def main() -> None:
     p.add_argument("--gateway", default="http://127.0.0.1:8411")
     p.add_argument("--every", type=float, default=10)
     p.add_argument("--once", action="store_true")
+    p.add_argument("--systems", nargs="+", default=["hindsight", "mem0"])
     args = p.parse_args()
     totals, started = _totals(), time.time()
     if args.once:
-        print(render(args.prefix, args.gateway, started, totals))
+        print(render(args.prefix, args.gateway, started, totals, args.systems))
         return
     try:
         while True:
-            print("\033[2J\033[H" + render(args.prefix, args.gateway, started, totals), flush=True)
+            print("\033[2J\033[H" + render(args.prefix, args.gateway, started, totals, args.systems), flush=True)
             time.sleep(args.every)
     except KeyboardInterrupt:
         pass

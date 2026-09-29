@@ -43,6 +43,8 @@ tags: [module, benchmark, selective-memory]
 
 ## Limits of this version
 
-- **Retrieval-level only.** Paraphrased leaks, where the content surfaces without the code, aren't caught. An answer-level check with a judge comes later.
+- **Probes are retrieval-level.** A probe counts a leak only when the exact code is recalled. `benchmark/src/smbench/selective/leakcheck.py` looks further, in two ways:
+  - `lineage` (exact, no LLM): in every memgate bank, each memory unit must carry its document's label set, and each consolidated observation the label set of every memory it was built from.
+  - `Checker` (answer level): re-asks must-not probes as the agent, requesting everything Hindsight's recall can return (entity observations, raw chunks, source facts, trace). It scans the whole response for the code, has gpt-oss-120b answer from it, and has the judge label the answer VALUE, HINT or NONE. A sample of per-agent leaks is the positive control.
 - **Scale:** small worlds give 3 × 162 probes, large worlds about 3,060 each. env worlds 3 × 540. Suites S6–S7 (hierarchy, scale) are still to come. Results: [[Review Selective S1-S3 2026-09-29]], [[Review Selective large 2026-09-29]], [[Review Selective S4-S5 2026-09-29]].
 - **Refusal count:** the runner prints memgate's refused carry-outs only after probing, so `--skip-ingest` runs don't report it.

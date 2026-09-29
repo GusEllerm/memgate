@@ -66,4 +66,7 @@ def load_adapter(name: str, run_id: str, gateway: str, model: str) -> MemoryAdap
     if name == "mem0":
         from smbench.adapters.mem0 import Mem0Adapter
         return Mem0Adapter(run_id=run_id, gateway=gateway, model=model)
+    if name in ("memgate", "memgate-nofilter"):
+        from smbench.adapters.memgate import MemgateAdapter
+        return MemgateAdapter(run_id=run_id, filtered=name == "memgate")
     raise ValueError(f"unknown system {name!r}")

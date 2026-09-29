@@ -158,7 +158,7 @@ class Runner:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--system", required=True, choices=["hindsight", "mem0"])
+    p.add_argument("--system", required=True, choices=["hindsight", "mem0", "memgate", "memgate-nofilter"])
     p.add_argument("--run-id", required=True)
     p.add_argument("--conversations", nargs="*", help="sample ids, e.g. conv-26 (default: all)")
     p.add_argument("--k", type=int, default=20, help="memories retrieved per question")

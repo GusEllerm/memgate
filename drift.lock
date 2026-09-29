@@ -53,12 +53,12 @@ sig = "38e2e458c00eee1a"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/scripts/run_locomo_full.sh"
-sig = "61f56c690857c45a"
+sig = "c4cd3da0e4ba9074"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/scripts/run_locomo_one.sh"
-sig = "01be6c9400914188"
+sig = "f09c63b949e9fbc4"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
@@ -68,7 +68,7 @@ sig = "8d938a20a1d319b6"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/adapters/__init__.py"
-sig = "1b343404ca336c85"
+sig = "bc85eb7e6aad7bd1"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
@@ -78,7 +78,7 @@ sig = "a239b48e47673e54"
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/adapters/__init__.py#load_adapter"
-sig = "30682cd84f657fd5"
+sig = "e13eb3c33324f26e"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
@@ -94,6 +94,26 @@ sig = "21ef34aa5a39185a"
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/adapters/mem0.py#_resolve_session_dates"
 sig = "6ed57f9aa4ebad7e"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/memgate.py#MemgateAdapter"
+sig = "2ae5fd92db89cc3c"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/memgate.py#add_to_world"
+sig = "76fa03a258c450ae"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/memgate.py#agent_id"
+sig = "78c2b9f8bd93bf7d"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/adapters/memgate.py#location_id"
+sig = "fda4b171b795980b"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
@@ -147,6 +167,21 @@ sig = "4b22ed06501643cb"
 
 [[bindings]]
 doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/selective/leakcheck.py"
+sig = "17efe0e519c714b6"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/selective/leakcheck.py#summarise"
+sig = "24e4ff48817ab87e"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
+target = "benchmark/src/smbench/selective/run.py#summarise"
+sig = "23a60dbc8d892447"
+
+[[bindings]]
+doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/site/build.py#wilson"
 sig = "89c623f3e2a6465b"
 
@@ -164,6 +199,21 @@ sig = "c399ddf98fd6b813"
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
 target = "benchmark/src/smbench/selective/dialogue.py#write_dialogue"
 sig = "2c80246871ddddc5"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/leakcheck.py#Checker"
+sig = "b04f957b5d0d6ac8"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/leakcheck.py#lineage"
+sig = "002aa567b96c9022"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/leakcheck.py#summarise"
+sig = "24e4ff48817ab87e"
 
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"

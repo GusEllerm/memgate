@@ -8,5 +8,5 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 system=$1 prefix=$2 parallel=${3:-3}
 mkdir -p results/logs
-.venvs/"$system"/bin/python -c "from smbench.locomo import data; print('\n'.join(s['sample_id'] for s in data.load()))" |
+.venvs/"${SMBENCH_VENV:-$system}"/bin/python -c "from smbench.locomo import data; print('\n'.join(s['sample_id'] for s in data.load()))" |
   xargs -P "$parallel" -n 1 scripts/run_locomo_one.sh "$system" "$prefix"

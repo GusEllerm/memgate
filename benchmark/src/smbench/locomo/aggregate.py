@@ -5,8 +5,9 @@
 
 Reports, per system: judge accuracy with a 95% Wilson interval and token F1, overall and per
 category; per-conversation accuracy; ingest and question timings. Across systems: an exact
-McNemar test on paired questions. `--repeat CONV:PREFIX` compares a conversation with an earlier
-run of it (run-to-run variance).
+McNemar test on paired questions, for every pair of systems. A system may be given as
+SYSTEM@PREFIX to take it from another run (e.g. hindsight@full-2026-09-28). `--repeat CONV:PREFIX`
+compares a conversation with an earlier run of it (run-to-run variance).
 """
 
 from __future__ import annotations
@@ -84,11 +85,14 @@ def main() -> None:
     p.add_argument("--out", type=Path)
     args = p.parse_args()
 
-    runs = {s: load_runs(args.prefix, s) for s in args.systems}
+    runs = {s: load_runs(*(s.split("@")[::-1] if "@" in s else (args.prefix, s))) for s in args.systems}
     report = {"prefix": args.prefix, "systems": {s: system_report(*runs[s]) for s in args.systems}}
-    if len(args.systems) == 2:
-        a, b = args.systems
+    pairs = [(a, b) for i, a in enumerate(args.systems) for b in args.systems[i + 1:]]
+    if len(pairs) == 1:
+        a, b = pairs[0]
         report["paired"] = {"systems": [a, b], **paired(runs[a][0], runs[b][0])}
+    elif pairs:
+        report["paired"] = [{"systems": [a, b], **paired(runs[a][0], runs[b][0])} for a, b in pairs]
     repeats = {}
     for spec in args.repeat:
         conv, old_prefix = spec.split(":")

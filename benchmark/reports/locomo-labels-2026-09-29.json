@@ -1,0 +1,247 @@
+{
+ "prefix": "labels-2026-09-29",
+ "systems": {
+  "hindsight@full-2026-09-28": {
+   "scores": {
+    "overall": {
+     "n": 1540,
+     "judge_accuracy": 0.6948,
+     "f1": 0.4415,
+     "unjudged": 0,
+     "ci95": [
+      0.6713,
+      0.7173
+     ]
+    },
+    "temporal": {
+     "n": 321,
+     "judge_accuracy": 0.7445,
+     "f1": 0.5479,
+     "unjudged": 0,
+     "ci95": [
+      0.6941,
+      0.7892
+     ]
+    },
+    "open-domain": {
+     "n": 96,
+     "judge_accuracy": 0.5625,
+     "f1": 0.2836,
+     "unjudged": 0,
+     "ci95": [
+      0.4628,
+      0.6574
+     ]
+    },
+    "multi-hop": {
+     "n": 282,
+     "judge_accuracy": 0.4965,
+     "f1": 0.3847,
+     "unjudged": 0,
+     "ci95": [
+      0.4385,
+      0.5545
+     ]
+    },
+    "single-hop": {
+     "n": 841,
+     "judge_accuracy": 0.7574,
+     "f1": 0.438,
+     "unjudged": 0,
+     "ci95": [
+      0.7273,
+      0.7852
+     ]
+    }
+   },
+   "per_conversation": {
+    "conv-26": 0.6711,
+    "conv-30": 0.6049,
+    "conv-41": 0.6974,
+    "conv-42": 0.6935,
+    "conv-43": 0.6348,
+    "conv-44": 0.7317,
+    "conv-47": 0.7533,
+    "conv-48": 0.7277,
+    "conv-49": 0.6987,
+    "conv-50": 0.7025
+   },
+   "timing_s": {
+    "ingest_process_total": 9572,
+    "questions_process_total": 2425
+   }
+  },
+  "memgate": {
+   "scores": {
+    "overall": {
+     "n": 1540,
+     "judge_accuracy": 0.6916,
+     "f1": 0.4524,
+     "unjudged": 0,
+     "ci95": [
+      0.668,
+      0.7141
+     ]
+    },
+    "temporal": {
+     "n": 321,
+     "judge_accuracy": 0.7726,
+     "f1": 0.5774,
+     "unjudged": 0,
+     "ci95": [
+      0.7237,
+      0.8151
+     ]
+    },
+    "open-domain": {
+     "n": 96,
+     "judge_accuracy": 0.5521,
+     "f1": 0.2906,
+     "unjudged": 0,
+     "ci95": [
+      0.4525,
+      0.6476
+     ]
+    },
+    "multi-hop": {
+     "n": 282,
+     "judge_accuracy": 0.4858,
+     "f1": 0.389,
+     "unjudged": 0,
+     "ci95": [
+      0.4281,
+      0.5439
+     ]
+    },
+    "single-hop": {
+     "n": 841,
+     "judge_accuracy": 0.7455,
+     "f1": 0.4444,
+     "unjudged": 0,
+     "ci95": [
+      0.715,
+      0.7738
+     ]
+    }
+   },
+   "per_conversation": {
+    "conv-26": 0.7039,
+    "conv-30": 0.6049,
+    "conv-41": 0.7171,
+    "conv-42": 0.6884,
+    "conv-43": 0.618,
+    "conv-44": 0.7154,
+    "conv-47": 0.6933,
+    "conv-48": 0.7225,
+    "conv-49": 0.7179,
+    "conv-50": 0.7025
+   },
+   "timing_s": {
+    "ingest_process_total": 23208,
+    "questions_process_total": 4374
+   }
+  },
+  "memgate-nofilter": {
+   "scores": {
+    "overall": {
+     "n": 1540,
+     "judge_accuracy": 0.6838,
+     "f1": 0.4409,
+     "unjudged": 0,
+     "ci95": [
+      0.6601,
+      0.7065
+     ]
+    },
+    "temporal": {
+     "n": 321,
+     "judge_accuracy": 0.7788,
+     "f1": 0.5763,
+     "unjudged": 0,
+     "ci95": [
+      0.7303,
+      0.8208
+     ]
+    },
+    "open-domain": {
+     "n": 96,
+     "judge_accuracy": 0.5417,
+     "f1": 0.2704,
+     "unjudged": 0,
+     "ci95": [
+      0.4423,
+      0.6378
+     ]
+    },
+    "multi-hop": {
+     "n": 282,
+     "judge_accuracy": 0.4894,
+     "f1": 0.3702,
+     "unjudged": 0,
+     "ci95": [
+      0.4316,
+      0.5475
+     ]
+    },
+    "single-hop": {
+     "n": 841,
+     "judge_accuracy": 0.7289,
+     "f1": 0.4324,
+     "unjudged": 0,
+     "ci95": [
+      0.6979,
+      0.7578
+     ]
+    }
+   },
+   "per_conversation": {
+    "conv-26": 0.6711,
+    "conv-30": 0.6543,
+    "conv-41": 0.7105,
+    "conv-42": 0.6834,
+    "conv-43": 0.6067,
+    "conv-44": 0.6992,
+    "conv-47": 0.7,
+    "conv-48": 0.7277,
+    "conv-49": 0.6795,
+    "conv-50": 0.6962
+   },
+   "timing_s": {
+    "ingest_process_total": 0,
+    "questions_process_total": 3411
+   }
+  }
+ },
+ "paired": [
+  {
+   "systems": [
+    "hindsight@full-2026-09-28",
+    "memgate"
+   ],
+   "n": 1540,
+   "only_first_correct": 141,
+   "only_second_correct": 136,
+   "mcnemar_p": 0.8101
+  },
+  {
+   "systems": [
+    "hindsight@full-2026-09-28",
+    "memgate-nofilter"
+   ],
+   "n": 1540,
+   "only_first_correct": 144,
+   "only_second_correct": 127,
+   "mcnemar_p": 0.3311
+  },
+  {
+   "systems": [
+    "memgate",
+    "memgate-nofilter"
+   ],
+   "n": 1540,
+   "only_first_correct": 67,
+   "only_second_correct": 55,
+   "mcnemar_p": 0.3193
+  }
+ ]
+}
