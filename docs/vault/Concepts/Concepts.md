@@ -7,3 +7,4 @@ Ideas that span modules. Name code where you make a claim about it.
 - [[Label Rule Table]]
 - [[Label and Memory Types]]
 - [[Benchmark Plan]]
+- [[Permission Layer]]
