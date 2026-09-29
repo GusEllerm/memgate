@@ -1,0 +1,8 @@
+# livedocs: drift.lock and stamps.jsonl hold fingerprints (hashes) of this repository's own code.
+# They grant access to nothing; secret scanners misread them as high-entropy secrets.
+version: 2
+secret:
+  ignored_paths:
+    - 'drift.lock'
+    - '**/.livedocs/stamps.jsonl'
+    - 'docs/vault/.livedocs/stamps.jsonl'
