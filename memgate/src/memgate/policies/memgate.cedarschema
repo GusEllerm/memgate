@@ -1,0 +1,25 @@
+// Entities are built fresh from the World and the label-set registry on every decision,
+// so derived attributes (haLocs, carryTypes) always reflect the current world.
+entity Agent;
+entity Environment;
+entity Location {
+  highAssurance: Bool,
+  environment: Environment,
+};
+entity LabelSet {
+  selfs: Set<Agent>,
+  locs: Set<Location>,
+  withs: Set<Agent>,
+  haLocs: Set<Location>,      // the high-assurance locations among locs (Cedar can't loop over set members)
+  carryTypes: Set<String>,    // memory types every location in locs lets out
+};
+action read appliesTo {
+  principal: Agent,
+  resource: LabelSet,
+  context: { location: Location },
+};
+action writePersonal appliesTo {
+  principal: Agent,
+  resource: LabelSet,
+  context: { memoryType: String },
+};

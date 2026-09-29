@@ -144,3 +144,78 @@ sig = "12bb339f30ba97c2"
 doc = "docs/vault/Modules/LoCoMo Harness.md"
 target = "benchmark/src/smbench/locomo/run.py#Runner"
 sig = "4b22ed06501643cb"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/derivation.py#CrossLabelSetMerge"
+sig = "ae2e2bbbdbf6f017"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/derivation.py#check_merge"
+sig = "805a41274b9040be"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/derivation.py#conversation_labels"
+sig = "626fc311f2e68ace"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/derivation.py#derived_labels"
+sig = "f88c199081d52b09"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/derivation.py#personal_labels"
+sig = "b094fe0702e91a4e"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/derivation.py#personal_note_labels"
+sig = "47e86ee2ddc8719a"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/labels.py"
+sig = "52ef10c27777861f"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/labels.py#Label"
+sig = "3d7f9121537f7570"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/labels.py#LabelSet"
+sig = "777901e5765e23c4"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/policies/memgate.cedar"
+sig = "daf3e29cc567875f"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/policy.py#Policy"
+sig = "77a3659af1d4821d"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/registry.py#Registry"
+sig = "ef7f2799fcce8a95"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/world.py#Environment"
+sig = "654ab204da412950"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/world.py#Location"
+sig = "623f110511650fcf"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/world.py#World"
+sig = "e1b9c98f30245abd"
