@@ -4,7 +4,7 @@ status: active
 authority: describes
 summary: "memgate's system-agnostic core: labels and content-addressed label sets, the world model (environments, locations, high assurance), the label-set registry, Cedar schema and policies, the allowed-ID resolver and carry-out check, and derivation rules. 19 tests."
 created: 2026-09-29
-updated: 2026-09-29
+updated: 2026-09-30
 tags: [module, memgate, permissions]
 ---
 
@@ -98,5 +98,5 @@ tags: [module, memgate, permissions]
 ## Not yet
 
 - **Changing the world file needs a restart** of processes that loaded it (e.g. the Hindsight validator). The cache follows the in-memory `World`.
-- **The SMT proof of the seal** needs the Cedar CLI with its analysis feature, plus cvc5; neither is installed yet.
+- **Write authorisation is in Python, not Cedar,** so the proofs ([[memgate Proofs]], done 2026-09-30) cover recall and the carry-out decision but not the validator's write checks. Moving writes into Cedar is proposed in [[Trust Boundaries]].
 - **Provenance and audit are built** (2026-09-29) and wired into [[memgate Hindsight Adapter]].

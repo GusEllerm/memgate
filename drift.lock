@@ -332,6 +332,16 @@ sig = "80d643aa4a33130d"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
+target = "benchmark/src/smbench/selective/leakcheck.py#lineage"
+sig = "002aa567b96c9022"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "benchmark/src/smbench/selective/world.py#World"
+sig = "5d7a2c21724b9f4c"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/derivation.py#CrossLabelSetMerge"
 sig = "ae2e2bbbdbf6f017"
 
