@@ -1,6 +1,26 @@
 version = 1
 
 [[bindings]]
+doc = "docs/vault/Concepts/Trust Boundaries.md"
+target = "benchmark/src/smbench/alcf/gateway.py#RequestLog"
+sig = "fffcea073ff9bb50"
+
+[[bindings]]
+doc = "docs/vault/Concepts/Trust Boundaries.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
+sig = "9a23fb35b6d988ca"
+
+[[bindings]]
+doc = "docs/vault/Concepts/Trust Boundaries.md"
+target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
+sig = "f43ea7531077e0d8"
+
+[[bindings]]
+doc = "docs/vault/Concepts/Trust Boundaries.md"
+target = "memgate/src/memgate/context.py"
+sig = "afad2b205fa65a06"
+
+[[bindings]]
 doc = "docs/vault/Modules/ALCF Gateway.md"
 target = "benchmark/src/smbench/alcf/auth.py#get_access_token"
 sig = "5d95c969dc260ad9"
@@ -454,3 +474,28 @@ sig = "51d86bcc42ccff20"
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/provenance.py#TrailNode"
 sig = "65805f5240e82863"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Proofs.md"
+target = "memgate/proofs/results.json"
+sig = "06e9d64f38798232"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Proofs.md"
+target = "memgate/proofs/src/main.rs"
+sig = "92e31ce3bce083e8"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Proofs.md"
+target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
+sig = "f43ea7531077e0d8"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Proofs.md"
+target = "memgate/src/memgate/policies/memgate.cedar"
+sig = "daf3e29cc567875f"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Proofs.md"
+target = "memgate/src/memgate/policy.py#Policy"
+sig = "54fc77902e222138"
