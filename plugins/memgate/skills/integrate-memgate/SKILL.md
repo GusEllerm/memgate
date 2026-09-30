@@ -44,7 +44,7 @@ Do not guess these. Ask the owner, give a recommendation, and record the answers
 
 ## 4. Deploy
 
-- Install the pinned release: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.2.0#subdirectory=memgate"`. The repo is private, so git access is needed.
+- Install the pinned release: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.2.0#subdirectory=memgate"`.
 - Generate the secret with `memgate secret` and store it where only the host can read it. Never put it where an agent process can see it.
 - Run `memgate serve` under the host's process supervision, bound to loopback, with the owner's LLM settings. The host process and the server must share `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
 

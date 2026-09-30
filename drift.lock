@@ -533,7 +533,7 @@ sig = "4f88b8189ed85e2c"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "82efe605a82f0b6d"
+sig = "135b7ed8a1b5c0b4"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -573,7 +573,7 @@ sig = "c161037c91c03766"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "plugins/memgate/skills/integrate-memgate/SKILL.md"
-sig = "3d07c60aa7e8f77c"
+sig = "1b161515ed0d4035"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"

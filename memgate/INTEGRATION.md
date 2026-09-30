@@ -69,7 +69,7 @@ Ids are free strings, except that `--ha--` is reserved.
 ## Install and run
 
 ```sh
-# memgate, with the Hindsight version its validator is tested against (the repo is private: needs git access)
+# memgate, with the Hindsight version its validator is tested against
 pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.2.0#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
