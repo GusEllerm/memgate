@@ -54,10 +54,12 @@ Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` 
   - memory-reading bank operations (list, export, get document, entity graph, …) are refused for agents, via `validate_bank_read`;
   - bank writes and bank creation are admin-only (`validate_bank_write`, `validate_create_bank`).
 
-**Launch:** `memgate/scripts/serve_hindsight_gated.sh` runs Hindsight with the validator loaded:
-- its own database (pg0://memgate);
-- port 8889, **bound to 127.0.0.1**;
+**Launch:** `memgate serve` ([[memgate Integration]]) runs Hindsight with the validator loaded:
+- its own database (pg0://memgate by default);
+- port 8889, **bound to 127.0.0.1** (a non-loopback bind needs `--allow-remote`);
 - the LLM-request log, audit log and tracing off.
+
+In this repo, `memgate/scripts/serve_hindsight_gated.sh` wraps it with the repo's defaults (memgate/.run/, the ALCF gateway).
 
 ## Tests (live)
 

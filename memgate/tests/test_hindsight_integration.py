@@ -183,3 +183,11 @@ def test_high_assurance_partition(mem):
     item = lambda tags: {"items": [{"content": "Misplaced memory.", "tags": tags}]}
     assert _raw("POST", f"/v1/default/banks/{vault_bank}/memories", item([lab]), ada_in_lab)[0] == 403    # ordinary into a partition
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([vault]), ada_in_vault)[0] == 403  # vault into the shared bank
+
+
+def test_conformance_passes_on_this_deployment():
+    """The packaged conformance suite (memgate conformance) against the same live server."""
+    from memgate.conformance import run
+    checks = run(Gate.from_env(), URL)
+    assert not [c for c in checks if c.status == "fail"], [c.__dict__ for c in checks if c.status == "fail"]
+    assert sum(c.status == "pass" for c in checks) >= 10

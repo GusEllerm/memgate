@@ -1,5 +1,10 @@
 # Agent instructions
 
+This repo is memgate. To integrate memgate into another project, read `memgate/INTEGRATION.md`
+(or use the `integrate-memgate` skill from this repo's plugin); the rest of this file is for working on memgate itself.
+
+After editing `memgate/INTEGRATION.md`, copy it to `plugins/memgate/skills/integrate-memgate/` (a test checks they match).
+
 ## Live documentation (livedocs)
 
 Notes under `docs/vault/` are bound to the code they mention (names in backticks). A pre-commit gate blocks

@@ -1,0 +1,15 @@
+{
+  "name": "memgate",
+  "description": "memgate: context-scoped permissions for agent memory, and the skill for integrating it into a host application.",
+  "owner": {
+    "name": "Gus Ellerm"
+  },
+  "plugins": [
+    {
+      "name": "memgate",
+      "source": "./plugins/memgate",
+      "description": "Integrate memgate (context-scoped permissions for agent memory) into a host application.",
+      "version": "0.2.0"
+    }
+  ]
+}

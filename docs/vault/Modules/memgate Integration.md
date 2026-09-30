@@ -1,0 +1,52 @@
+---
+type: module
+status: active
+authority: describes
+summary: "How memgate is packaged for an agent to integrate into a host (e.g. Knowledge Ranch): the Context-based API, the memgate command line (serve, check-world, conformance, secret), the integration guide, the integrate-memgate skill in the repo's Claude Code plugin, a runnable quickstart, and release 0.2.0."
+created: 2026-09-30
+updated: 2026-09-30
+tags: [module, memgate, integration, knowledge-ranch]
+---
+
+# memgate Integration
+
+> [!abstract] Role
+> Everything an integrating agent needs, shipped with memgate. That agent works in the host's repo, without this vault or its history. Decided 2026-09-30: a Claude Code plugin with a skill, plus a plain guide; the library, with a `Context` seam and no service ([[Decision Log]]). The trust model it hands over is in [[Trust Boundaries]].
+
+## Pieces
+
+- **The guide:** `memgate/INTEGRATION.md`. It covers:
+  - the rules;
+  - the host contract (seven obligations, from verified context to labelled logs);
+  - the world-file format;
+  - install and run;
+  - the API and when to call what;
+  - verification;
+  - what not to do without the owner;
+  - the limits.
+
+  A copy is bundled in the skill; `memgate/tests/test_docs.py` fails if the two differ.
+- **The skill:** `plugins/memgate/skills/integrate-memgate/SKILL.md`, in the plugin `plugins/memgate`, listed by the repo's marketplace file `.claude-plugin/marketplace.json`. Install it with `claude plugin marketplace add GusEllerm/memgate` and `claude plugin install memgate@memgate`. Its procedure:
+  1. survey the host;
+  2. put the owner's decisions to the owner (high assurance, carry-out rules, identity, provenance, LLM);
+  3. generate the world file from the host's model;
+  4. deploy;
+  5. put one memory module in the host that builds every Context;
+  6. carry out the host's side of the contract;
+  7. verify (conformance with 0 failures, plus host tests);
+  8. report.
+- **The API seam:** `Context` (agent, location, participants) in `memgate/src/memgate/context.py`. Every `HindsightMemory` call takes one ([[memgate Hindsight Adapter]]). The host builds it from verified facts, and that is where identity and context verification will plug in at integration.
+- **The command line:** `memgate/src/memgate/cli.py`, installed as `memgate`:
+  - `memgate serve` (`cmd_serve`): Hindsight with the validator. It checks the world file first, binds loopback unless `--allow-remote` is passed, turns off LLM traces, and takes LLM settings from `MEMGATE_LLM_*`. `memgate/scripts/serve_hindsight_gated.sh` is now a wrapper over it, keeping this repo's defaults.
+  - `memgate check-world` (`check_world` in `memgate/src/memgate/worldcheck.py`): the world-file format, with every mistake reported. The ids `--ha--` are reserved.
+  - `memgate conformance` (`run` in `memgate/src/memgate/conformance.py`): canaries in a throwaway bank on the live deployment, 14 checks, adapting to the host's world. Checks the world has no place for are skipped. The bank is deleted afterwards, and the exit code is non-zero on any failure.
+  - `memgate secret`: a new shared secret.
+- **Example:** `memgate/examples/quickstart.py` with `memgate/examples/world.json`.
+- **Release:** 0.2.0 (`memgate/CHANGELOG.md`). The host installs `memgate[hindsight]` from the git tag. The `hindsight` extra pins Hindsight 0.10.1.
+
+## Evidence (2026-09-30)
+
+- **Conformance on this repo's deployment:** 14 of 14 passed. It also runs as a live test (`test_conformance_passes_on_this_deployment`).
+- **Negative control:** against a Hindsight without memgate's validator, the 6 checks that depend on the validator failed (secret, side doors, forged tags, write rules, partition search, seal) and the exit code was 1. The client-side checks still passed, so conformance tells the two locks apart.
+- **Quickstart:** run against a fresh `memgate serve`, it refused both forbidden carry-outs, and recalled only what each context may read.
+- **Plugin:** the plugin and marketplace manifests pass `claude plugin validate`.

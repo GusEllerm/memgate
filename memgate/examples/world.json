@@ -1,0 +1,15 @@
+{
+  "environments": [
+    {"id": "campus"},
+    {"id": "studio", "carry_out": ["opinion", "skill"]},
+    {"id": "severed-floor", "carry_out": []}
+  ],
+  "locations": [
+    {"id": "lab", "environment": "campus"},
+    {"id": "cafe", "environment": "campus"},
+    {"id": "vault", "environment": "campus", "high_assurance": true},
+    {"id": "gallery", "environment": "studio"},
+    {"id": "macrodata", "environment": "severed-floor"}
+  ],
+  "agents": ["ada", "bo", "cy"]
+}

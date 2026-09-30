@@ -1,0 +1,142 @@
+# Integrating memgate
+
+For the agent or developer wiring memgate into a host application (for example Knowledge Ranch). Read it end to end before changing the host. The `integrate-memgate` skill in this repo's plugin walks the same steps.
+
+## What memgate does
+
+memgate decides which memories an agent may recall, store and carry out, from the **context** it is in:
+
+- **who** is acting;
+- **where** it is (a location, in an environment);
+- **who else is present**.
+
+It sits in front of a memory system (today [Hindsight](https://github.com/vectorize-io/hindsight) 0.10.1). Every memory carries a label set formed from the context it was stored in, and every recall is filtered to the label sets that context may read.
+
+The rules, all enforced:
+
+| Rule | Meaning |
+| --- | --- |
+| Witnesses, in place | A conversation is recalled only by someone who was present, and only in the location where it happened. |
+| Personal memory | Readable by its owner everywhere, by no one else. |
+| Carry-out | Content becomes personal memory only if every environment it came from lets that memory type out, and only where the source is readable. |
+| High assurance | Nothing formed in a high-assurance location is ever recalled outside it; nothing is carried out of it; anything written inside it stays inside. Each high-assurance location is stored in its own partition. |
+| Fail closed | Unknown agents and locations are refused everything; errors refuse rather than allow. |
+
+The Cedar policies are proved with Cedar's symbolic compiler, and each rule holds for every possible request. They are tested on random worlds and live, and benchmarked: 0 leaks in about 11,000 locked probes, and no measurable recall cost on LoCoMo.
+
+## The contract: what memgate trusts, and what the host must do
+
+memgate trusts the **Context** it is given. It cannot know where an agent really is or who is really present; only the host can. Everything below is the host's job. If any item is skipped, memgate's guarantees do not hold.
+
+1. **The host builds every Context from verified facts.** An agent never supplies its own agent id, location or participants. If agents run as separate processes, the host must verify the caller's identity (per-agent credentials) and take location and participants from its own simulation state. A common design is a short-lived context token signed by the host and bound to the agent's credential, reissued whenever the agent moves.
+2. **Agents never reach memgate or the memory store directly.** memgate runs inside a host-controlled service. The shared secret (`MEMGATE_SECRET`) and the memory store's port (loopback by default) are out of agents' reach. An agent that can read the secret can impersonate anyone.
+3. **The world file mirrors the host's world.** Every agent, location and environment the host uses must be listed before it is used. Unlisted ones are refused. Regenerate the file when the world changes. Write it to a temporary name and rename it, so memgate never reads a half-written file. memgate picks up changes within a second, with no restart.
+4. **The host clears or seals an agent's working context when it leaves a location,** above all a high-assurance one. memgate filters what an agent can *recall*. What is already in its prompt or scratchpad goes with it unless the host drops it.
+5. **The host scopes tools by the same labels.** Files, databases, messages, code execution and web access are all ways to move information that memgate never sees. Give storage the location's labels. Turn off outbound tools inside high-assurance locations.
+6. **Logs, traces and transcripts are labelled data.** Store them per high-assurance partition, as memgate does for its own provenance.
+7. **Memory type at carry-out** (fact, opinion, skill, episode) is the agent's own classification. memgate trusts it and records it in the audit log. Selective environments (for example "opinions only") are only as strong as that classification.
+
+## Mapping the host's world
+
+A world file is JSON. Check it with `memgate check-world world.json`.
+
+```json
+{
+  "environments": [
+    {"id": "campus"},
+    {"id": "studio", "carry_out": ["opinion", "skill"]},
+    {"id": "severed-floor", "carry_out": []}
+  ],
+  "locations": [
+    {"id": "lab", "environment": "campus"},
+    {"id": "vault", "environment": "campus", "high_assurance": true},
+    {"id": "gallery", "environment": "studio"}
+  ],
+  "agents": ["ada", "bo", "cy"]
+}
+```
+
+| Concept | Meaning | Host decision |
+| --- | --- | --- |
+| Environment | A set of locations sharing one carry-out rule | Which memory types may leave: `carry_out` lists them. Omitted means all four; `[]` means nothing leaves |
+| Location | Where conversations happen; every memory formed there is bound to it | Which locations exist, and which are high assurance |
+| High assurance | Outbound only: nothing leaves, anything inside stays inside; personal memory may still be recalled there | Which locations need it (secrets, sensitive work) |
+| Agent | An identity with its own personal memory | Every agent id the host will ever pass |
+| Participants | Who is present in a conversation (the Context) | Taken from the simulation at the time of each call |
+
+Ids are free strings, except that `--ha--` is reserved.
+
+## Install and run
+
+```sh
+# memgate, with the Hindsight version its validator is tested against (the repo is private: needs git access)
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.2.0#subdirectory=memgate"
+
+export MEMGATE_WORLD=/srv/host/world.json
+export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
+export MEMGATE_SECRET=$(memgate secret)                        # store it where only the host can read it
+export MEMGATE_LLM_BASE_URL=https://your-llm/v1 MEMGATE_LLM_MODEL=your-model MEMGATE_LLM_API_KEY=...
+
+memgate serve --port 8889 --db pg0://memgate                   # Hindsight + memgate's validator, loopback only
+```
+
+- **`memgate serve`** starts Hindsight with memgate's validator: the second lock, inside the store. It refuses a non-loopback bind unless you pass `--allow-remote`. It turns off Hindsight's LLM traces, which would hold memory content outside the partitions.
+- **The LLM** is used by Hindsight to extract and consolidate memories (any OpenAI-compatible endpoint). **Embeddings** are local (BAAI/bge-small-en-v1.5 by default).
+- **The host process and the server must see the same three settings:** `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
+
+## The API
+
+```python
+from memgate import Context, Gate
+from memgate.adapters.hindsight import HindsightMemory
+
+gate = Gate.from_env()                                     # world (followed for changes), registry, secret
+mem = HindsightMemory(gate, bank="ranch", base_url="http://127.0.0.1:8889")
+mem.create_bank()
+
+ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # built by the host, from verified facts
+```
+
+| Call | Use it when | Notes |
+| --- | --- | --- |
+| `mem.recall(ctx, query, k=20)` | The agent needs to remember something | Returns a `RecallBatch` of `Recalled` (text, label set, date, write id), best first, only what `ctx` may read. `.recall_id` is set when provenance is on |
+| `mem.remember(ctx, text, when=None, about=None, turns=())` | Something was said or seen in a conversation | Stored under `ctx`'s location and participants. `turns` links it to what was said (provenance). Returns the write id |
+| `mem.keep_note(ctx, text)` | An agent's private note that should stay where it was written | Readable only by its author, only in that location |
+| `mem.carry_out(ctx, text, memory_type, source=None)` | An agent takes something with it into personal memory | `source` defaults to `ctx`'s conversation; pass a recalled memory's label set to carry out something older. Raises `PermissionError` if the environment forbids it |
+| `mem.say(ctx, text, recalls=[recall_id, ...])` | An agent speaks | Records which recalls it drew on, so later memories trace back (needs a `ProvenanceLog`) |
+
+- **Writes that break a rule** raise `PermissionError` before anything is stored. Store errors raise `HindsightError`. None of these calls ever returns an unchecked result.
+- **Provenance** (optional; recommended where audit matters): `HindsightMemory(..., provenance=ProvenanceLog(root, gate))` from `memgate.provenance`. It keeps a W3C PROV-style record of every write, recall and turn, with one SQLite file per high-assurance location.
+
+A turn, in order:
+1. `recall(ctx, …)`.
+2. The agent speaks.
+3. `say(ctx, text, [batch.recall_id])`.
+4. `remember(ctx, what was said, turns=[turn])`.
+
+When the agent leaves, the host may call `carry_out` for whatever the agent chooses to take, then drops the agent's working context.
+
+## Verify
+
+1. `memgate check-world world.json`: the host's world file is usable.
+2. `memgate conformance --url http://127.0.0.1:8889`, with the same `MEMGATE_*` settings as the server. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal), then deletes the bank. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
+3. **Host-level tests memgate can't do for you:**
+   - an agent's Context changes when it moves;
+   - participants match who is really present;
+   - no agent process can read `MEMGATE_SECRET` or reach the store's port;
+   - working context is cleared on leaving a high-assurance location.
+
+## Stop and ask the owner before
+
+- editing the Cedar policies (`src/memgate/policies/`) or the validator: the proofs and tests are the spec;
+- letting any agent-facing code construct a `Context` from agent-supplied values;
+- giving any agent process the secret, or exposing the memory store beyond the host;
+- turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
+- disabling a failing conformance check.
+
+## Limits (0.2.0)
+
+- **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
+- **Identity and context verification are the host's** (see the contract).
+- **Not tested against adversarial agents.** The evidence covers cooperative agents.
+- **Reflect and mental models are disabled** under memgate.
