@@ -17,9 +17,11 @@ tags: [module, memgate, hindsight]
 
 Code: `memgate/src/memgate/adapters/hindsight/client.py`.
 
-`HindsightMemory` is the only way agents' memory reaches Hindsight. Its operations are below.
+`HindsightMemory` (synchronous, urllib) and `AsyncHindsightMemory` (asyncio, httpx; since 0.3.0) are the only way agents' memory reaches Hindsight. They have the same API. Both are built on `_Core`, which makes every decision (labels, permission checks, routing, provenance) and does no I/O. So the two cannot decide differently; only the transport differs. Their operations are below.
 
-**Partitions (since 2026-09-30).** A world has one shared bank, for ordinary locations and personal memory, plus one bank per high-assurance location, named by `partition_bank` in `memgate/src/memgate/context.py`. `HindsightMemory.bank_for` sends each write to the partition of the high-assurance location it is labelled with, if any. A recall in a high-assurance location searches its partition and the shared bank (where personal memory lives) and merges the two by Hindsight's final score. A recall anywhere else never touches a partition. So a vault's memories never share ranking statistics, caches or consolidation with anything outside it. `HindsightMemory.partitions` lists the banks, and `HindsightMemory.pending_operations` counts across all of them.
+**Partitions (since 2026-09-30).** A world has one shared bank, for ordinary locations and personal memory, plus one bank per high-assurance location, named by `partition_bank` in `memgate/src/memgate/context.py`. `_Core.bank_for` sends each write to the partition of the high-assurance location it is labelled with, if any. A recall in a high-assurance location searches its partition and the shared bank (where personal memory lives) and merges the two by Hindsight's final score. A recall anywhere else never touches a partition. So a vault's memories never share ranking statistics, caches or consolidation with anything outside it. `_Core.partitions` lists the banks, and `HindsightMemory.pending_operations` counts across all of them.
+
+**A separate partition server (since 0.3.0).** With `partition_url=`, every call on a partition bank goes to its own server (`_Core._base_for`), and everything else to `base_url`. Run that server with `memgate serve --scope partitions` and the other with `--scope shared`: the validator's `MemgateValidator._out_of_scope` then refuses the other's banks on each. It's for isolation; it's also the only way to give high assurance its own LLM, since Hindsight 0.10.1 can't set an LLM per bank.
 
 Every method takes a `Context` (agent, location, participants; `memgate/src/memgate/context.py`), which the host builds from what it has verified; the acting agent is always among the participants (since 0.2.0, 2026-09-30).
 
@@ -27,7 +29,7 @@ Every method takes a `Context` (agent, location, participants; `memgate/src/memg
 | --- | --- |
 | `HindsightMemory.remember` | Stores something from `ctx`'s conversation under its label set (location + participants) |
 | `HindsightMemory.keep_note` | A personal note that stays where it was written |
-| `HindsightMemory.carry_out` | Checks `Policy.may_carry_out` at `ctx`'s location, then writes into personal memory; the source defaults to `ctx`'s conversation (`Context.conversation`), or a recalled memory's label set |
+| `HindsightMemory.carry_out` | Checks `Policy.may_carry_out` at `ctx`'s location, then writes into personal memory. The source is a recalled item (its label set, with its write as provenance; since 0.3.0), a label set or its ID, or by default `ctx`'s conversation (`Context.conversation`) |
 | `HindsightMemory.say` | Records what the agent said to `ctx`'s participants and which recalls it drew on (provenance) |
 | `HindsightMemory.recall` | Computes the allowed IDs itself and passes them as tags with `any_strict` |
 

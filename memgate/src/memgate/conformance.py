@@ -1,6 +1,7 @@
 """Conformance: prove a live memgate deployment enforces the rules, end to end.
 
     memgate conformance --url http://127.0.0.1:8889        # MEMGATE_WORLD, MEMGATE_REGISTRY, MEMGATE_SECRET set
+    memgate conformance --url http://127.0.0.1:8889 --partition-url http://127.0.0.1:8890   # split deployment
 
 Run it against the deployment's own server and world, after any change to the deployment. It picks
 agents and locations from the world, plants canary strings (unique codes) in a throwaway bank,
@@ -44,7 +45,7 @@ def _raw(url: str, method: str, path: str, body: dict | None, headers: dict) -> 
         return e.code, e.read().decode(errors="replace")
 
 
-def run(gate: Gate, url: str, wait_s: float = 900) -> list[Check]:
+def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = None) -> list[Check]:
     from memgate.adapters.hindsight.client import HindsightError, HindsightMemory
 
     url = url.rstrip("/")
@@ -64,6 +65,7 @@ def run(gate: Gate, url: str, wait_s: float = 900) -> list[Check]:
         Check("ha-partition", "It is stored in the location's own partition, not the shared bank"),
         Check("ha-partition-search", "The partition cannot be searched from outside"),
         Check("ha-seal", "Personal memory cannot be written inside a high-assurance location"),
+        Check("split-scope", "In a split deployment, each server refuses the other's banks"),
     ]}
 
     def ok(cid, cond, detail=""):
@@ -73,7 +75,8 @@ def run(gate: Gate, url: str, wait_s: float = 900) -> list[Check]:
     ha = sorted(l for l in w.locations if w.high_assurance(l))
     agents = sorted(w.agents)
     bank = f"memgate-conformance-{uuid.uuid4().hex[:8]}"
-    mem = HindsightMemory(gate, bank=bank, base_url=url)
+    mem = HindsightMemory(gate, bank=bank, base_url=url, partition_url=partition_url)
+    purl = (partition_url or url).rstrip("/")
     admin = {HEADER_SECRET: gate.secret, HEADER_ROLE: "admin"}
 
     def as_(agent, loc):
@@ -150,11 +153,12 @@ def run(gate: Gate, url: str, wait_s: float = 900) -> list[Check]:
             ok("ha-inside", sees(a, v, codes["ha"], "conformance dial"))
             ok("ha-outside", not sees(a, l1, codes["ha"], "conformance dial"))
             vault_bank = partition_bank(bank, v)
-            docs = lambda bk: json.loads(_raw(url, "GET", f"/v1/default/banks/{bk}/documents?limit=500", None, admin)[1] or "{}").get("items", [])
+            docs = lambda bk: json.loads(_raw(purl if bk == vault_bank else url, "GET",
+                                              f"/v1/default/banks/{bk}/documents?limit=500", None, admin)[1] or "{}").get("items", [])
             reg = gate.registry.all()
             in_v = lambda d: v in reg[d["tags"][0]].locs
             ok("ha-partition", any(in_v(d) for d in docs(vault_bank)) and not any(in_v(d) for d in docs(bank)))
-            status, _ = _raw(url, "POST", f"/v1/default/banks/{vault_bank}/memories/recall", {"query": "x"}, as_(a, l1))
+            status, _ = _raw(purl, "POST", f"/v1/default/banks/{vault_bank}/memories/recall", {"query": "x"}, as_(a, l1))
             ok("ha-partition-search", status == 403, f"status {status}")
             mine = gate.registry.register(personal_labels(a))
             status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories",
@@ -165,8 +169,14 @@ def run(gate: Gate, url: str, wait_s: float = 900) -> list[Check]:
             except PermissionError:
                 client_refused = True
             ok("ha-seal", status == 403 and client_refused, f"validator {status}, client refused {client_refused}")
+            if partition_url:
+                s1, _ = _raw(url, "POST", f"/v1/default/banks/{vault_bank}/memories/recall", {"query": "x"}, as_(a, v))
+                s2, _ = _raw(purl, "POST", f"/v1/default/banks/{bank}/memories/recall", {"query": "x"}, as_(a, l1))
+                ok("split-scope", s1 == 403 and s2 == 403, f"shared server on a partition {s1}, partition server on shared {s2}")
+            else:
+                checks["split-scope"].detail = "not a split deployment (no --partition-url)"
         else:
-            for cid in ("ha-inside", "ha-outside", "ha-partition", "ha-partition-search", "ha-seal"):
+            for cid in ("ha-inside", "ha-outside", "ha-partition", "ha-partition-search", "ha-seal", "split-scope"):
                 checks[cid].detail = "the world has no high-assurance location"
     finally:
         for bk in mem.partitions():

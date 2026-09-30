@@ -1,27 +1,35 @@
-"""memgate's Hindsight client: the only way agents' memory reaches Hindsight.
+"""memgate's Hindsight clients: the only way agents' memory reaches Hindsight.
 
-It labels every write from the context, registers the label set, and tags the item with its ID.
-On recall it computes the allowed label sets itself (first lock) and passes them as tags; the
+They label every write from the context, register the label set, and tag the item with its ID.
+On recall they compute the allowed label sets themselves (first lock) and pass them as tags; the
 validator inside Hindsight recomputes and overwrites them (second lock). One shared bank holds the
 world's ordinary locations and personal memory; each high-assurance location has its own bank (its
 partition, `partition_bank`). A write goes to the partition of the high-assurance location it is
 labelled with, if any; a recall in a high-assurance location searches its partition and the shared
 bank (where personal memory lives) and merges them by score; a recall anywhere else never touches a
-partition.
+partition. Partitions can live on a server of their own (`partition_url`), for isolation.
+
+`HindsightMemory` is synchronous (urllib, no dependencies); `AsyncHindsightMemory` is the same API
+for asyncio hosts (needs httpx: `pip install 'memgate[async]'`). Both share `_Core`, which holds
+every permission decision and does no I/O.
 """
 
 from __future__ import annotations
 
 import json
+import re
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
 
-from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Context, Gate, partition_bank
+from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, PARTITION_SEP, Context,
+                             Gate, partition_bank)
 from memgate.derivation import personal_labels, personal_note_labels
 from memgate.labels import LabelSet
 from memgate.provenance import ProvenanceLog, new_id
+
+_BANK_IN_PATH = re.compile(r"^/v1/default/banks/([^/?]+)")
 
 
 class HindsightError(RuntimeError):
@@ -43,22 +51,117 @@ class RecallBatch(list):
     recall_id: str | None = None
 
 
-class HindsightMemory:
-    def __init__(self, gate: Gate, bank: str, base_url: str = "http://127.0.0.1:8888", timeout: float = 900,
-                 provenance: ProvenanceLog | None = None):
+class _Core:
+    """Everything but the transport: labels, permission checks, routing, provenance."""
+
+    def __init__(self, gate: Gate, bank: str, base_url: str = "http://127.0.0.1:8889", timeout: float = 900,
+                 provenance: ProvenanceLog | None = None, partition_url: str | None = None):
         self.gate, self.bank, self.base_url, self.timeout = gate, bank, base_url.rstrip("/"), timeout
+        self.partition_url = partition_url.rstrip("/") if partition_url else None
         self.provenance = provenance
         self._created: set[str] = set()
 
-    # -- transport ----------------------------------------------------------------------------------
+    # -- routing ------------------------------------------------------------------------------------
+    def _base_for(self, path: str) -> str:
+        """The server a request goes to: partitions to `partition_url` when set, all else to `base_url`."""
+        m = _BANK_IN_PATH.match(path)
+        if self.partition_url and m and PARTITION_SEP in m.group(1):
+            return self.partition_url
+        return self.base_url
+
+    def _headers(self, agent: str | None, location: str | None, role: str) -> dict:
+        h = {"Content-Type": "application/json", HEADER_SECRET: self.gate.secret, HEADER_ROLE: role}
+        if agent:
+            h[HEADER_AGENT] = agent
+        if location:
+            h[HEADER_LOCATION] = location
+        return h
+
+    def partitions(self) -> list[str]:
+        """The shared bank and one partition per high-assurance location in the world."""
+        w = self.gate.world
+        return [self.bank] + [partition_bank(self.bank, l) for l in sorted(w.locations) if w.high_assurance(l)]
+
+    def bank_for(self, labels: LabelSet) -> str:
+        """Where a memory with these labels is stored."""
+        ha = sorted(l for l in labels.locs if self.gate.world.high_assurance(l))
+        return partition_bank(self.bank, ha[0]) if ha else self.bank
+
+    # -- decisions (no I/O) ------------------------------------------------------------------------
+    def _plan_write(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
+                    about: str | None) -> tuple[str, dict, str, str]:
+        """Check and label a write: (bank, request body, label-set ID, write ID). Raises PermissionError."""
+        if not self.gate.policy.may_write(agent, location, labels):
+            raise PermissionError(f"{agent} may not write {labels} at {location}")
+        ls_id = self.gate.registry.register(labels)
+        write_id = new_id("w")
+        item = {"content": text, "tags": [ls_id], "context": about, "document_id": write_id,
+                "timestamp": when.isoformat() if when else None}
+        return self.bank_for(labels), {"items": [item]}, ls_id, write_id
+
+    def _after_write(self, agent: str, location: str, ls_id: str, write_id: str, kind: str, text: str,
+                     turns=(), derived_from=()) -> None:
+        if self.provenance:
+            self.provenance.record_write(write_id, agent, location, ls_id, kind, text, turns=turns, derived_from=derived_from)
+            self.provenance.audit(location, "write", write_id=write_id, agent=agent, label_set=ls_id, kind=kind)
+
+    def _resolve_source(self, ctx: Context, source) -> tuple[LabelSet, list[str]]:
+        """A carry-out's source as a label set, plus the writes it came from when known."""
+        if source is None:
+            return ctx.conversation(), []
+        if isinstance(source, Recalled):
+            return self.gate.registry.get(source.label_set), [source.write_id] if source.write_id else []
+        if isinstance(source, str):
+            return self.gate.registry.get(source), []
+        return source, []
+
+    def _plan_carry_out(self, ctx: Context, memory_type: str, source, source_writes) -> list[str]:
+        """Check a carry-out; returns the writes it derives from. Raises PermissionError if refused."""
+        labels, writes = self._resolve_source(ctx, source)
+        allowed = self.gate.policy.may_carry_out(ctx.agent, ctx.location, labels, memory_type)
+        if self.provenance:
+            self.provenance.audit(ctx.location, "carry_out", agent=ctx.agent, source=labels.id,
+                                  memory_type=memory_type, allowed=allowed)
+        if not allowed:
+            raise PermissionError(f"{memory_type} may not be carried out of {labels}")
+        return list(source_writes) or writes
+
+    def _plan_recall(self, ctx: Context, query: str, budget: str) -> tuple[set[str], list[str], dict]:
+        allowed_set = self.gate.policy.allowed_ids(ctx.agent, ctx.location)
+        body = {"query": query, "budget": budget, "tags": sorted(allowed_set) or ["ls_none"], "tags_match": "any_strict"}
+        banks = [self.bank]
+        if self.gate.world.high_assurance(ctx.location):
+            banks.append(partition_bank(self.bank, ctx.location))      # at most two partitions per recall
+        return allowed_set, banks, body
+
+    def _finish_recall(self, ctx: Context, query: str, allowed_set: set[str], results: list[dict], merged: bool,
+                       k: int) -> RecallBatch:
+        if merged:
+            results.sort(key=lambda r: -((r.get("scores") or {}).get("final") or 0.0))
+        out = RecallBatch()
+        for r in results[:k]:
+            tags = r.get("tags") or []
+            when = r.get("occurred_start") or r.get("mentioned_at")
+            out.append(Recalled(r["text"], tags[0] if tags else "", str(when)[:10] if when else None, r.get("document_id")))
+        if self.provenance:
+            returned = [(m.write_id, m.label_set) for m in out if m.write_id]
+            out.recall_id = self.provenance.record_recall(ctx.agent, ctx.location, query, allowed_set, returned)
+            self.provenance.audit(ctx.location, "recall", agent=ctx.agent, allowed=len(allowed_set), returned=len(out))
+        return out
+
+    @staticmethod
+    def _unfinished(ops) -> int:
+        ops = ops.get("operations", ops if isinstance(ops, list) else [])
+        return sum(o.get("status") not in ("completed", "failed", "cancelled") for o in ops)
+
+
+class HindsightMemory(_Core):
+    """Synchronous client. Every method takes a `Context`, built by the host from verified facts."""
+
     def _call(self, method: str, path: str, body: dict | None, *, agent: str | None = None,
               location: str | None = None, role: str = "agent") -> dict:
-        headers = {"Content-Type": "application/json", HEADER_SECRET: self.gate.secret, HEADER_ROLE: role}
-        if agent:
-            headers[HEADER_AGENT] = agent
-        if location:
-            headers[HEADER_LOCATION] = location
-        req = urllib.request.Request(f"{self.base_url}{path}", method=method, headers=headers,
+        req = urllib.request.Request(f"{self._base_for(path)}{path}", method=method,
+                                     headers=self._headers(agent, location, role),
                                      data=json.dumps(body).encode() if body is not None else None)
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as r:
@@ -75,32 +178,12 @@ class HindsightMemory:
             self._call("PUT", f"/v1/default/banks/{bank}", {"name": bank}, role="admin")   # idempotent
             self._created.add(bank)
 
-    def partitions(self) -> list[str]:
-        """The shared bank and one partition per high-assurance location in the world."""
-        w = self.gate.world
-        return [self.bank] + [partition_bank(self.bank, l) for l in sorted(w.locations) if w.high_assurance(l)]
-
-    def bank_for(self, labels: LabelSet) -> str:
-        """Where a memory with these labels is stored."""
-        ha = sorted(l for l in labels.locs if self.gate.world.high_assurance(l))
-        return partition_bank(self.bank, ha[0]) if ha else self.bank
-
-    # -- writes -------------------------------------------------------------------------------------
     def _retain(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
-                context: str | None, kind: str, turns=(), derived_from=()) -> str:
-        """Store one memory; returns its write ID (also its Hindsight document_id)."""
-        if not self.gate.policy.may_write(agent, location, labels):
-            raise PermissionError(f"{agent} may not write {labels} at {location}")
-        ls_id = self.gate.registry.register(labels)
-        write_id = new_id("w")
-        item = {"content": text, "tags": [ls_id], "context": context, "document_id": write_id,
-                "timestamp": when.isoformat() if when else None}
-        bank = self.bank_for(labels)
+                about: str | None, kind: str, turns=(), derived_from=()) -> str:
+        bank, body, ls_id, write_id = self._plan_write(agent, location, labels, text, when, about)
         self._ensure(bank)
-        self._call("POST", f"/v1/default/banks/{bank}/memories", {"items": [item]}, agent=agent, location=location)
-        if self.provenance:
-            self.provenance.record_write(write_id, agent, location, ls_id, kind, text, turns=turns, derived_from=derived_from)
-            self.provenance.audit(location, "write", write_id=write_id, agent=agent, label_set=ls_id, kind=kind)
+        self._call("POST", f"/v1/default/banks/{bank}/memories", body, agent=agent, location=location)
+        self._after_write(agent, location, ls_id, write_id, kind, text, turns, derived_from)
         return write_id
 
     def remember(self, ctx: Context, text: str, *, when: datetime | None = None, about: str | None = None,
@@ -115,23 +198,17 @@ class HindsightMemory:
         return self._retain(ctx.agent, ctx.location, personal_note_labels(ctx.agent, ctx.location), text, when,
                             "personal note", "note")
 
-    def carry_out(self, ctx: Context, text: str, memory_type: str, *, source: LabelSet | None = None,
+    def carry_out(self, ctx: Context, text: str, memory_type: str, *, source: LabelSet | Recalled | str | None = None,
                   when: datetime | None = None, source_writes: list[str] = ()) -> str:
         """Copy something into the agent's personal memory, if every environment it came from allows.
 
-        `source` is the label set the content was formed under; it defaults to `ctx`'s conversation.
-        Pass a recalled memory's label set to carry out something from an earlier conversation here;
-        it must be readable in `ctx` (Cedar checks). `memory_type` is the agent's own classification
-        (fact, opinion, skill, episode), audited. Raises PermissionError if refused."""
-        source = source or ctx.conversation()
-        allowed = self.gate.policy.may_carry_out(ctx.agent, ctx.location, source, memory_type)
-        if self.provenance:
-            self.provenance.audit(ctx.location, "carry_out", agent=ctx.agent, source=source.id,
-                                  memory_type=memory_type, allowed=allowed)
-        if not allowed:
-            raise PermissionError(f"{memory_type} may not be carried out of {source}")
+        `source` is what the content was formed under: a recalled memory (its label set and write),
+        a label set or its ID, or by default `ctx`'s conversation. It must be readable in `ctx`
+        (Cedar checks). `memory_type` is the agent's own classification (fact, opinion, skill,
+        episode), audited. Raises PermissionError if refused."""
+        writes = self._plan_carry_out(ctx, memory_type, source, source_writes)
         return self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
-                            f"carried out ({memory_type})", "carry_out", derived_from=source_writes)
+                            f"carried out ({memory_type})", "carry_out", derived_from=writes)
 
     def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
         """Record what `ctx.agent` said, to `ctx.participants`, and which recalls (their `recall_id`s)
@@ -140,45 +217,112 @@ class HindsightMemory:
             return None
         return self.provenance.record_turn(ctx.agent, ctx.location, list(ctx.participants), text, list(recalls))
 
-    # -- reads --------------------------------------------------------------------------------------
     def recall(self, ctx: Context, query: str, k: int = 20, budget: str = "mid") -> RecallBatch:
         """The memories `ctx.agent` may recall at `ctx.location` that best match `query`, best first."""
-        agent, location = ctx.agent, ctx.location
-        allowed_set = self.gate.policy.allowed_ids(agent, location)
-        allowed = sorted(allowed_set) or ["ls_none"]
-        banks = [self.bank]
-        if self.gate.world.high_assurance(location):
-            banks.append(partition_bank(self.bank, location))      # at most two partitions per recall
+        allowed_set, banks, body = self._plan_recall(ctx, query, budget)
         results = []
         for bank in banks:
             self._ensure(bank)
-            resp = self._call("POST", f"/v1/default/banks/{bank}/memories/recall",
-                              {"query": query, "budget": budget, "tags": allowed, "tags_match": "any_strict"},
-                              agent=agent, location=location)
-            results += resp.get("results", [])
-        if len(banks) > 1:
-            results.sort(key=lambda r: -((r.get("scores") or {}).get("final") or 0.0))
-        out = RecallBatch()
-        for r in results[:k]:
-            tags = r.get("tags") or []
-            when = r.get("occurred_start") or r.get("mentioned_at")
-            out.append(Recalled(r["text"], tags[0] if tags else "", str(when)[:10] if when else None, r.get("document_id")))
-        if self.provenance:
-            returned = [(m.write_id, m.label_set) for m in out if m.write_id]
-            out.recall_id = self.provenance.record_recall(agent, location, query, allowed_set, returned)
-            self.provenance.audit(location, "recall", agent=agent, allowed=len(allowed_set), returned=len(out))
-        return out
+            results += self._call("POST", f"/v1/default/banks/{bank}/memories/recall", body,
+                                  agent=ctx.agent, location=ctx.location).get("results", [])
+        return self._finish_recall(ctx, query, allowed_set, results, len(banks) > 1, k)
 
     def pending_operations(self) -> int:
         """Background operations not yet finished, across the shared bank and every partition in use."""
         total = 0
         for bank in self.partitions():
             try:
-                ops = self._call("GET", f"/v1/default/banks/{bank}/operations", None, role="admin")
+                total += self._unfinished(self._call("GET", f"/v1/default/banks/{bank}/operations", None, role="admin"))
             except HindsightError as e:
-                if e.status == 404:          # a partition nothing has been written to yet
-                    continue
-                raise
-            ops = ops.get("operations", ops if isinstance(ops, list) else [])
-            total += sum(o.get("status") not in ("completed", "failed", "cancelled") for o in ops)
+                if e.status != 404:          # 404: a partition nothing has been written to yet
+                    raise
+        return total
+
+
+class AsyncHindsightMemory(_Core):
+    """The same API as `HindsightMemory`, for asyncio hosts. Needs httpx (`pip install 'memgate[async]'`).
+    Use it as an async context manager, or call `aclose()` when done."""
+
+    def __init__(self, *args, **kwargs):
+        import httpx
+        super().__init__(*args, **kwargs)
+        self._http = httpx.AsyncClient(timeout=self.timeout)
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *exc):
+        await self.aclose()
+
+    async def aclose(self) -> None:
+        await self._http.aclose()
+
+    async def _call(self, method: str, path: str, body: dict | None, *, agent: str | None = None,
+                    location: str | None = None, role: str = "agent") -> dict:
+        r = await self._http.request(method, f"{self._base_for(path)}{path}", headers=self._headers(agent, location, role),
+                                     content=json.dumps(body).encode() if body is not None else None)
+        if r.status_code >= 400:
+            raise HindsightError(r.status_code, r.text)
+        return r.json() if r.content else {}
+
+    async def create_bank(self) -> None:
+        await self._ensure(self.bank)
+
+    async def _ensure(self, bank: str) -> None:
+        if bank not in self._created:
+            await self._call("PUT", f"/v1/default/banks/{bank}", {"name": bank}, role="admin")
+            self._created.add(bank)
+
+    async def _retain(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
+                      about: str | None, kind: str, turns=(), derived_from=()) -> str:
+        bank, body, ls_id, write_id = self._plan_write(agent, location, labels, text, when, about)
+        await self._ensure(bank)
+        await self._call("POST", f"/v1/default/banks/{bank}/memories", body, agent=agent, location=location)
+        self._after_write(agent, location, ls_id, write_id, kind, text, turns, derived_from)
+        return write_id
+
+    async def remember(self, ctx: Context, text: str, *, when: datetime | None = None, about: str | None = None,
+                       turns: list[str] = ()) -> str:
+        """See `HindsightMemory.remember`."""
+        return await self._retain(ctx.agent, ctx.location, ctx.conversation(), text, when, about, "conversation", turns=turns)
+
+    async def keep_note(self, ctx: Context, text: str, *, when: datetime | None = None) -> str:
+        """See `HindsightMemory.keep_note`."""
+        return await self._retain(ctx.agent, ctx.location, personal_note_labels(ctx.agent, ctx.location), text, when,
+                                  "personal note", "note")
+
+    async def carry_out(self, ctx: Context, text: str, memory_type: str, *,
+                        source: LabelSet | Recalled | str | None = None, when: datetime | None = None,
+                        source_writes: list[str] = ()) -> str:
+        """See `HindsightMemory.carry_out`."""
+        writes = self._plan_carry_out(ctx, memory_type, source, source_writes)
+        return await self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
+                                  f"carried out ({memory_type})", "carry_out", derived_from=writes)
+
+    async def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
+        """See `HindsightMemory.say`."""
+        if not self.provenance:
+            return None
+        return self.provenance.record_turn(ctx.agent, ctx.location, list(ctx.participants), text, list(recalls))
+
+    async def recall(self, ctx: Context, query: str, k: int = 20, budget: str = "mid") -> RecallBatch:
+        """See `HindsightMemory.recall`."""
+        allowed_set, banks, body = self._plan_recall(ctx, query, budget)
+        results = []
+        for bank in banks:
+            await self._ensure(bank)
+            resp = await self._call("POST", f"/v1/default/banks/{bank}/memories/recall", body,
+                                    agent=ctx.agent, location=ctx.location)
+            results += resp.get("results", [])
+        return self._finish_recall(ctx, query, allowed_set, results, len(banks) > 1, k)
+
+    async def pending_operations(self) -> int:
+        """See `HindsightMemory.pending_operations`."""
+        total = 0
+        for bank in self.partitions():
+            try:
+                total += self._unfinished(await self._call("GET", f"/v1/default/banks/{bank}/operations", None, role="admin"))
+            except HindsightError as e:
+                if e.status != 404:
+                    raise
         return total

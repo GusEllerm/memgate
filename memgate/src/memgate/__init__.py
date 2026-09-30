@@ -16,6 +16,6 @@ from memgate.context import Context, Gate, load_world
 from memgate.labels import Label, LabelSet, NOBODY
 from memgate.world import Environment, Location, World
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = ["Context", "Gate", "load_world", "Label", "LabelSet", "NOBODY", "Environment", "Location", "World"]

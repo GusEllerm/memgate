@@ -17,7 +17,7 @@ tags: [concept, memgate, security, trust-boundaries, knowledge-ranch]
 
 - **Trusted:**
   - the Ranch host, which runs the simulation and knows who is where with whom;
-  - memgate: `HindsightMemory` in `memgate/src/memgate/adapters/hindsight/client.py`, plus the Cedar policies;
+  - memgate: `HindsightMemory` and `AsyncHindsightMemory` in `memgate/src/memgate/adapters/hindsight/client.py`, plus the Cedar policies;
   - the gated Hindsight server with `MemgateValidator`;
   - the world file and the label-set registry.
 - **Untrusted:** each agent's words. That means its queries and the text it asks to remember, and, if the agents' tools allow it, anything an agent does outside the memory service.
@@ -57,7 +57,7 @@ Ranch agents will run as their own processes with tool and network access (Gus, 
 **This is deferred to the Ranch integration** (Decision Log, 2026-09-30). The mechanism depends on how the Ranch identifies processes and connects them, and building it here would mean guessing that interface.
 
 **What this repo guarantees in the meantime is a contract.** memgate trusts the agent, location and participants it is given. Whoever integrates it must deliver them verified. When that check is added, it goes where memgate turns a request into a context:
-- the public methods of `HindsightMemory` (recall, remember, keep_note, carry_out), which today take agent, location and participants as arguments;
+- the `Context` every client method takes (since 0.2.0): the host builds it, and that is where verification happens before any memgate call;
 - the validator's `_caller`, which today trusts the agent and location headers once the shared secret checks out.
 
 The Cedar policies, the label derivation and the proofs are unchanged by it: they already decide on a given context.

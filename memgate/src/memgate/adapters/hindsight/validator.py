@@ -30,6 +30,8 @@ from hindsight_api.extensions.operation_validator import (
     ValidationResult,
 )
 
+import os
+
 from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_location
 
 NO_MATCH = "ls_none"  # a tag no item carries: recall returns nothing
@@ -50,6 +52,23 @@ class MemgateValidator(OperationValidatorExtension):
     def __init__(self, config: dict | None = None):
         super().__init__(config or {})
         self.gate = Gate.from_env()
+        # Which banks this server holds (MEMGATE_SERVE_SCOPE): "all" (default), "shared" (no high-assurance
+        # partitions) or "partitions" (only them), so a split deployment can never land a memory on the
+        # wrong server.
+        self.scope = os.environ.get("MEMGATE_SERVE_SCOPE", "all")
+        if self.scope not in ("all", "shared", "partitions"):
+            raise ValueError(f"MEMGATE_SERVE_SCOPE must be all, shared or partitions, not {self.scope!r}")
+
+    def _out_of_scope(self, bank_id: str) -> str | None:
+        """Why this server may not touch `bank_id`, or None."""
+        if self.scope == "all":
+            return None
+        is_partition = partition_location(bank_id, self.gate.world) is not None
+        if self.scope == "shared" and is_partition:
+            return "this server does not hold high-assurance partitions"
+        if self.scope == "partitions" and not is_partition:
+            return "this server holds only high-assurance partitions"
+        return None
 
     # -- identity -------------------------------------------------------------------------------
     def _caller(self, ctx) -> tuple[str, str | None, str | None]:
@@ -68,6 +87,8 @@ class MemgateValidator(OperationValidatorExtension):
             role, agent, location = self._caller(ctx)
         except PermissionError as e:
             return ValidationResult.reject(str(e))
+        if (why := self._out_of_scope(ctx.bank_id)):
+            return ValidationResult.reject(why)
         if role == "internal":
             return ValidationResult.accept()
         if not agent or not location:
@@ -86,6 +107,8 @@ class MemgateValidator(OperationValidatorExtension):
             return ValidationResult.reject(str(e))
         if role == "internal":
             return ValidationResult.accept()
+        if (why := self._out_of_scope(ctx.bank_id)):
+            return ValidationResult.reject(why)
         known = self.gate.registry.all()
         part = partition_location(ctx.bank_id, self.gate.world)
         for item in ctx.contents:
@@ -118,6 +141,8 @@ class MemgateValidator(OperationValidatorExtension):
         return ValidationResult.reject("mental models blend a whole bank")
 
     async def validate_bank_read(self, ctx: BankReadContext) -> ValidationResult:
+        if (why := self._out_of_scope(ctx.bank_id)):
+            return ValidationResult.reject(why)
         try:
             role, _, _ = self._caller(ctx)
         except PermissionError as e:
@@ -127,6 +152,8 @@ class MemgateValidator(OperationValidatorExtension):
         return ValidationResult.reject(f"{ctx.operation} reads memory around the label filter")
 
     async def validate_create_bank(self, ctx: CreateBankContext) -> ValidationResult:
+        if (why := self._out_of_scope(ctx.bank_id)):
+            return ValidationResult.reject(why)
         try:
             role, _, _ = self._caller(ctx)
         except PermissionError as e:
@@ -134,6 +161,8 @@ class MemgateValidator(OperationValidatorExtension):
         return ValidationResult.accept() if role in ("internal", "admin") else ValidationResult.reject("admin only")
 
     async def validate_bank_write(self, ctx: BankWriteContext) -> ValidationResult:
+        if (why := self._out_of_scope(ctx.bank_id)):
+            return ValidationResult.reject(why)
         try:
             role, _, _ = self._caller(ctx)
         except PermissionError as e:

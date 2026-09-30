@@ -73,6 +73,8 @@ def cmd_serve(args) -> int:
         "MEMGATE_WORLD": str(Path(world).resolve()),
         "MEMGATE_REGISTRY": str(Path(registry).resolve()),
         "MEMGATE_SECRET": secret,
+        "MEMGATE_SERVE_SCOPE": args.scope,
+        "MEMGATE_WORLD_CHECK_S": str(args.world_check_interval),
         "HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION": "memgate.adapters.hindsight.validator:MemgateValidator",
         "HINDSIGHT_API_EXTENSION_PASSTHROUGH_HEADERS": ",".join(HEADERS),
         "HINDSIGHT_API_DATABASE_URL": args.db,
@@ -90,7 +92,9 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_AUDIT_LOG_ENABLED": "false",
         "HINDSIGHT_API_OTEL_TRACES_ENABLED": "false",
     })
-    print(f"memgate: Hindsight with the validator on http://{args.host}:{args.port} (database {args.db})", flush=True)
+    db_shown = args.db.split("@")[-1] if "@" in args.db else args.db        # never print a password
+    print(f"memgate: Hindsight with the validator on http://{args.host}:{args.port} "
+          f"(scope {args.scope}, database {db_shown})", flush=True)
     os.execve(binary, [binary], env)
     return 0  # not reached
 
@@ -102,7 +106,7 @@ def cmd_conformance(args) -> int:
         if not _env(name):
             print(f"conformance needs {name} (the same values the server was started with)", file=sys.stderr)
             return 2
-    checks = run(Gate.from_env(), args.url, wait_s=args.wait)
+    checks = run(Gate.from_env(), args.url, wait_s=args.wait, partition_url=args.partition_url)
     if args.json:
         import json
         print(json.dumps([c.__dict__ for c in checks], indent=1))
@@ -138,11 +142,17 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--llm-model", default=_env("MEMGATE_LLM_MODEL", "openai/gpt-oss-120b"))
     s.add_argument("--llm-max-concurrent", type=int, default=int(_env("MEMGATE_LLM_MAX_CONCURRENT", "6")))
     s.add_argument("--embedder", default=_env("MEMGATE_EMBEDDER", "BAAI/bge-small-en-v1.5"))
+    s.add_argument("--scope", choices=["all", "shared", "partitions"], default=_env("MEMGATE_SERVE_SCOPE", "all"),
+                   help="which banks this server holds: all (default), shared (no high-assurance partitions), or "
+                        "partitions (only them, for a separate high-assurance server)")
+    s.add_argument("--world-check-interval", type=float, default=float(_env("MEMGATE_WORLD_CHECK_S", "1.0")),
+                   help="seconds between checks of the world file for changes (0 = every decision)")
     s.add_argument("--hindsight-bin")
     s.set_defaults(func=cmd_serve)
 
     k = sub.add_parser("conformance", help="check a live deployment enforces the rules (canaries, then cleans up)")
     k.add_argument("--url", default=f"http://127.0.0.1:{_env('MEMGATE_PORT', '8889')}")
+    k.add_argument("--partition-url", help="the high-assurance partition server, in a split deployment")
     k.add_argument("--wait", type=float, default=900, help="seconds to wait for Hindsight's background work")
     k.add_argument("--json", action="store_true")
     k.set_defaults(func=cmd_conformance)

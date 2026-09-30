@@ -69,20 +69,27 @@ Ids are free strings, except that `--ha--` is reserved.
 ## Install and run
 
 ```sh
-# memgate, with the Hindsight version its validator is tested against
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.2.0#subdirectory=memgate"
+# the server side: memgate with the Hindsight version its validator is tested against (its own environment)
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.3.0#subdirectory=memgate"
+# the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.3.0#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
 export MEMGATE_SECRET=$(memgate secret)                        # store it where only the host can read it
 export MEMGATE_LLM_BASE_URL=https://your-llm/v1 MEMGATE_LLM_MODEL=your-model MEMGATE_LLM_API_KEY=...
 
-memgate serve --port 8889 --db pg0://memgate                   # Hindsight + memgate's validator, loopback only
+export MEMGATE_DB=pg0://memgate                                # or postgresql://... (needs vector and pg_trgm)
+memgate serve --port 8889                                      # Hindsight + memgate's validator, loopback only
 ```
 
 - **`memgate serve`** starts Hindsight with memgate's validator: the second lock, inside the store. It refuses a non-loopback bind unless you pass `--allow-remote`. It turns off Hindsight's LLM traces, which would hold memory content outside the partitions.
 - **The LLM** is used by Hindsight to extract and consolidate memories (any OpenAI-compatible endpoint). **Embeddings** are local (BAAI/bge-small-en-v1.5 by default).
 - **The host process and the server must see the same three settings:** `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
+- **The database:** `pg0://name` is an embedded Postgres. For your own server, use a `postgresql://` URL in `MEMGATE_DB`, not the `--db` flag, so the password stays out of the process list. The database needs the `vector` (pgvector) and `pg_trgm` extensions; pre-create them if Hindsight's role may not.
+- **World changes:** both sides re-read the world file when it changes, checked at most every `MEMGATE_WORLD_CHECK_S` seconds (default 1; `memgate serve --world-check-interval`). In the host, call `gate.refresh(force=True)` right after writing the file. A memory call to something created within that interval may be refused by the server; retry once.
+- **The registry** is a SQLite file (WAL). The host writes it and the server only reads, which works across processes and containers on one host. Never put it on NFS or EFS, or on a macOS Docker Desktop bind mount shared with a host process.
+- **A separate server for high-assurance partitions** (optional, for isolation): run a second `memgate serve --scope partitions` with its own port and database, and the first with `--scope shared`. Both use the same world, registry and secret. Pass `partition_url=` to the client. Each server refuses the other's banks. Both can use the same LLM (Hindsight 0.10.1 cannot give one bank its own LLM, so a different LLM for high assurance needs this split anyway).
 
 ## The API
 
@@ -102,9 +109,11 @@ ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # buil
 | `mem.recall(ctx, query, k=20)` | The agent needs to remember something | Returns a `RecallBatch` of `Recalled` (text, label set, date, write id), best first, only what `ctx` may read. `.recall_id` is set when provenance is on |
 | `mem.remember(ctx, text, when=None, about=None, turns=())` | Something was said or seen in a conversation | Stored under `ctx`'s location and participants. `turns` links it to what was said (provenance). Returns the write id |
 | `mem.keep_note(ctx, text)` | An agent's private note that should stay where it was written | Readable only by its author, only in that location |
-| `mem.carry_out(ctx, text, memory_type, source=None)` | An agent takes something with it into personal memory | `source` defaults to `ctx`'s conversation; pass a recalled memory's label set to carry out something older. Raises `PermissionError` if the environment forbids it |
+| `mem.carry_out(ctx, text, memory_type, source=None)` | An agent takes something with it into personal memory | `source` is what the content was formed under. Pass the `Recalled` item itself to carry out something recalled (its label set, and its write for provenance), or a label set or its ID. It defaults to `ctx`'s conversation. It must be readable in `ctx`. Raises `PermissionError` if the environment forbids it |
 | `mem.say(ctx, text, recalls=[recall_id, ...])` | An agent speaks | Records which recalls it drew on, so later memories trace back (needs a `ProvenanceLog`) |
 
+- **Async hosts:** `AsyncHindsightMemory` (same arguments, `await` every call; use `async with`, or call `aclose()`) has the same API and the same decisions. Otherwise wrap the sync client in `asyncio.to_thread`; it is thread-safe.
+- **Carrying out what an agent recalled** (the usual pattern on leaving a place): `recall` there, let the agent pick items and classify each, then call `carry_out(ctx, text, type, source=item)` per item. The item's own label set is the source, because it may have been formed with different people present than now.
 - **Writes that break a rule** raise `PermissionError` before anything is stored. Store errors raise `HindsightError`. None of these calls ever returns an unchecked result.
 - **Provenance** (optional; recommended where audit matters): `HindsightMemory(..., provenance=ProvenanceLog(root, gate))` from `memgate.provenance`. It keeps a W3C PROV-style record of every write, recall and turn, with one SQLite file per high-assurance location.
 
@@ -119,7 +128,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 ## Verify
 
 1. `memgate check-world world.json`: the host's world file is usable.
-2. `memgate conformance --url http://127.0.0.1:8889`, with the same `MEMGATE_*` settings as the server. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal), then deletes the bank. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
+2. `memgate conformance --url http://127.0.0.1:8889`, with the same `MEMGATE_*` settings as the server; add `--partition-url` for a split deployment. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal), then deletes the bank. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
 3. **Host-level tests memgate can't do for you:**
    - an agent's Context changes when it moves;
    - participants match who is really present;
@@ -134,7 +143,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.2.0)
+## Limits (0.3.0)
 
 - **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
 - **Identity and context verification are the host's** (see the contract).

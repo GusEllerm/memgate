@@ -159,3 +159,29 @@ def test_bank_administration_is_admin_only(validator):
 
 def test_hindsights_own_background_work_passes(validator):
     assert run(validator.validate_consolidate(ConsolidateContext(bank_id=BANK, request_context=rc(internal=True)))).allowed
+
+
+# -- split deployment: each server holds only its scope ---------------------------------------------
+@pytest.mark.parametrize("scope,bank,ok", [
+    ("all", BANK, True), ("all", VAULT_BANK, True),
+    ("shared", BANK, True), ("shared", VAULT_BANK, False),
+    ("partitions", BANK, False), ("partitions", VAULT_BANK, True),
+])
+def test_server_scope(validator, monkeypatch, scope, bank, ok):
+    validator.scope = scope
+    where = "vault" if bank == VAULT_BANK else "lab"
+    recall = run(validator.validate_recall(RecallContext(bank_id=bank, query="q", request_context=rc("ada", where))))
+    labels = personal_note_labels("ada", "vault") if bank == VAULT_BANK else conversation_labels("lab", ["ada"])
+    write = retain(validator, bank, labels, agent="ada", location=where)
+    stats = run(validator.validate_bank_read(BankReadContext(bank, BankReadOperation.GET_BANK_STATS, rc("ada", where))))
+    create = run(validator.validate_create_bank(CreateBankContext(bank, rc(role="admin"))))
+    assert recall.allowed is ok and write.allowed is ok and stats.allowed is ok and create.allowed is ok
+
+
+def test_scope_comes_from_the_environment(tmp_path, monkeypatch, validator):
+    from memgate.adapters.hindsight.validator import MemgateValidator
+    monkeypatch.setenv("MEMGATE_SERVE_SCOPE", "partitions")
+    assert MemgateValidator().scope == "partitions"
+    monkeypatch.setenv("MEMGATE_SERVE_SCOPE", "everything")
+    with pytest.raises(ValueError):
+        MemgateValidator()

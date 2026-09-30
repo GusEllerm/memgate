@@ -44,7 +44,10 @@ Do not guess these. Ask the owner, give a recommendation, and record the answers
 
 ## 4. Deploy
 
-- Install the pinned release: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.2.0#subdirectory=memgate"`.
+- Install the pinned release (v0.3.0), as two installs:
+  - the server, in its own environment: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.3.0#subdirectory=memgate"`;
+  - the client, in the host: the same URL without `[hindsight]`, with `[async]` if the host is asyncio (`AsyncHindsightMemory`), otherwise use the sync client in `asyncio.to_thread`.
+- If high-assurance locations should be isolated on their own server, run a second `memgate serve --scope partitions` beside one with `--scope shared`, and pass `partition_url=` to the client. See the guide.
 - Generate the secret with `memgate secret` and store it where only the host can read it. Never put it where an agent process can see it.
 - Run `memgate serve` under the host's process supervision, bound to loopback, with the owner's LLM settings. The host process and the server must share `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
 
@@ -56,7 +59,7 @@ Do not guess these. Ask the owner, give a recommendation, and record the answers
   1. before an agent acts: `recall`;
   2. after it speaks: `say` (with the batch's `recall_id`), then `remember` (with `turns`);
   3. private notes: `keep_note`;
-  4. leaving a location: `carry_out` for what the agent chooses to take (the agent's own memory type), then the host clears the agent's working context.
+  4. leaving a location: `recall` there, let the agent pick what to take and classify each item (fact, opinion, skill, episode), then `carry_out(ctx, text, type, source=item)` per item. The recalled item is the source, because it may have formed with different people present. Then the host clears the agent's working context.
 - **Handle errors.** A `PermissionError` is a refusal: tell the agent, don't retry around it. A `HindsightError` is a store failure: fail the action. Never continue without memory filtering.
 
 ## 6. The host's side of the contract

@@ -134,6 +134,8 @@ class Gate:
 
     @classmethod
     def from_env(cls, prefix: str = "MEMGATE") -> "Gate":
+        """From MEMGATE_WORLD, MEMGATE_REGISTRY and MEMGATE_SECRET; MEMGATE_WORLD_CHECK_S sets how often
+        (in seconds, default 1; 0 means on every decision) the world file is checked for changes."""
         path = os.environ[f"{prefix}_WORLD"]
         return cls(load_world(path), Registry(os.environ[f"{prefix}_REGISTRY"]), os.environ[f"{prefix}_SECRET"],
-                   world_path=path)
+                   world_path=path, check_every=float(os.environ.get(f"{prefix}_WORLD_CHECK_S", "1.0")))

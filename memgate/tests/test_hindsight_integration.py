@@ -191,3 +191,28 @@ def test_conformance_passes_on_this_deployment():
     checks = run(Gate.from_env(), URL)
     assert not [c for c in checks if c.status == "fail"], [c.__dict__ for c in checks if c.status == "fail"]
     assert sum(c.status == "pass" for c in checks) >= 10
+
+
+def test_async_client_round_trip():
+    """AsyncHindsightMemory against the live server: write, wait, recall only what the context may read."""
+    import asyncio
+    pytest.importorskip("httpx")
+    from memgate.adapters.hindsight import AsyncHindsightMemory
+
+    async def go():
+        async with AsyncHindsightMemory(Gate.from_env(), bank=f"it-async-{uuid.uuid4().hex[:8]}", base_url=URL) as m:
+            await m.create_bank()
+            await m.remember(Context("ada", "lab", ("ada", "bo")), "Ada and Bo set the async canary to CANARY-ASYNC-6612.")
+            while await m.pending_operations():
+                await asyncio.sleep(3)
+            ada = [r.text for r in await m.recall(Context("ada", "lab"), "async canary")]
+            cy = [r.text for r in await m.recall(Context("cy", "lab"), "async canary")]
+            for bank in m.partitions():
+                try:
+                    await m._call("DELETE", f"/v1/default/banks/{bank}", None, role="admin")
+                except Exception:
+                    pass
+            return ada, cy
+    ada, cy = asyncio.run(go())
+    assert any("CANARY-ASYNC-6612" in t for t in ada)
+    assert not any("CANARY-ASYNC-6612" in t for t in cy)

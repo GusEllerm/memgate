@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0 (2026-09-30)
+
+Changes for the Knowledge Ranch integration.
+
+- **Carry out what was recalled:** `carry_out(ctx, text, type, source=<Recalled>)` takes the recalled
+  item's own label set as the source, and its write as provenance. `source` also accepts a label set
+  or its ID; it still defaults to the Context's conversation.
+- **Async client:** `AsyncHindsightMemory`, the same API with `await` (`pip install 'memgate[async]'`,
+  httpx). Both clients share one core that makes every decision and does no I/O.
+- **A separate server for high-assurance partitions:** the client's `partition_url=` sends partition
+  banks to their own server. `memgate serve --scope shared|partitions|all` makes each server's
+  validator refuse the other's banks. `memgate conformance --partition-url` checks a split deployment
+  (a new `split-scope` check).
+- **World check interval:** `MEMGATE_WORLD_CHECK_S` / `memgate serve --world-check-interval` (default
+  1 s; 0 means on every decision).
+- `memgate serve` no longer prints a database password.
+
 ## 0.2.0 (2026-09-30)
 
 First release meant for integration into a host application.
