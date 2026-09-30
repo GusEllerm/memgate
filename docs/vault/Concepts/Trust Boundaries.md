@@ -2,7 +2,7 @@
 type: concept
 status: active
 authority: proposes
-summary: "Trust-boundary review of memgate (2026-09-30). The read path is proved and tested and trusts only the recall context: agent and location. The write path trusts more of its caller: participants, a carry-out's source and memory type, and a note's location. It is checked in Python, not proved. Three hardening proposals and one open question go to the Decision Log. Leakage through agents' own actions (files, tools, working context, messages) is outside what a memory service can prevent; what the Ranch host must do, and what memgate can offer, is set out here."
+summary: "Trust-boundary review of memgate (2026-09-30). The read path is proved and tested and trusts only the recall context: agent and location. The write path trusts more of its caller: participants, a carry-out's source and memory type, and a note's location. It is checked in Python, not proved. Verified identity and host-attested context are deferred to the Ranch integration, with a contract recorded here. Two memory-service hardenings stay proposed, and memory-type classification is open. Leakage through agents' own actions (files, tools, working context, messages) is outside what a memory service can prevent; what the Ranch host must do, and what memgate can offer, is set out here."
 created: 2026-09-30
 updated: 2026-09-30
 tags: [concept, memgate, security, trust-boundaries, knowledge-ranch]
@@ -48,11 +48,25 @@ memgate's guarantee is only as strong as the most trusted input an agent can inf
 
 **The write path trusts more of its caller than it should.** Participants, a carry-out's source and memory type, and a note's location all come from whoever calls memgate. That is fine while the caller is the trusted host passing true context. It is not fine if agents drive those calls through their tools with arguments they choose. Write authorisation also lives in Python (validator and client), so the proofs don't cover it.
 
+## The contract with the host
+
+Ranch agents will run as their own processes with tool and network access (Gus, 2026-09-30). So the host can't simply make every memory call on an agent's behalf. Two things have to be verified before a call reaches memgate:
+- **Who is calling (authentication).** Per-agent credentials, so an agent can't act as another.
+- **What context it is in (attestation).** Location and participants, vouched for by the host, the only party that knows them. A common form is a short-lived context token signed by the host (agent, location, participants, conversation, turn, expiry) and bound to the agent's credential, reissued whenever the agent moves.
+
+**This is deferred to the Ranch integration** (Decision Log, 2026-09-30). The mechanism depends on how the Ranch identifies processes and connects them, and building it here would mean guessing that interface.
+
+**What this repo guarantees in the meantime is a contract.** memgate trusts the agent, location and participants it is given. Whoever integrates it must deliver them verified. When that check is added, it goes where memgate turns a request into a context:
+- the public methods of `HindsightMemory` (recall, remember, keep_note, carry_out), which today take agent, location and participants as arguments;
+- the validator's `_caller`, which today trusts the agent and location headers once the shared secret checks out.
+
+The Cedar policies, the label derivation and the proofs are unchanged by it: they already decide on a given context.
+
 ## Hardening proposals
 
-These are for the Decision Log; none is implemented yet.
-1. **The host asserts context.** Agents never pass agent, location or participants. The host opens a memgate session per agent-turn, bound to the true context. The agent-facing API takes only a query, a text, and (for carry-out) a memory type.
-2. **Carry-out takes its source from the context, and is authorised in Cedar with a location.** The source is the label set of the conversation the agent is in, taken from the session, not passed by the caller. The Cedar carry-out decision gains the current location and requires it to hold every one of the source's location labels, so a carry-out is only authorised where its source is readable. SymCC can then prove it.
+For the Decision Log. None is implemented yet.
+1. **Verified context (deferred to Ranch integration).** As in the contract above.
+2. **Carry-out authorised in Cedar with a location (proposed, in scope here).** The Cedar carry-out decision gains the current location and requires it to hold every one of the source's location labels, so a carry-out is only authorised where its source is readable. SymCC can then prove it. Taking the source itself from verified context, rather than from the caller, is deferred with item 1.
 3. **High-assurance seal on writes, in Cedar.** Every write made in a high-assurance location must carry that location's label. That covers personal memory, notes and carry-outs alike. Moving write authorisation into Cedar (a `write` action with the current location) puts this under the proofs: nothing written inside a high-assurance location is ever readable outside it.
 4. **Who classifies memory type (open question).** The agent's own claim; the host; an independent classifier (an LLM, which makes it a judgement call again); or the most restrictive type unless verified. Selective environments are only as strong as this choice.
 
@@ -70,7 +84,7 @@ memgate controls what an agent can *recall*. It can't control what an agent *doe
 - **The simulation's own records.** Logs, traces and transcripts written by the host. Our gateway logs request metadata only, not prompts. Hindsight's LLM trace is off. memgate's provenance log keeps high-assurance records in a separate partition.
 - **The model provider,** which sees every prompt.
 
-We can't solve these by building only the memory service. But the same model extends past memory, and memgate can supply the pieces.
+We can't solve these by building only the memory service. All of this is deferred to the Ranch integration (Decision Log, 2026-09-30). But the same model extends past memory, and memgate can supply the pieces.
 
 **What the host (Knowledge Ranch) has to do:**
 - Clear or seal an agent's working context when it leaves a location, above all a high-assurance one.
