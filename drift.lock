@@ -1,6 +1,11 @@
 version = 1
 
 [[bindings]]
+doc = "docs/vault/Concepts/Permission Layer.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
+sig = "9a23fb35b6d988ca"
+
+[[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "benchmark/src/smbench/alcf/gateway.py#RequestLog"
 sig = "fffcea073ff9bb50"

@@ -2,7 +2,7 @@
 type: concept
 status: active
 authority: proposes
-summary: "Trust-boundary review of memgate (2026-09-30). The read path is proved and tested and trusts only the recall context: agent and location. The write path trusts more of its caller: participants, a carry-out's source and memory type, and a note's location. It is checked in Python, not proved. Verified identity and host-attested context are deferred to the Ranch integration, with a contract recorded here. Two memory-service hardenings stay proposed, and memory-type classification is open. Leakage through agents' own actions (files, tools, working context, messages) is outside what a memory service can prevent; what the Ranch host must do, and what memgate can offer, is set out here."
+summary: "Trust-boundary review of memgate (2026-09-30). The read path is proved and tested and trusts only the recall context: agent and location. The write path trusts more of its caller: participants, a carry-out's source and memory type, and a note's location. It is checked in Python, not proved. Verified identity and host-attested context are deferred to the Ranch integration, with a contract recorded here. Two memory-service hardenings are accepted (2026-09-30) and due before handover; memory type stays the agent's own claim, audited. Leakage through agents' own actions (files, tools, working context, messages) is outside what a memory service can prevent; what the Ranch host must do, and what memgate can offer, is set out here."
 created: 2026-09-30
 updated: 2026-09-30
 tags: [concept, memgate, security, trust-boundaries, knowledge-ranch]
@@ -64,11 +64,11 @@ The Cedar policies, the label derivation and the proofs are unchanged by it: the
 
 ## Hardening proposals
 
-For the Decision Log. None is implemented yet.
+Decisions of 2026-09-30. Items 2 and 3 are accepted and not yet implemented.
 1. **Verified context (deferred to Ranch integration).** As in the contract above.
-2. **Carry-out authorised in Cedar with a location (proposed, in scope here).** The Cedar carry-out decision gains the current location and requires it to hold every one of the source's location labels, so a carry-out is only authorised where its source is readable. SymCC can then prove it. Taking the source itself from verified context, rather than from the caller, is deferred with item 1.
-3. **High-assurance seal on writes, in Cedar.** Every write made in a high-assurance location must carry that location's label. That covers personal memory, notes and carry-outs alike. Moving write authorisation into Cedar (a `write` action with the current location) puts this under the proofs: nothing written inside a high-assurance location is ever readable outside it.
-4. **Who classifies memory type (open question).** The agent's own claim; the host; an independent classifier (an LLM, which makes it a judgement call again); or the most restrictive type unless verified. Selective environments are only as strong as this choice.
+2. **Carry-out authorised in Cedar with a location (accepted).** The Cedar carry-out decision gains the current location and requires it to hold every one of the source's location labels, so a carry-out is only authorised where its source is readable. SymCC can then prove it. Taking the source itself from verified context, rather than from the caller, is deferred with item 1.
+3. **High-assurance seal on writes, in Cedar (accepted).** Every write made in a high-assurance location must carry that location's label. That covers personal memory, notes and carry-outs alike. Moving write authorisation into Cedar (a `write` action with the current location) puts this under the proofs: nothing written inside a high-assurance location is ever readable outside it.
+4. **Who classifies memory type (decided: the agent's own claim, audited).** Trusted under the cooperative threat model. The audit log records the claimed type with every carry-out decision. Revisit at Ranch integration: the alternatives are the host, an independent classifier (an LLM, which makes it a judgement call again), or the most restrictive type unless verified. Selective environments are only as strong as this choice.
 
 ## Agents' own actions: leakage the memory service can't see
 

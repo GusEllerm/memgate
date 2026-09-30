@@ -105,5 +105,5 @@ The benchmark imports memgate; memgate never imports the benchmark.
 ## Open questions
 
 - [x] When the residual compiler was needed: at tens of thousands of label sets. It's built; see [[memgate Core]].
-- [ ] The API for recording which memories an agent recalled when speaking: in memgate, or in the host application (CHORUS)?
+- [x] The API for recording which memories an agent recalled when speaking: in memgate (accepted 2026-09-30; the host calls `say` with the recall IDs).
 - [ ] Hindsight's reflect: the validator can't force reflect's tag scope, so the adapter must always pass it (or reflect is disabled).
