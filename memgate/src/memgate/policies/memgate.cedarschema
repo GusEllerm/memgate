@@ -18,8 +18,15 @@ action read appliesTo {
   resource: LabelSet,
   context: { location: Location },
 };
+// Storing any memory under a label set, made at `location`.
+action write appliesTo {
+  principal: Agent,
+  resource: LabelSet,
+  context: { location: Location },
+};
+// Carrying a memory formed under `resource` into the principal's personal memory, from `location`.
 action writePersonal appliesTo {
   principal: Agent,
   resource: LabelSet,
-  context: { memoryType: String },
+  context: { memoryType: String, location: Location },
 };

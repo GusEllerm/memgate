@@ -28,7 +28,8 @@ tags: [module, memgate, permissions]
 - **Policies** (`memgate/src/memgate/policies/memgate.cedar` and `memgate.cedarschema`):
   - read: identity and location labels held, and the reader among the participants;
   - the high-assurance seal;
-  - carry-out only as far as every environment allows, and never out of high assurance.
+  - write (since 2026-09-30): the writer holds every identity label and is the owner or a participant, a label set with a location is written only there, and the **high-assurance write seal**: anything written in a high-assurance location carries its label;
+  - carry-out only where the source is readable, only as far as every environment allows, and never out of high assurance.
   - Derived attributes (`haLocs`, `carryTypes`) are computed from the world on every decision, because Cedar can't loop over set members.
 - **Decisions** (`memgate/src/memgate/policy.py`):
   - `Policy.allowed_ids` returns the label sets a context may read, in four steps:
@@ -36,7 +37,8 @@ tags: [module, memgate, permissions]
     2. `Compiler` (`memgate/src/memgate/residual.py`) turns the residual into one SQL filter over the registry. It handles the operators our policies use; anything else raises `Unsupported` and falls back to `Policy.allowed_ids_exact`, which checks each label set with Cedar.
     3. The result is cached per agent and location, keyed on `World.fingerprint`, and later calls check only label sets registered since.
     4. `memgate/tests/test_residual.py` checks the compiled answer against Cedar's exact answer for every agent and location in 300 random worlds, with and without an over-broad grant.
-  - `Policy.may_carry_out` checks a write into personal memory.
+  - `Policy.may_write` decides every write (agent, location, label set); memgate's client and the validator both call it.
+  - `Policy.may_carry_out` checks a carry-out into personal memory, from the carrier's current location.
   - `Policy.validate` checks the policies against the schema.
 - **Derivation** (`memgate/src/memgate/derivation.py`):
   - `conversation_labels` gives the location plus everyone present; `personal_labels` and `personal_note_labels` cover personal memory.
@@ -90,7 +92,8 @@ tags: [module, memgate, permissions]
   - personal memory is readable by its owner everywhere and by no one else;
   - high assurance is outbound only;
   - Gus's {A,B}, {A,C}, then {A,B,C} case.
-- **Carry-out:** open, selective and *Severance* environments; never out of high assurance; only a witness can carry a memory out.
+- **Carry-out:** open, selective and *Severance* environments; never out of high assurance; only a witness can carry a memory out; only where the source is readable.
+- **Writes:** only a participant writes a conversation, only there; never under another agent's identity; notes only in their location; inside a high-assurance location, personal memory can't be written (the seal).
 - **Derivation:** participants intersect; no shared participant means nobody can read it; a summary of {A,B} with {A,B,C} stays hidden from C; memories crossing locations are unreadable from either; merges only within a label set.
 - **Schema:** the policies validate against the schema.
 - **Negative controls:** removing the participant check lets a non-witness read. Removing the seal leaks the vault once an over-broad grant exists. The read rule alone already keeps high-assurance memories in place; the seal is the backstop for later rules that grant too much.
@@ -98,5 +101,5 @@ tags: [module, memgate, permissions]
 ## Not yet
 
 - **Changing the world file needs a restart** of processes that loaded it (e.g. the Hindsight validator). The cache follows the in-memory `World`.
-- **Write authorisation is in Python, not Cedar,** so the proofs ([[memgate Proofs]], done 2026-09-30) cover recall and the carry-out decision but not the validator's write checks. Moving writes into Cedar is proposed in [[Trust Boundaries]].
+- **Verified context** (who is calling, where, with whom) is deferred to the Ranch integration; memgate trusts the context it's given ([[Trust Boundaries]]). Recall, write and carry-out decisions are all in Cedar and proved ([[memgate Proofs]]).
 - **Provenance and audit are built** (2026-09-29) and wired into [[memgate Hindsight Adapter]].

@@ -1,4 +1,4 @@
-"""Recall and carry-out decisions, checked against the rules in the Decision Log."""
+"""Recall, write and carry-out decisions, checked against the rules in the Decision Log."""
 
 from memgate.derivation import conversation_labels, personal_labels, personal_note_labels
 
@@ -48,18 +48,43 @@ def test_carry_out_follows_the_environment(policy):
     lab = conversation_labels("lab", ["ada", "bo"])
     gallery = conversation_labels("gallery", ["ada", "bo"])
     macro = conversation_labels("macrodata", ["ada", "bo"])
-    assert policy.may_carry_out("ada", lab, "fact")            # open
-    assert policy.may_carry_out("ada", gallery, "opinion")     # selective: opinions out
-    assert not policy.may_carry_out("ada", gallery, "fact")    # selective: facts stay
-    assert not policy.may_carry_out("ada", macro, "opinion")   # Severance: nothing leaves
+    assert policy.may_carry_out("ada", "lab", lab, "fact")                # open
+    assert policy.may_carry_out("ada", "gallery", gallery, "opinion")     # selective: opinions out
+    assert not policy.may_carry_out("ada", "gallery", gallery, "fact")    # selective: facts stay
+    assert not policy.may_carry_out("ada", "macrodata", macro, "opinion")  # Severance: nothing leaves
 
 
 def test_nothing_is_carried_out_of_high_assurance(policy):
-    assert not policy.may_carry_out("ada", conversation_labels("vault", ["ada"]), "opinion")
+    assert not policy.may_carry_out("ada", "vault", conversation_labels("vault", ["ada"]), "opinion")
 
 
 def test_only_a_witness_can_carry_a_memory_out(policy):
-    assert not policy.may_carry_out("dee", conversation_labels("lab", ["ada", "bo"]), "fact")
+    assert not policy.may_carry_out("dee", "lab", conversation_labels("lab", ["ada", "bo"]), "fact")
+
+
+def test_carry_out_only_where_the_source_is_readable(policy):
+    lab = conversation_labels("lab", ["ada", "bo"])
+    assert policy.may_carry_out("ada", "lab", lab, "fact")
+    assert not policy.may_carry_out("ada", "cafe", lab, "fact")        # same environment, other location
+    assert not policy.may_carry_out("ada", "macrodata", lab, "fact")   # claimed source, wrong place
+
+
+def test_writes_follow_the_labels(policy):
+    assert policy.may_write("ada", "lab", conversation_labels("lab", ["ada", "bo"]))      # a participant, there
+    assert not policy.may_write("dee", "lab", conversation_labels("lab", ["ada", "bo"]))  # not a participant
+    assert not policy.may_write("ada", "cafe", conversation_labels("lab", ["ada", "bo"]))  # not there
+    assert policy.may_write("ada", "cafe", personal_labels("ada"))                        # own personal memory
+    assert not policy.may_write("bo", "cafe", personal_labels("ada"))                     # never another's identity
+    assert policy.may_write("ada", "lab", personal_note_labels("ada", "lab"))
+    assert not policy.may_write("ada", "cafe", personal_note_labels("ada", "lab"))
+
+
+def test_high_assurance_write_seal(policy):
+    # Inside a high-assurance location every write must carry that location's label.
+    assert policy.may_write("ada", "vault", conversation_labels("vault", ["ada", "bo"]))
+    assert policy.may_write("ada", "vault", personal_note_labels("ada", "vault"))
+    assert not policy.may_write("ada", "vault", personal_labels("ada"))        # personal memory: no way out
+    assert policy.may_write("ada", "lab", personal_labels("ada"))              # outside, as before
 
 
 TOO_BROAD = '''

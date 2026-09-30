@@ -20,7 +20,7 @@ import uuid
 import pytest
 
 from memgate.context import Gate
-from memgate.derivation import conversation_labels
+from memgate.derivation import conversation_labels, personal_labels, personal_note_labels
 
 URL = os.environ.get("MEMGATE_HINDSIGHT_URL")
 pytestmark = pytest.mark.skipif(not URL, reason="needs a live gated Hindsight (MEMGATE_HINDSIGHT_URL)")
@@ -121,6 +121,18 @@ def test_writes_must_carry_a_label_set_the_writer_may_write(mem):
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([ab]), agent_dee)[0] == 403        # not a participant
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([]), agent_dee)[0] == 403          # unlabelled
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item(["ls_madeup"]), agent_dee)[0] == 403  # unregistered
+
+
+def test_high_assurance_write_seal(mem):
+    """Inside the vault, a write must carry the vault's label, even straight to Hindsight."""
+    ada_in_vault = {"x-memgate-secret": mem.gate.secret, "x-memgate-agent": "ada", "x-memgate-location": "vault"}
+    mine = mem.gate.registry.register(personal_labels("ada"))
+    note = mem.gate.registry.register(personal_note_labels("ada", "vault"))
+    item = lambda tags: {"items": [{"content": "Ada notes something in the vault.", "tags": tags}]}
+    assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([mine]), ada_in_vault)[0] == 403   # personal: sealed
+    assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([note]), ada_in_vault)[0] == 200   # a note stays inside
+    with pytest.raises(PermissionError):                                                                # memgate's own check
+        mem.carry_out("ada", "vault", personal_labels("ada"), "Something from the vault.", "opinion")
 
 
 def test_retelling_leaves_a_trail(tmp_path):

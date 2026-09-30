@@ -29,7 +29,7 @@ def permitted_carry_outs(world: World, pol: Policy) -> list[tuple[dict, bool]]:
     for c in world.conversations:
         src = conversation_labels(c.location, c.participants)
         for co in c.carry_outs:
-            out.append(({**co, "conversation": c.id}, pol.may_carry_out(co["agent"], src, world.facts[co["fact"]].kind)))
+            out.append(({**co, "conversation": c.id}, pol.may_carry_out(co["agent"], c.location, src, world.facts[co["fact"]].kind)))
     return out
 
 

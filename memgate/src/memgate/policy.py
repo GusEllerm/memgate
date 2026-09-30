@@ -108,7 +108,15 @@ class Policy:
         results = cedarpy.is_authorized_batch(requests, self.policies, self._entities(label_sets), self.schema)
         return {i for i, r in zip(label_sets, results) if r.allowed}
 
-    def may_carry_out(self, agent: str, source: LabelSet, memory_type: str) -> bool:
+    def may_write(self, agent: str, location: str, labels: LabelSet) -> bool:
+        """May `agent`, at `location`, store a memory under `labels`?"""
+        request = {"principal": _ref("Agent", agent), "action": _ref("Action", "write"),
+                   "resource": _ref("LabelSet", labels.id), "context": {"location": _uid("Location", location)}}
+        return cedarpy.is_authorized(request, self.policies, self._entities({labels.id: labels}), self.schema).allowed
+
+    def may_carry_out(self, agent: str, location: str, source: LabelSet, memory_type: str) -> bool:
+        """May `agent`, at `location`, carry a `memory_type` formed under `source` into personal memory?"""
         request = {"principal": _ref("Agent", agent), "action": _ref("Action", "writePersonal"),
-                   "resource": _ref("LabelSet", source.id), "context": {"memoryType": memory_type}}
+                   "resource": _ref("LabelSet", source.id),
+                   "context": {"memoryType": memory_type, "location": _uid("Location", location)}}
         return cedarpy.is_authorized(request, self.policies, self._entities({source.id: source}), self.schema).allowed

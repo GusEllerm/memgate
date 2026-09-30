@@ -4,7 +4,7 @@ status: active
 authority: describes
 summary: "The selective-memory benchmark (suites S1–S5): seeded worlds with planted codes in LLM-written dialogue, a Cedar answer key independent of the systems, and three systems on Hindsight (no filter, per-agent stores, memgate). Measures leak rate and recall per probe kind and scenario."
 created: 2026-09-29
-updated: 2026-09-29
+updated: 2026-09-30
 tags: [module, benchmark, selective-memory]
 ---
 
@@ -28,7 +28,7 @@ tags: [module, benchmark, selective-memory]
 - **Dialogue** (`benchmark/src/smbench/selective/dialogue.py`). `write_dialogue` has gpt-oss-120b write each conversation. It retries until every code stated is present verbatim, no other code appears, and only participants speak.
   - `build` writes dialogue six conversations at a time and saves each world to benchmark/datasets/selective/ (world-<seed>.json, world-<seed>-large.json), the **released dataset**, committed. Saved worlds are never regenerated.
 - **Answer key** (`benchmark/src/smbench/selective/oracle.py`). `expected` applies memgate's Cedar policies to the ground truth: the label sets of the conversations each fact was stated in. It decides whether each (agent, location, fact) should recall, independently of every system.
-  - **S4/S5:** `permitted_carry_outs` asks memgate's `Policy.may_carry_out` whether each carry-out attempt is allowed; only permitted carry-outs, and notes (readable in their own location only), count as holding a fact.
+  - **S4/S5:** `permitted_carry_outs` asks memgate's `Policy.may_carry_out` whether each carry-out attempt is allowed (from the conversation's location); only permitted carry-outs, and notes (readable in their own location only), count as holding a fact.
   - `probe_kind` classifies each probe: witness-here, witness-elsewhere, non-witness, retold-to-newcomer, untold-to-newcomer, carried-fact or carried-opinion, carry-refused-fact, carry-refused-opinion or carry-refused-ha, ha-witness-inside, ha-witness-outside, note-here, note-elsewhere, note-other-agent. It is written independently of the answer key, so the two cross-check each other.
 - **Systems** (`benchmark/src/smbench/selective/systems.py`), all on Hindsight 0.10.1, so the permission strategy is the only difference:
   - `NoFilter`: one bank per world, recall unfiltered. The leak baseline.
@@ -47,4 +47,4 @@ tags: [module, benchmark, selective-memory]
   - `lineage` (exact, no LLM): in every memgate bank, each memory unit must carry its document's label set, and each consolidated observation the label set of every memory it was built from.
   - `Checker` (answer level): re-asks must-not probes as the agent, requesting everything Hindsight's recall can return (entity observations, raw chunks, source facts, trace). It scans the whole response for the code, has gpt-oss-120b answer from it, and has the judge label the answer VALUE, HINT or NONE. A sample of per-agent leaks is the positive control.
 - **Scale:** small worlds give 3 × 162 probes, large worlds about 3,060 each. env worlds 3 × 540. Suites S6–S7 (hierarchy, scale) are still to come. Results: [[Review Selective S1-S3 2026-09-29]], [[Review Selective large 2026-09-29]], [[Review Selective S4-S5 2026-09-29]].
-- **Refusal count:** the runner prints memgate's refused carry-outs only after probing, so `--skip-ingest` runs don't report it.
+- **Refusal count:** the runner prints memgate's refused carry-outs per world after probing (a running total before 2026-09-30), so `--skip-ingest` runs don't report it.

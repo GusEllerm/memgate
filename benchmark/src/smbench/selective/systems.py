@@ -160,7 +160,8 @@ class Memgate:
         m.create_bank()
         jobs = [lambda c=c: m.remember(c.participants[0], c.location, c.participants, transcript(world, c), when=when(world, c))
                 for c in world.conversations]
-        self.refused: list[str] = getattr(self, "refused", [])
+        self.refused: dict[int, list[str]] = getattr(self, "refused", {})   # world seed -> refused facts
+        refused = self.refused.setdefault(world.seed, [])
 
         def carry(c, co):
             try:
@@ -168,7 +169,7 @@ class Memgate:
                             personal_text(world, co["agent"], co["fact"]), world.facts[co["fact"]].kind,
                             when=when(world, c))
             except PermissionError:
-                self.refused.append(co["fact"])            # memgate refused it: nothing is stored
+                refused.append(co["fact"])                 # memgate refused it: nothing is stored
 
         jobs += [lambda c=c, co=co: carry(c, co) for c in world.conversations for co in c.carry_outs]
         jobs += [lambda n=n: m.keep_note(n["agent"], n["location"], note_text(world, n)) for n in world.notes]

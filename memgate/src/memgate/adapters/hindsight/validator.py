@@ -91,10 +91,9 @@ class MemgateValidator(OperationValidatorExtension):
             if item.get("observation_scopes") not in (None, "combined"):
                 return ValidationResult.reject("observation scopes that widen beyond a label set are not allowed")
             if role != "admin":
-                ls = known[tags[0]]
-                writer_ok = agent in ls.selfs or agent in ls.withs
-                place_ok = not ls.locs or ls.locs == {location}
-                if not (writer_ok and place_ok):
+                if not agent or not location:
+                    return ValidationResult.reject("a write needs an agent and a location")
+                if not self.gate.policy.may_write(agent, location, known[tags[0]]):
                     return ValidationResult.reject("writer may not write this label set here")
         return ValidationResult.accept()
 

@@ -119,8 +119,8 @@ def main() -> None:
                           f"{'no change' if not changed else changed}", flush=True)
             print(f"probed {s.name} world {w.seed}: {len(exp)} probes", flush=True)
         for s in syss:
-            if getattr(s, "refused", None):
-                print(f"{s.name} refused {len(s.refused)} carry-outs in world {w.seed}", flush=True)
+            if w.seed in getattr(s, "refused", {}):
+                print(f"{s.name} refused {len(s.refused[w.seed])} carry-outs in world {w.seed}", flush=True)
     (out / "probes.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))
     if audit:
         (out / "side_effects.json").write_text(json.dumps(audit, indent=1))

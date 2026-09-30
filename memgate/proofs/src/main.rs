@@ -78,13 +78,38 @@ fn properties() -> Vec<Property> {
             claim: "Only an agent who holds the memory's identity and participant labels can carry it out",
             policy: r#"permit (principal, action == Action::"writePersonal", resource) when {
                 [principal].containsAll(resource.selfs) && (resource.withs.isEmpty() || resource.withs.contains(principal)) };"# },
-        Property { id: "C4-carry-spec", action: "writePersonal", check: Check::Equivalent, assumes: None,
-            claim: "Carry-out is allowed exactly when C1, C2 and C3 all hold",
+        Property { id: "C4-carry-where-readable", action: "writePersonal", check: Check::Implies, assumes: None,
+            claim: "A memory is carried out only where its source is readable (the carrier is in every one of its locations)",
+            policy: r#"permit (principal, action == Action::"writePersonal", resource) when { [context.location].containsAll(resource.locs) };"# },
+        Property { id: "C5-carry-spec", action: "writePersonal", check: Check::Equivalent, assumes: None,
+            claim: "Carry-out is allowed exactly when C1–C4 all hold",
             policy: r#"permit (principal, action == Action::"writePersonal", resource) when {
                 [principal].containsAll(resource.selfs) && (resource.withs.isEmpty() || resource.withs.contains(principal)) &&
+                [context.location].containsAll(resource.locs) &&
                 resource.carryTypes.contains(context.memoryType) && resource.haLocs.isEmpty() };"# },
-        Property { id: "C5-carry-live", action: "writePersonal", check: Check::NotAlwaysDenies, assumes: None,
+        Property { id: "C6-carry-live", action: "writePersonal", check: Check::NotAlwaysDenies, assumes: None,
             claim: "Carry-out is possible at all", policy: "" },
+        // -- writes ----------------------------------------------------------------------------------
+        Property { id: "W1-own-identity", action: "write", check: Check::Implies, assumes: None,
+            claim: "No agent writes under another agent's identity label",
+            policy: r#"permit (principal, action == Action::"write", resource) when { [principal].containsAll(resource.selfs) };"# },
+        Property { id: "W2-writer-holds", action: "write", check: Check::Implies, assumes: None,
+            claim: "A writer either writes under its own identity or is one of the participants",
+            policy: r#"permit (principal, action == Action::"write", resource) when { !resource.selfs.isEmpty() || resource.withs.contains(principal) };"# },
+        Property { id: "W3-write-place", action: "write", check: Check::Implies, assumes: None,
+            claim: "A memory with a location label is written only in that location",
+            policy: r#"permit (principal, action == Action::"write", resource) when { [context.location].containsAll(resource.locs) };"# },
+        Property { id: "W4-write-seal", action: "write", check: Check::Implies, assumes: None,
+            claim: "Anything written in a high-assurance location carries that location's label",
+            policy: r#"permit (principal, action == Action::"write", resource) when { !context.location.highAssurance || resource.locs.contains(context.location) };"# },
+        Property { id: "W5-write-spec", action: "write", check: Check::Equivalent, assumes: None,
+            claim: "A write is allowed exactly when W1–W4 all hold",
+            policy: r#"permit (principal, action == Action::"write", resource) when {
+                [principal].containsAll(resource.selfs) && (!resource.selfs.isEmpty() || resource.withs.contains(principal)) &&
+                [context.location].containsAll(resource.locs) &&
+                (!context.location.highAssurance || resource.locs.contains(context.location)) };"# },
+        Property { id: "W6-write-live", action: "write", check: Check::NotAlwaysDenies, assumes: None,
+            claim: "Writing is possible at all", policy: "" },
     ]
 }
 

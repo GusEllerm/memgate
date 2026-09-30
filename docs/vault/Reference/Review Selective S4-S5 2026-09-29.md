@@ -4,7 +4,7 @@ status: active
 authority: reference
 summary: "Selective memory S4 (environments and carry-out) and S5 (high assurance) on three env worlds (1,620 probes per system): memgate leaked 0 of 1,446 with recall 174/174 at 20 and at 5; it refused exactly the 24 carry-outs the answer key forbids, and stored exactly what the key expects. No filter leaked 100%; per-agent stores leaked 23.2%, including every high-assurance fact asked about outside the vault. High-assurance recalls changed no bank for any system."
 created: 2026-09-29
-updated: 2026-09-29
+updated: 2026-09-30
 tags: [agentic-memory, benchmark, selective-memory, results, high-assurance]
 ---
 
@@ -55,6 +55,17 @@ By scenario, memgate leaked 0/936 (S4) and 0/510 (S5).
 
   memgate refused the other 8 in each world, 24 in all. Each memgate bank held **16 documents, exactly as expected**: 8 conversations, 6 carry-outs and 2 notes. So refused carry-outs stored nothing, not even a stub.
 - **Side effects.** The 108 recalls made inside the vault run first in each world, with a snapshot of each bank taken before and after. The snapshot counts nodes, links, documents, observations, the last write and operations. **Nothing changed for any system.** Hindsight recall is read-only at the bank level, so this confirms the baseline rather than separating the systems. It would catch a recall that set off consolidation, a reflect, or a write. memgate's own provenance record of those recalls goes to the vault's separate partition by design ([[memgate Core]]).
+
+## Re-run with writes in Cedar (2026-09-30)
+
+memgate only (the baselines are unaffected), after the high-assurance write seal and the carry-out location check moved into Cedar ([[memgate Proofs]] W1–W6, C4). Results were identical:
+- 0 of 1,446 must-not probes leaked;
+- recall 174/174 at 20 and at 5;
+- 24 carry-outs refused (8 per world);
+- 16 documents per bank;
+- no side effects from the 108 recalls per world inside the vault.
+
+Report: benchmark/reports/selective-env-2026-09-30.json.
 
 ## Reading it
 

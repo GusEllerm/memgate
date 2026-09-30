@@ -69,6 +69,8 @@ class HindsightMemory:
     def _retain(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
                 context: str | None, kind: str, turns=(), derived_from=()) -> str:
         """Store one memory; returns its write ID (also its Hindsight document_id)."""
+        if not self.gate.policy.may_write(agent, location, labels):
+            raise PermissionError(f"{agent} may not write {labels} at {location}")
         ls_id = self.gate.registry.register(labels)
         write_id = new_id("w")
         item = {"content": text, "tags": [ls_id], "context": context, "document_id": write_id,
@@ -93,7 +95,7 @@ class HindsightMemory:
     def carry_out(self, agent: str, location: str, source: LabelSet, text: str, memory_type: str, *,
                   when: datetime | None = None, source_writes: list[str] = ()) -> str:
         """Copy something into the agent's personal memory, if every environment it came from allows."""
-        allowed = self.gate.policy.may_carry_out(agent, source, memory_type)
+        allowed = self.gate.policy.may_carry_out(agent, location, source, memory_type)
         if self.provenance:
             self.provenance.audit(location, "carry_out", agent=agent, source=source.id, memory_type=memory_type, allowed=allowed)
         if not allowed:

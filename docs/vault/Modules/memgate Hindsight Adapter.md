@@ -2,9 +2,9 @@
 type: module
 status: active
 authority: describes
-summary: "memgate's Hindsight adapter: a client that labels, registers and tags every write and scopes every recall (first lock), and an operation-validator extension inside Hindsight that recomputes and overwrites recall tags, checks writes, and closes the side doors (second lock). 6 live integration tests pass, including bypass attempts."
+summary: "memgate's Hindsight adapter: a client that labels, registers and tags every write and scopes every recall (first lock), and an operation-validator extension inside Hindsight that recomputes and overwrites recall tags, checks writes, and closes the side doors (second lock). 8 live integration tests pass, including bypass attempts and the high-assurance write seal."
 created: 2026-09-29
-updated: 2026-09-29
+updated: 2026-09-30
 tags: [module, memgate, hindsight]
 ---
 
@@ -23,13 +23,13 @@ Code: `memgate/src/memgate/adapters/hindsight/client.py`.
 | --- | --- |
 | `HindsightMemory.remember` | Labels a conversation memory (location + participants), registers the label set, retains with it as the only tag |
 | `HindsightMemory.keep_note` | A personal note that stays in its location |
-| `HindsightMemory.carry_out` | Checks `Policy.may_carry_out`, then writes into personal memory |
+| `HindsightMemory.carry_out` | Checks `Policy.may_carry_out` from the carrier's current location, then writes into personal memory |
 | `HindsightMemory.recall` | Computes the allowed IDs itself and passes them as tags with `any_strict` |
 
 Every request carries the gate secret plus the agent and location headers, from `memgate/src/memgate/context.py` (`Gate`, `load_world`).
 
 **Provenance** (optional, when given a `ProvenanceLog`):
-- **Writes:** every write gets a write ID, stored as Hindsight's document_id, so every fact Hindsight extracts from it traces back to it. The write and its sources are logged.
+- **Writes:** every write is first checked with `Policy.may_write` (PermissionError if refused). Every write gets a write ID, stored as Hindsight's document_id, so every fact Hindsight extracts from it traces back to it. The write and its sources are logged.
 - **Recalls:** `HindsightMemory.recall` returns a `RecallBatch`. Each `Recalled` item carries its `write_id`, and the batch carries the `recall_id` of the logged recall.
 - **Turns:** `HindsightMemory.say` records what an agent said and which recalls it drew on. `HindsightMemory.remember(turns=...)` links a new memory to those turns.
 - **Audit:** carry-outs, allowed or refused, are audited.
@@ -40,7 +40,7 @@ Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` 
 
 - **Identity:** trusts only the caller's identity. A request without the memgate secret is refused, and Hindsight's own background work (consolidation) passes as internal.
 - **`validate_recall`:** recomputes the allowed IDs with the same world and registry, and **overwrites** the request's tags. Forged tags are ignored. `Gate` keeps a single `Policy`, so the compiled per-context cache ([[memgate Core]]) survives across requests: a repeat recall costs about 0.01 ms at 100k label sets.
-- **`validate_retain`:** each item needs exactly one registered label-set tag that the writer may write (a participant or owner, in that location). Observation scopes wider than "combined" are refused.
+- **`validate_retain`:** each item needs exactly one registered label-set tag, and `Policy.may_write` must allow the writer to write it at its location (the same Cedar decision memgate's client makes first, including the high-assurance write seal). Observation scopes wider than "combined" are refused.
 - **Side doors closed:**
   - reflect is refused, because its scope can't be enforced;
   - mental models are refused, because they blend a bank;

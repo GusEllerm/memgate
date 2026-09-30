@@ -2,7 +2,7 @@
 type: module
 status: active
 authority: describes
-summary: "Formal proofs of memgate's Cedar policies with Cedar's symbolic compiler (SymCC, checked in Lean, solved by cvc5): for every possible request and entity store, recall is allowed exactly when the identity, location, participant and high-assurance rules all hold, and carry-out exactly when its three rules hold. All eight policy checks never error. One guarantee depends on memgate computing haLocs correctly, which a Python test checks."
+summary: "Formal proofs of memgate's Cedar policies with Cedar's symbolic compiler (SymCC, checked in Lean, solved by cvc5): for every possible request and entity store, recall, writes and carry-out are each allowed exactly when their stated rules hold, including the high-assurance seal on reads and writes. All six policies never error, for any of the three actions. One guarantee depends on memgate computing haLocs correctly, which a Python test checks."
 created: 2026-09-30
 updated: 2026-09-30
 tags: [module, memgate, security, formal-methods]
@@ -28,11 +28,11 @@ Each guarantee is written as a Cedar *property* policy. SymCC compiles memgate's
 
 A failure comes with a concrete counterexample, a request plus entities. Separately, every policy is checked never to error. Cedar skips a policy that errors, and for a forbid that would mean *allowing*.
 
-## Results (2026-09-30)
+## Results (2026-09-30, with writes in Cedar)
 
 | Property | Claim | Result |
 | --- | --- | --- |
-| never-errors | None of the four policies errors, for either action | proved (8/8) |
+| never-errors | None of the six policies errors, for any of the three actions | proved (18/18) |
 | R1 identity | A memory with an identity label is recalled only by that agent | proved |
 | R2 location | A memory with a location label is recalled only in that location | proved |
 | R3 participants | A memory with participant labels is recalled only by a participant | proved |
@@ -43,8 +43,15 @@ A failure comes with a concrete counterexample, a request plus entities. Separat
 | C1 no high assurance | Nothing formed in a high-assurance location is carried out | proved |
 | C2 environments allow | Carried out only if every source environment lets that type out | proved (meaning depends on carryTypes) |
 | C3 carrier had access | Only an agent holding the identity and participant labels can carry it out | proved |
-| C4 carry spec | Carry-out is allowed **exactly** when C1–C3 hold | proved |
-| C5 carry live | Some carry-out is allowed | proved |
+| C4 carry where readable | A memory is carried out only where its source is readable (added 2026-09-30) | proved |
+| C5 carry spec | Carry-out is allowed **exactly** when C1–C4 hold | proved |
+| C6 carry live | Some carry-out is allowed | proved |
+| W1 own identity | No agent writes under another agent's identity label | proved |
+| W2 writer holds | A writer writes under its own identity or is a participant | proved |
+| W3 write place | A memory with a location label is written only in that location | proved |
+| W4 write seal | Anything written in a high-assurance location carries that location's label | proved |
+| W5 write spec | A write is allowed **exactly** when W1–W4 hold | proved |
+| W6 write live | Some write is allowed | proved |
 
 ## What the proofs rest on
 
@@ -54,4 +61,5 @@ A failure comes with a concrete counterexample, a request plus entities. Separat
 
   SymCC treats these as arbitrary. That's why R5 gets a counterexample: a label set whose `haLocs` names a location that isn't high-assurance. `memgate/tests/test_entities.py` checks, on random worlds, that the attributes are computed exactly as the proofs assume. With it, R5 and C2 hold end to end.
 - **The inputs to a decision.** A proof covers the decision for a given request: agent, location, label set, memory type. It says nothing about whether those inputs are true. Who supplies them, and how far each is trusted, is the subject of [[Trust Boundaries]].
-- **Only the policies.** Label derivation (`memgate/src/memgate/derivation.py`), the write checks in the validator (`MemgateValidator.validate_retain`) and the SQL compilation of the policies are Python. They are covered by tests (the compiled filter against Cedar in `memgate/tests/test_residual.py`), not by these proofs. Moving write authorisation into Cedar would bring it under the proofs too; see [[Trust Boundaries]].
+- **The seal, end to end.** W4 (a write in a high-assurance location carries its label), the tested `haLocs` invariant, and R4 (a memory with a high-assurance label is recalled only there) together give: nothing written inside a high-assurance location is ever recalled outside it.
+- **Only the policies.** Label derivation (`memgate/src/memgate/derivation.py`) and the SQL compilation of the read policies are Python, covered by tests (the compiled filter against Cedar in `memgate/tests/test_residual.py`), not by these proofs. Every write and carry-out decision is a Cedar call (`Policy.may_write`, `Policy.may_carry_out`), made by memgate's client and again by the validator (`MemgateValidator.validate_retain`).
