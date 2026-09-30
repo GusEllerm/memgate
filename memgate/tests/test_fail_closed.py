@@ -4,7 +4,7 @@ import urllib.error
 
 import pytest
 
-from memgate.context import Gate
+from memgate.context import Context, Gate
 from memgate.derivation import conversation_labels, personal_labels
 
 
@@ -21,18 +21,18 @@ def test_an_unreachable_memory_store_raises_rather_than_returning_nothing_checke
     from memgate.adapters.hindsight.client import HindsightMemory
     mem = HindsightMemory(Gate(world, registry, "s"), bank="b", base_url="http://127.0.0.1:9", timeout=2)
     with pytest.raises((urllib.error.URLError, OSError)):
-        mem.recall("ada", "lab", "anything")
+        mem.recall(Context("ada", "lab"), "anything")
     with pytest.raises((urllib.error.URLError, OSError)):
-        mem.remember("ada", "lab", ["ada", "bo"], "anything")
+        mem.remember(Context("ada", "lab", ("ada", "bo")), "anything")
 
 
 def test_a_refused_write_never_reaches_the_store(world, registry):
     from memgate.adapters.hindsight.client import HindsightMemory
     mem = HindsightMemory(Gate(world, registry, "s"), bank="b", base_url="http://127.0.0.1:9", timeout=2)
     with pytest.raises(PermissionError):                       # refused before any network call
-        mem.remember("dee", "lab", ["ada", "bo"], "Dee plants a memory.")
+        mem.remember(Context("ada", "nowhere", ("ada", "bo")), "A place the world doesn't list.")
     with pytest.raises(PermissionError):
-        mem.carry_out("ada", "vault", personal_labels("ada"), "From the vault.", "opinion")
+        mem.carry_out(Context("ada", "vault"), "From the vault.", "opinion", source=personal_labels("ada"))
     assert len(registry) == 0                                   # nothing was even registered
 
 

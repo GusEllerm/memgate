@@ -21,11 +21,14 @@ Code: `memgate/src/memgate/adapters/hindsight/client.py`.
 
 **Partitions (since 2026-09-30).** A world has one shared bank, for ordinary locations and personal memory, plus one bank per high-assurance location, named by `partition_bank` in `memgate/src/memgate/context.py`. `HindsightMemory.bank_for` sends each write to the partition of the high-assurance location it is labelled with, if any. A recall in a high-assurance location searches its partition and the shared bank (where personal memory lives) and merges the two by Hindsight's final score. A recall anywhere else never touches a partition. So a vault's memories never share ranking statistics, caches or consolidation with anything outside it. `HindsightMemory.partitions` lists the banks, and `HindsightMemory.pending_operations` counts across all of them.
 
+Every method takes a `Context` (agent, location, participants; `memgate/src/memgate/context.py`), which the host builds from what it has verified; the acting agent is always among the participants (since 0.2.0, 2026-09-30).
+
 | Method | Does |
 | --- | --- |
-| `HindsightMemory.remember` | Labels a conversation memory (location + participants), registers the label set, retains with it as the only tag |
-| `HindsightMemory.keep_note` | A personal note that stays in its location |
-| `HindsightMemory.carry_out` | Checks `Policy.may_carry_out` from the carrier's current location, then writes into personal memory |
+| `HindsightMemory.remember` | Stores something from `ctx`'s conversation under its label set (location + participants) |
+| `HindsightMemory.keep_note` | A personal note that stays where it was written |
+| `HindsightMemory.carry_out` | Checks `Policy.may_carry_out` at `ctx`'s location, then writes into personal memory; the source defaults to `ctx`'s conversation (`Context.conversation`), or a recalled memory's label set |
+| `HindsightMemory.say` | Records what the agent said to `ctx`'s participants and which recalls it drew on (provenance) |
 | `HindsightMemory.recall` | Computes the allowed IDs itself and passes them as tags with `any_strict` |
 
 Every request carries the gate secret plus the agent and location headers, from `memgate/src/memgate/context.py` (`Gate`, `load_world`).

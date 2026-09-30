@@ -69,8 +69,9 @@ class MemgateAdapter:
         cid = session.conversation_id
         self._speakers[cid] = session.speakers
         participants = [agent_id(cid, s) for s in session.speakers]
-        self.mem.remember(participants[0], location_id(cid), participants, session.transcript(), when=session.when,
-                          context=f"Conversation between {session.speakers[0]} and {session.speakers[1]}")
+        from memgate import Context
+        self.mem.remember(Context(participants[0], location_id(cid), tuple(participants)), session.transcript(),
+                          when=session.when, about=f"Conversation between {session.speakers[0]} and {session.speakers[1]}")
 
     def finalize(self, conversation_id: str) -> None:
         # The bank is shared, so this also waits for other conversations' background work.
@@ -80,7 +81,8 @@ class MemgateAdapter:
 
     def search(self, conversation_id: str, query: str, k: int) -> list[Memory]:
         if self.filtered:
-            hits = self.mem.recall(self._asker(conversation_id), location_id(conversation_id), query, k=k)
+            from memgate import Context
+            hits = self.mem.recall(Context(self._asker(conversation_id), location_id(conversation_id)), query, k=k)
             return [Memory(text=h.text, when=h.when) for h in hits]
         resp = self.mem._call("POST", f"/v1/default/banks/{self.bank}/memories/recall",
                               {"query": query, "budget": "mid"}, role="internal")

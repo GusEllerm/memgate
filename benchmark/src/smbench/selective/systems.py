@@ -155,31 +155,33 @@ class Memgate:
         return self._mem[world.seed]
 
     def ingest_jobs(self, world: World) -> list:
-        from memgate.derivation import conversation_labels
+        from memgate import Context
         m = self._m(world)
         m.create_bank()
-        jobs = [lambda c=c: m.remember(c.participants[0], c.location, c.participants, transcript(world, c), when=when(world, c))
+        jobs = [lambda c=c: m.remember(Context(c.participants[0], c.location, tuple(c.participants)), transcript(world, c),
+                                       when=when(world, c))
                 for c in world.conversations]
         self.refused: dict[int, list[str]] = getattr(self, "refused", {})   # world seed -> refused facts
         refused = self.refused.setdefault(world.seed, [])
 
         def carry(c, co):
             try:
-                m.carry_out(co["agent"], c.location, conversation_labels(c.location, c.participants),
+                m.carry_out(Context(co["agent"], c.location, tuple(c.participants)),   # source: this conversation
                             personal_text(world, co["agent"], co["fact"]), world.facts[co["fact"]].kind,
                             when=when(world, c))
             except PermissionError:
                 refused.append(co["fact"])                 # memgate refused it: nothing is stored
 
         jobs += [lambda c=c, co=co: carry(c, co) for c in world.conversations for co in c.carry_outs]
-        jobs += [lambda n=n: m.keep_note(n["agent"], n["location"], note_text(world, n)) for n in world.notes]
+        jobs += [lambda n=n: m.keep_note(Context(n["agent"], n["location"]), note_text(world, n)) for n in world.notes]
         return jobs
 
     def pending(self, world: World) -> int:
         return self._m(world).pending_operations()
 
     def recall(self, world: World, agent: str, location: str, query: str, k: int) -> list[str]:
-        return [r.text for r in self._m(world).recall(agent, location, query, k=k)]
+        from memgate import Context
+        return [r.text for r in self._m(world).recall(Context(agent, location), query, k=k)]
 
     def snapshot(self, world: World) -> dict:
         """Stats for the shared bank and every high-assurance partition that exists."""

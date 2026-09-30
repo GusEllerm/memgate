@@ -19,7 +19,7 @@ import uuid
 
 import pytest
 
-from memgate.context import Gate, partition_bank
+from memgate.context import Context, Gate, partition_bank
 from memgate.derivation import conversation_labels, personal_labels, personal_note_labels
 
 URL = os.environ.get("MEMGATE_HINDSIGHT_URL")
@@ -41,9 +41,9 @@ def mem():
     m = HindsightMemory(gate, bank=f"it-{uuid.uuid4().hex[:8]}", base_url=URL)
     m.create_bank()
     for key, (loc, people, text) in CANARIES.items():
-        m.remember(people[0], loc, people, text, context=f"conversation {key}")
-    m.keep_note("ada", "vault", "Ada's private vault note says the spare key code is CANARY-NOTE-5150.")
-    m.carry_out("ada", "lab", conversation_labels("lab", ["ada", "bo"]),
+        m.remember(Context(people[0], loc, tuple(people)), text, about=f"conversation {key}")
+    m.keep_note(Context("ada", "vault"), "Ada's private vault note says the spare key code is CANARY-NOTE-5150.")
+    m.carry_out(Context("ada", "lab", ("ada", "bo")),
                 "Ada's opinion: the lab espresso machine is excellent, rated CANARY-PERSONAL-3303.", "opinion")
     deadline = time.time() + 900
     while m.pending_operations() and time.time() < deadline:
@@ -56,7 +56,7 @@ def reachable(mem, agent, location) -> set[str]:
     found = set()
     for query in ("safe combination", "greenhouse door code", "project codename", "reactor dial setting",
                   "spare key code", "espresso machine opinion"):
-        for r in mem.recall(agent, location, query, k=20):
+        for r in mem.recall(Context(agent, location), query, k=20):
             for tag in ("AB-7731", "AC-4410", "ABC-2208", "VAULT-9001", "NOTE-5150", "PERSONAL-3303"):
                 if tag in r.text:
                     found.add(tag.split("-")[0])
@@ -76,9 +76,9 @@ def test_witnesses_and_places(mem):
 
 def test_carry_out_blocked_by_environment(mem):
     with pytest.raises(PermissionError):
-        mem.carry_out("ada", "macrodata", conversation_labels("macrodata", ["ada"]), "anything", "opinion")
+        mem.carry_out(Context("ada", "macrodata"), "anything", "opinion")
     with pytest.raises(PermissionError):
-        mem.carry_out("ada", "vault", conversation_labels("vault", ["ada", "bo"]), "anything", "opinion")
+        mem.carry_out(Context("ada", "vault", ("ada", "bo")), "anything", "opinion")
 
 
 # -- the second lock: requests that try to go around memgate ------------------------------------------
@@ -133,7 +133,7 @@ def test_high_assurance_write_seal(mem):
     vault_bank = partition_bank(mem.bank, "vault")
     assert _raw("POST", f"/v1/default/banks/{vault_bank}/memories", item([note]), ada_in_vault)[0] == 200  # a note stays inside
     with pytest.raises(PermissionError):                                                                # memgate's own check
-        mem.carry_out("ada", "vault", personal_labels("ada"), "Something from the vault.", "opinion")
+        mem.carry_out(Context("ada", "vault"), "Something from the vault.", "opinion", source=personal_labels("ada"))
 
 
 def test_retelling_leaves_a_trail(tmp_path):
@@ -146,14 +146,15 @@ def test_retelling_leaves_a_trail(tmp_path):
     log = ProvenanceLog(tmp_path, gate.world)
     m = HindsightMemory(gate, bank=f"it-prov-{uuid.uuid4().hex[:8]}", base_url=URL, provenance=log)
     m.create_bank()
-    w_ab = m.remember("ada", "lab", ["ada", "bo"], "Ada and Bo agreed the lab safe combination is CANARY-AB-7731.")
+    w_ab = m.remember(Context("ada", "lab", ("ada", "bo")), "Ada and Bo agreed the lab safe combination is CANARY-AB-7731.")
     while m.pending_operations():
         time.sleep(3)
 
-    recalled = m.recall("ada", "lab", "safe combination")
+    recalled = m.recall(Context("ada", "lab"), "safe combination")
     assert any(r.write_id == w_ab for r in recalled)          # Hindsight's document_id carries the write ID
-    turn = m.say("ada", "lab", ["ada", "bo", "cy"], "Bo and I set the safe combination last week.", [recalled.recall_id])
-    w_abc = m.remember("ada", "lab", ["ada", "bo", "cy"], "Ada told Bo and Cy the safe combination was set last week.", turns=[turn])
+    trio = Context("ada", "lab", ("ada", "bo", "cy"))
+    turn = m.say(trio, "Bo and I set the safe combination last week.", [recalled.recall_id])
+    w_abc = m.remember(trio, "Ada told Bo and Cy the safe combination was set last week.", turns=[turn])
 
     assert log.sources_of(w_abc, ["shared"]) == [w_ab]
     cy = log.trail(w_abc, "cy", "lab", gate.policy)

@@ -18,8 +18,8 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
 
-from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_bank
-from memgate.derivation import conversation_labels, personal_labels, personal_note_labels
+from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Context, Gate, partition_bank
+from memgate.derivation import personal_labels, personal_note_labels
 from memgate.labels import LabelSet
 from memgate.provenance import ProvenanceLog, new_id
 
@@ -103,36 +103,47 @@ class HindsightMemory:
             self.provenance.audit(location, "write", write_id=write_id, agent=agent, label_set=ls_id, kind=kind)
         return write_id
 
-    def remember(self, agent: str, location: str, participants: list[str], text: str, *,
-                 when: datetime | None = None, context: str | None = None, turns: list[str] = ()) -> str:
-        """Store something said or seen in a conversation at `location` among `participants`.
-        `turns` are the provenance IDs of the turns (see `say`) it was formed from."""
-        return self._retain(agent, location, conversation_labels(location, participants), text, when, context,
-                            "conversation", turns=turns)
+    def remember(self, ctx: Context, text: str, *, when: datetime | None = None, about: str | None = None,
+                 turns: list[str] = ()) -> str:
+        """Store something said or seen in `ctx`'s conversation (its location, among its participants).
+        `about` is a short description for the memory system; `turns` are the provenance IDs of the
+        turns (see `say`) it was formed from. Returns the write ID."""
+        return self._retain(ctx.agent, ctx.location, ctx.conversation(), text, when, about, "conversation", turns=turns)
 
-    def keep_note(self, agent: str, location: str, text: str, *, when: datetime | None = None) -> str:
-        """A personal note that stays in `location` (e.g. inside a high-assurance location)."""
-        return self._retain(agent, location, personal_note_labels(agent, location), text, when, "personal note", "note")
+    def keep_note(self, ctx: Context, text: str, *, when: datetime | None = None) -> str:
+        """A personal note that stays where it was written (e.g. inside a high-assurance location)."""
+        return self._retain(ctx.agent, ctx.location, personal_note_labels(ctx.agent, ctx.location), text, when,
+                            "personal note", "note")
 
-    def carry_out(self, agent: str, location: str, source: LabelSet, text: str, memory_type: str, *,
+    def carry_out(self, ctx: Context, text: str, memory_type: str, *, source: LabelSet | None = None,
                   when: datetime | None = None, source_writes: list[str] = ()) -> str:
-        """Copy something into the agent's personal memory, if every environment it came from allows."""
-        allowed = self.gate.policy.may_carry_out(agent, location, source, memory_type)
+        """Copy something into the agent's personal memory, if every environment it came from allows.
+
+        `source` is the label set the content was formed under; it defaults to `ctx`'s conversation.
+        Pass a recalled memory's label set to carry out something from an earlier conversation here;
+        it must be readable in `ctx` (Cedar checks). `memory_type` is the agent's own classification
+        (fact, opinion, skill, episode), audited. Raises PermissionError if refused."""
+        source = source or ctx.conversation()
+        allowed = self.gate.policy.may_carry_out(ctx.agent, ctx.location, source, memory_type)
         if self.provenance:
-            self.provenance.audit(location, "carry_out", agent=agent, source=source.id, memory_type=memory_type, allowed=allowed)
+            self.provenance.audit(ctx.location, "carry_out", agent=ctx.agent, source=source.id,
+                                  memory_type=memory_type, allowed=allowed)
         if not allowed:
             raise PermissionError(f"{memory_type} may not be carried out of {source}")
-        return self._retain(agent, location, personal_labels(agent), text, when, f"carried out ({memory_type})",
-                            "carry_out", derived_from=source_writes)
+        return self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
+                            f"carried out ({memory_type})", "carry_out", derived_from=source_writes)
 
-    def say(self, speaker: str, location: str, participants: list[str], text: str, recalls: list[str] = ()) -> str | None:
-        """Record what an agent said and which recalls it drew on; returns the turn's provenance ID."""
+    def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
+        """Record what `ctx.agent` said, to `ctx.participants`, and which recalls (their `recall_id`s)
+        it drew on; returns the turn's provenance ID (None without a provenance log)."""
         if not self.provenance:
             return None
-        return self.provenance.record_turn(speaker, location, participants, text, list(recalls))
+        return self.provenance.record_turn(ctx.agent, ctx.location, list(ctx.participants), text, list(recalls))
 
     # -- reads --------------------------------------------------------------------------------------
-    def recall(self, agent: str, location: str, query: str, k: int = 20, budget: str = "mid") -> RecallBatch:
+    def recall(self, ctx: Context, query: str, k: int = 20, budget: str = "mid") -> RecallBatch:
+        """The memories `ctx.agent` may recall at `ctx.location` that best match `query`, best first."""
+        agent, location = ctx.agent, ctx.location
         allowed_set = self.gate.policy.allowed_ids(agent, location)
         allowed = sorted(allowed_set) or ["ls_none"]
         banks = [self.bank]
