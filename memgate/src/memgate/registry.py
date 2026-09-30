@@ -1,7 +1,10 @@
 """The label-set registry: every label combination in use, keyed by its content-addressed ID.
 
 Memory systems store only the opaque ID; the registry is how the policy layer knows what an ID
-means. Registration is idempotent, so any process can register the label set it is writing.
+means. Registration is idempotent, so any process can register the label set it is writing: several
+host processes (e.g. web workers) may share one registry file on one host. SQLite serialises their
+writes (a writer waits up to `timeout` seconds for the lock), so row IDs stay in commit order, which
+the policy's incremental cache relies on (`select_ids`). tests/test_registry_processes.py checks it.
 """
 
 from __future__ import annotations
@@ -15,8 +18,8 @@ from memgate.labels import LabelSet
 
 
 class Registry:
-    def __init__(self, path: str | Path = ":memory:"):
-        self._db = sqlite3.connect(str(path), check_same_thread=False)
+    def __init__(self, path: str | Path = ":memory:", timeout: float = 30.0):
+        self._db = sqlite3.connect(str(path), check_same_thread=False, timeout=timeout)
         self._lock = threading.Lock()
         with self._lock:
             self._db.executescript("""
