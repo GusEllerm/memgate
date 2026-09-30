@@ -4,7 +4,7 @@ status: active
 authority: reference
 summary: "The two checks before adopting Hindsight with memgate, both passed. Recall cost: LoCoMo with all ten conversations in one memgate bank scored 69.2% against 69.5% for isolated banks (paired p = 0.81); without the filter, 14% of questions pulled in other conversations' memories. Reworded leaks: 0 of 3,312 must-not probes disclosed anything at answer level (positive control 98/98 flagged), no code in any recall channel, and 0 lineage violations across 9 banks, including 1,840 consolidated observations in the shared LoCoMo bank."
 created: 2026-09-29
-updated: 2026-09-29
+updated: 2026-09-30
 tags: [agentic-memory, benchmark, memgate, results, decision-input]
 ---
 
@@ -96,7 +96,7 @@ Each recall requested everything Hindsight can return: entity observations, raw 
 
 - **One run per condition.** The recall comparison rests on paired questions and on noise measured earlier on one conversation, not on repeated full runs.
 - **Consolidation only.** The lineage audit covers observations. Mental models and reflect are blocked by the validator, so they weren't exercised.
-- **Cooperative agents.** Probes ask directly. The threat model is cooperative agents, as decided, so there is no adversarial prompting.
+- **Cooperative agents only.** Probes ask directly, matching the accepted threat model. An adversarial run was planned on 2026-09-30 and dropped: Claude's session couldn't build it, and writing it by hand wasn't worth the time then. Nothing here shows how memgate behaves against agents that try to extract locked memory or write around the rules. Before the Ranch runs agents that aren't trusted to cooperate, this needs doing: in-house, with red-team tooling (garak, PyRIT, promptfoo), or by an external review. Formal proofs of the Cedar policies (SymCC) and a trust-boundary review would narrow the gap without adversarial simulation.
 - **Two leak-check limits:** probes still name the fact's topic, and the large worlds' non-witness probes were sampled (500 of 4,945).
 
 ## Open
