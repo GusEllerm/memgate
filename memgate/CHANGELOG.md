@@ -3,10 +3,15 @@
 ## 0.3.1 (2026-09-30)
 
 - **Security:** `memgate serve` redacts the database URL it prints at startup: a password in the
-  user part or in the query (`password=`, `sslpassword=` and similar) is shown as `***`. 0.2.0 printed
-  the full URL, and 0.3.0 still printed a password given as a query parameter. Hindsight still
-  receives the real URL. If you ran 0.2.0 with a password in `MEMGATE_DB`, redact your logs and
-  consider rotating the password. Reported by the CHORUS integration.
+  user part or in the query is shown as `***`. 0.2.0 printed the full URL, and 0.3.0 still printed a
+  password given as a query parameter. Hindsight still receives the real URL.
+- **Security:** `memgate serve` refuses a database URL with a password in its query (`?password=`,
+  `sslpassword=` and similar). Hindsight 0.10.1 masks a password in the URL's user part but logs the
+  query in clear at startup, so put the password in the user part. Checked end to end: with the
+  password in the user part, it appears nowhere in memgate's or Hindsight's output, including when
+  the database can't be reached (`tests/test_serve_logs.py`).
+- If you ran 0.2.0 or 0.3.0 with a password in `MEMGATE_DB`, redact the logs and rotate the password.
+  Reported by the CHORUS integration.
 - **Registry:** an explicit 30 s lock wait (`Registry(path, timeout=30.0)`), and a test that several
   processes can write one registry at once (for example web workers).
 

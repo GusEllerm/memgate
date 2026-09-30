@@ -28,6 +28,14 @@ def _env(name: str, default: str | None = None) -> str | None:
 _SECRET_PARAMS = {"password", "pass", "passwd", "pwd", "sslpassword", "secret", "token", "api_key", "apikey"}
 
 
+def _secret_in_query(url: str) -> bool:
+    from urllib.parse import parse_qsl, urlsplit
+    try:
+        return any(k.lower() in _SECRET_PARAMS for k, _ in parse_qsl(urlsplit(url).query, keep_blank_values=True))
+    except ValueError:
+        return False
+
+
 def redact_db_url(url: str) -> str:
     """A database URL safe to print: any password in the user part or the query is replaced by ***."""
     from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
@@ -72,6 +80,11 @@ def cmd_serve(args) -> int:
     if errors:
         print("the world file has problems (memgate check-world):\n  " + "\n  ".join(errors), file=sys.stderr)
         return 1
+    if _secret_in_query(args.db):
+        print("refusing a database URL with a password in its query (e.g. ?password=...): Hindsight 0.10.1 logs "
+              "the query in clear at startup. Put the password in the user part instead "
+              "(postgresql://user:password@host/db), which Hindsight masks.", file=sys.stderr)
+        return 2
     secret = _env("MEMGATE_SECRET")
     if args.secret_file:
         secret = Path(args.secret_file).read_text().strip()

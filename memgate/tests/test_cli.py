@@ -28,10 +28,10 @@ def test_serve_does_not_print_the_database_password(tmp_path, monkeypatch, capsy
     fake_bin.write_text("#!/bin/sh\n")
     fake_bin.chmod(0o755)
     monkeypatch.setenv("MEMGATE_SECRET", "not-printed-either")
-    monkeypatch.setenv("MEMGATE_DB", "postgresql://memgate:hunter2@db:5432/memgate?password=hunter2")
+    monkeypatch.setenv("MEMGATE_DB", "postgresql://memgate:hunter2@db:5432/memgate?sslmode=require")
 
     def no_exec(binary, argv, env):
-        assert env["HINDSIGHT_API_DATABASE_URL"].count("hunter2") == 2       # the child still gets the real URL
+        assert "hunter2" in env["HINDSIGHT_API_DATABASE_URL"]                # the child still gets the real URL
         raise SystemExit(0)
     monkeypatch.setattr(cli.os, "execve", no_exec)
     # --db's default is read from MEMGATE_DB when the parser is built, so build it after setting the env.
@@ -41,3 +41,22 @@ def test_serve_does_not_print_the_database_password(tmp_path, monkeypatch, capsy
     out = capsys.readouterr()
     assert "hunter2" not in out.out + out.err and "not-printed-either" not in out.out + out.err
     assert "postgresql://memgate:***@db:5432/memgate" in out.out
+
+
+def test_serve_refuses_a_password_in_the_query(tmp_path, monkeypatch, capsys):
+    """Hindsight 0.10.1 logs a URL's query in clear, so serve won't pass one carrying a password."""
+    world = tmp_path / "world.json"
+    world.write_text('{"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["a"]}')
+    monkeypatch.setenv("MEMGATE_SECRET", "s")
+    monkeypatch.setattr(cli.os, "execve", lambda *a: pytest.fail("must not start Hindsight"))
+    rc = cli.main(["serve", "--world", str(world), "--registry", str(tmp_path / "r.sqlite"),
+                   "--db", "postgresql://db/memgate?user=memgate&password=hunter2"])
+    out = capsys.readouterr()
+    assert rc == 2 and "user part" in out.err and "hunter2" not in out.out + out.err
+
+
+def test_help_never_shows_the_database_url(monkeypatch, capsys):
+    monkeypatch.setenv("MEMGATE_DB", "postgresql://memgate:hunter2@db/memgate")
+    with pytest.raises(SystemExit):
+        cli.main(["serve", "--help"])
+    assert "hunter2" not in capsys.readouterr().out
