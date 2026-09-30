@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1 (2026-09-30)
+
+- **Security:** `memgate serve` redacts the database URL it prints at startup: a password in the
+  user part or in the query (`password=`, `sslpassword=` and similar) is shown as `***`. 0.2.0 printed
+  the full URL, and 0.3.0 still printed a password given as a query parameter. Hindsight still
+  receives the real URL. If you ran 0.2.0 with a password in `MEMGATE_DB`, redact your logs and
+  consider rotating the password. Reported by the CHORUS integration.
+- **Registry:** an explicit 30 s lock wait (`Registry(path, timeout=30.0)`), and a test that several
+  processes can write one registry at once (for example web workers).
+
 ## 0.3.0 (2026-09-30)
 
 Changes for the Knowledge Ranch integration.

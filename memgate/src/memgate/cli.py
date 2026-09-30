@@ -25,6 +25,28 @@ def _env(name: str, default: str | None = None) -> str | None:
     return os.environ.get(name, default)
 
 
+_SECRET_PARAMS = {"password", "pass", "passwd", "pwd", "sslpassword", "secret", "token", "api_key", "apikey"}
+
+
+def redact_db_url(url: str) -> str:
+    """A database URL safe to print: any password in the user part or the query is replaced by ***."""
+    from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return "<unprintable database URL>"
+    netloc = parts.netloc
+    if "@" in netloc:
+        userinfo, host = netloc.rsplit("@", 1)
+        user = userinfo.split(":", 1)[0]
+        netloc = f"{user}:***@{host}" if ":" in userinfo else f"{user}@{host}"
+    query = parts.query
+    if query:
+        query = urlencode([(k, "***" if k.lower() in _SECRET_PARAMS else v) for k, v in parse_qsl(query, keep_blank_values=True)],
+                          safe="*")
+    return urlunsplit((parts.scheme, netloc, parts.path, query, parts.fragment))
+
+
 def cmd_check_world(args) -> int:
     from memgate.worldcheck import check_world_file
     errors = check_world_file(args.world)
@@ -92,9 +114,8 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_AUDIT_LOG_ENABLED": "false",
         "HINDSIGHT_API_OTEL_TRACES_ENABLED": "false",
     })
-    db_shown = args.db.split("@")[-1] if "@" in args.db else args.db        # never print a password
     print(f"memgate: Hindsight with the validator on http://{args.host}:{args.port} "
-          f"(scope {args.scope}, database {db_shown})", flush=True)
+          f"(scope {args.scope}, database {redact_db_url(args.db)})", flush=True)
     os.execve(binary, [binary], env)
     return 0  # not reached
 

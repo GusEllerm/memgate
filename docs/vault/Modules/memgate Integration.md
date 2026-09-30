@@ -37,12 +37,12 @@ tags: [module, memgate, integration, knowledge-ranch]
   8. report.
 - **The API seam:** `Context` (agent, location, participants) in `memgate/src/memgate/context.py`. Every `HindsightMemory` call takes one ([[memgate Hindsight Adapter]]). The host builds it from verified facts, and that is where identity and context verification will plug in at integration.
 - **The command line:** `memgate/src/memgate/cli.py`, installed as `memgate`:
-  - `memgate serve` (`cmd_serve`): Hindsight with the validator. It checks the world file first, binds loopback unless `--allow-remote` is passed, turns off LLM traces, and takes LLM settings from `MEMGATE_LLM_*`. `memgate/scripts/serve_hindsight_gated.sh` is now a wrapper over it, keeping this repo's defaults.
+  - `memgate serve` (`cmd_serve`): Hindsight with the validator. It checks the world file first, binds loopback unless `--allow-remote` is passed, turns off LLM traces, and takes LLM settings from `MEMGATE_LLM_*`. The database URL it prints is redacted by `redact_db_url` (since 0.3.1; 0.2.0 printed it in full, found by the CHORUS integration). `memgate/scripts/serve_hindsight_gated.sh` is now a wrapper over it, keeping this repo's defaults.
   - `memgate check-world` (`check_world` in `memgate/src/memgate/worldcheck.py`): the world-file format, with every mistake reported. The ids `--ha--` are reserved.
   - `memgate conformance` (`run` in `memgate/src/memgate/conformance.py`): canaries in a throwaway bank on the live deployment, 15 checks (`split-scope` only with `--partition-url`), adapting to the host's world. Checks the world has no place for are skipped. The bank is deleted afterwards, and the exit code is non-zero on any failure.
   - `memgate secret`: a new shared secret.
 - **Example:** `memgate/examples/quickstart.py` with `memgate/examples/world.json`.
-- **Release:** 0.3.0 (`memgate/CHANGELOG.md`), made for the Knowledge Ranch plan (decision D15 in CHORUS's `docs/knowledge-ranch/design/memory.md`, drafted with the chorus-dev session). The server installs `memgate[hindsight]`, which pins Hindsight 0.10.1. The host installs the client alone, with `memgate[async]` for `AsyncHindsightMemory`. 0.3.0 added:
+- **Release:** 0.3.1 (`memgate/CHANGELOG.md`; 0.3.1 is a security patch for that printed URL, plus the registry's explicit lock wait). 0.3.0 was made for the Knowledge Ranch plan (decision D15 in CHORUS's `docs/knowledge-ranch/design/memory.md`, drafted with the chorus-dev session). The server installs `memgate[hindsight]`, which pins Hindsight 0.10.1. The host installs the client alone, with `memgate[async]` for `AsyncHindsightMemory`. 0.3.0 added:
   - `carry_out(source=<Recalled>)`;
   - the async client;
   - a separate partition server (`partition_url`, and `memgate serve --scope`);

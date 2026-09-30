@@ -553,12 +553,12 @@ sig = "65805f5240e82863"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/CHANGELOG.md"
-sig = "6a77232852136511"
+sig = "895f0f7025292c0f"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "4e50b2890aa9f85b"
+sig = "dd6409ea4d48a488"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -583,7 +583,12 @@ sig = "7e292a965b3b1097"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/cli.py#cmd_serve"
-sig = "1fd0bf3dc4ccf4de"
+sig = "8ef96a233f044e50"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Integration.md"
+target = "memgate/src/memgate/cli.py#redact_db_url"
+sig = "468943d42d3a65a2"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -608,7 +613,7 @@ sig = "c161037c91c03766"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "plugins/memgate/skills/integrate-memgate/SKILL.md"
-sig = "adc6811e1c31ce90"
+sig = "041e64d61da8039e"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
