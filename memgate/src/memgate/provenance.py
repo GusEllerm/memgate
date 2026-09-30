@@ -99,12 +99,17 @@ class TrailNode:
 
 
 class ProvenanceLog:
-    def __init__(self, root: str | Path, world: World):
+    def __init__(self, root: str | Path, world):
+        """`world` is a World, or anything with a `world` attribute (a Gate), so reloads are followed."""
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
-        self.world = world
+        self._world = world
         self._conns: dict[str, sqlite3.Connection] = {}
         self._lock = threading.RLock()
+
+    @property
+    def world(self) -> World:
+        return self._world if isinstance(self._world, World) else self._world.world
 
     # -- partitions --------------------------------------------------------------------------------
     def partition(self, location: str | None) -> str:

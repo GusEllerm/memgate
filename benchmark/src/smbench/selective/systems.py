@@ -182,11 +182,21 @@ class Memgate:
         return [r.text for r in self._m(world).recall(agent, location, query, k=k)]
 
     def snapshot(self, world: World) -> dict:
+        """Stats for the shared bank and every high-assurance partition that exists."""
+        from memgate.adapters.hindsight.client import HindsightError
         m = self._m(world)
-        st = m._call("GET", f"/v1/default/banks/{m.bank}/stats", None, role="admin")
-        ops = m._call("GET", f"/v1/default/banks/{m.bank}/operations", None, role="admin")
-        ops = ops.get("operations", ops if isinstance(ops, list) else [])
-        return {m.bank: {**{k: st.get(k) for k in STAT_FIELDS}, "operations": len(ops)}}
+        out = {}
+        for bank in m.partitions():
+            try:
+                st = m._call("GET", f"/v1/default/banks/{bank}/stats", None, role="admin")
+                ops = m._call("GET", f"/v1/default/banks/{bank}/operations", None, role="admin")
+            except HindsightError as e:
+                if e.status == 404:
+                    continue
+                raise
+            ops = ops.get("operations", ops if isinstance(ops, list) else [])
+            out[bank] = {**{k: st.get(k) for k in STAT_FIELDS}, "operations": len(ops)}
+        return out
 
 
 def wait(system, world: World, timeout: float = 1800) -> None:

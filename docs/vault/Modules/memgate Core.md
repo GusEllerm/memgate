@@ -38,6 +38,8 @@ tags: [module, memgate, permissions]
     3. The result is cached per agent and location, keyed on `World.fingerprint`, and later calls check only label sets registered since.
     4. `memgate/tests/test_residual.py` checks the compiled answer against Cedar's exact answer for every agent and location in 300 random worlds, with and without an over-broad grant.
   - `Policy.may_write` decides every write (agent, location, label set); memgate's client and the validator both call it.
+  - Every decision fails closed on an agent or location the world doesn't list (`Policy._known`): Cedar skips a policy that errors, and a skipped forbid would allow.
+- **Deployment** (`Gate` in `memgate/src/memgate/context.py`): the world, registry and secret. Given the world file's path, `Gate.refresh` reloads it when it changes (checked at most once a second), so a running simulation can change agents, locations and environments without a restart; an unreadable file keeps the last good world.
   - `Policy.may_carry_out` checks a carry-out into personal memory, from the carrier's current location.
   - `Policy.validate` checks the policies against the schema.
 - **Derivation** (`memgate/src/memgate/derivation.py`):
@@ -84,7 +86,7 @@ tags: [module, memgate, permissions]
 
   The compiled answer is identical to Cedar's at every size.
 
-## Tests (32)
+## Tests (52 in memgate's environment, plus 27 validator specs in Hindsight's)
 
 `memgate/tests/`:
 - **Recall:**
@@ -96,10 +98,13 @@ tags: [module, memgate, permissions]
 - **Writes:** only a participant writes a conversation, only there; never under another agent's identity; notes only in their location; inside a high-assurance location, personal memory can't be written (the seal).
 - **Derivation:** participants intersect; no shared participant means nobody can read it; a summary of {A,B} with {A,B,C} stays hidden from C; memories crossing locations are unreadable from either; merges only within a label set.
 - **Schema:** the policies validate against the schema.
+- **Entities** (`memgate/tests/test_entities.py`): `haLocs` and `carryTypes` mean what the proofs assume, on random worlds.
+- **World reload** (`memgate/tests/test_world_reload.py`): a changed world file takes effect without a restart, decisions are recomputed, and a file that doesn't parse leaves the last good world in force.
+- **Fail closed** (`memgate/tests/test_fail_closed.py`): unknown agents and locations are refused everything; an unreachable store raises rather than returning an unchecked answer; a refused write never reaches the store; a broken registry raises.
+- **Validator spec** (`memgate/tests/test_validator.py`): every hook, including partition placement and the seal.
 - **Negative controls:** removing the participant check lets a non-witness read. Removing the seal leaks the vault once an over-broad grant exists. The read rule alone already keeps high-assurance memories in place; the seal is the backstop for later rules that grant too much.
 
 ## Not yet
 
-- **Changing the world file needs a restart** of processes that loaded it (e.g. the Hindsight validator). The cache follows the in-memory `World`.
 - **Verified context** (who is calling, where, with whom) is deferred to the Ranch integration; memgate trusts the context it's given ([[Trust Boundaries]]). Recall, write and carry-out decisions are all in Cedar and proved ([[memgate Proofs]]).
 - **Provenance and audit are built** (2026-09-29) and wired into [[memgate Hindsight Adapter]].

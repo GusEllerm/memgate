@@ -2,8 +2,12 @@
 
 It labels every write from the context, registers the label set, and tags the item with its ID.
 On recall it computes the allowed label sets itself (first lock) and passes them as tags; the
-validator inside Hindsight recomputes and overwrites them (second lock). One Hindsight bank holds a
-whole world; high-assurance locations can be given their own bank (a separate partition).
+validator inside Hindsight recomputes and overwrites them (second lock). One shared bank holds the
+world's ordinary locations and personal memory; each high-assurance location has its own bank (its
+partition, `partition_bank`). A write goes to the partition of the high-assurance location it is
+labelled with, if any; a recall in a high-assurance location searches its partition and the shared
+bank (where personal memory lives) and merges them by score; a recall anywhere else never touches a
+partition.
 """
 
 from __future__ import annotations
@@ -14,7 +18,7 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import datetime
 
-from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate
+from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_bank
 from memgate.derivation import conversation_labels, personal_labels, personal_note_labels
 from memgate.labels import LabelSet
 from memgate.provenance import ProvenanceLog, new_id
@@ -44,6 +48,7 @@ class HindsightMemory:
                  provenance: ProvenanceLog | None = None):
         self.gate, self.bank, self.base_url, self.timeout = gate, bank, base_url.rstrip("/"), timeout
         self.provenance = provenance
+        self._created: set[str] = set()
 
     # -- transport ----------------------------------------------------------------------------------
     def _call(self, method: str, path: str, body: dict | None, *, agent: str | None = None,
@@ -63,7 +68,22 @@ class HindsightMemory:
             raise HindsightError(e.code, e.read().decode(errors="replace")) from None
 
     def create_bank(self) -> None:
-        self._call("PUT", f"/v1/default/banks/{self.bank}", {"name": self.bank}, role="admin")
+        self._ensure(self.bank)
+
+    def _ensure(self, bank: str) -> None:
+        if bank not in self._created:
+            self._call("PUT", f"/v1/default/banks/{bank}", {"name": bank}, role="admin")   # idempotent
+            self._created.add(bank)
+
+    def partitions(self) -> list[str]:
+        """The shared bank and one partition per high-assurance location in the world."""
+        w = self.gate.world
+        return [self.bank] + [partition_bank(self.bank, l) for l in sorted(w.locations) if w.high_assurance(l)]
+
+    def bank_for(self, labels: LabelSet) -> str:
+        """Where a memory with these labels is stored."""
+        ha = sorted(l for l in labels.locs if self.gate.world.high_assurance(l))
+        return partition_bank(self.bank, ha[0]) if ha else self.bank
 
     # -- writes -------------------------------------------------------------------------------------
     def _retain(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
@@ -75,7 +95,9 @@ class HindsightMemory:
         write_id = new_id("w")
         item = {"content": text, "tags": [ls_id], "context": context, "document_id": write_id,
                 "timestamp": when.isoformat() if when else None}
-        self._call("POST", f"/v1/default/banks/{self.bank}/memories", {"items": [item]}, agent=agent, location=location)
+        bank = self.bank_for(labels)
+        self._ensure(bank)
+        self._call("POST", f"/v1/default/banks/{bank}/memories", {"items": [item]}, agent=agent, location=location)
         if self.provenance:
             self.provenance.record_write(write_id, agent, location, ls_id, kind, text, turns=turns, derived_from=derived_from)
             self.provenance.audit(location, "write", write_id=write_id, agent=agent, label_set=ls_id, kind=kind)
@@ -113,11 +135,20 @@ class HindsightMemory:
     def recall(self, agent: str, location: str, query: str, k: int = 20, budget: str = "mid") -> RecallBatch:
         allowed_set = self.gate.policy.allowed_ids(agent, location)
         allowed = sorted(allowed_set) or ["ls_none"]
-        resp = self._call("POST", f"/v1/default/banks/{self.bank}/memories/recall",
-                          {"query": query, "budget": budget, "tags": allowed, "tags_match": "any_strict"},
-                          agent=agent, location=location)
+        banks = [self.bank]
+        if self.gate.world.high_assurance(location):
+            banks.append(partition_bank(self.bank, location))      # at most two partitions per recall
+        results = []
+        for bank in banks:
+            self._ensure(bank)
+            resp = self._call("POST", f"/v1/default/banks/{bank}/memories/recall",
+                              {"query": query, "budget": budget, "tags": allowed, "tags_match": "any_strict"},
+                              agent=agent, location=location)
+            results += resp.get("results", [])
+        if len(banks) > 1:
+            results.sort(key=lambda r: -((r.get("scores") or {}).get("final") or 0.0))
         out = RecallBatch()
-        for r in resp.get("results", [])[:k]:
+        for r in results[:k]:
             tags = r.get("tags") or []
             when = r.get("occurred_start") or r.get("mentioned_at")
             out.append(Recalled(r["text"], tags[0] if tags else "", str(when)[:10] if when else None, r.get("document_id")))
@@ -128,6 +159,15 @@ class HindsightMemory:
         return out
 
     def pending_operations(self) -> int:
-        ops = self._call("GET", f"/v1/default/banks/{self.bank}/operations", None, role="admin")
-        ops = ops.get("operations", ops if isinstance(ops, list) else [])
-        return sum(o.get("status") not in ("completed", "failed", "cancelled") for o in ops)
+        """Background operations not yet finished, across the shared bank and every partition in use."""
+        total = 0
+        for bank in self.partitions():
+            try:
+                ops = self._call("GET", f"/v1/default/banks/{bank}/operations", None, role="admin")
+            except HindsightError as e:
+                if e.status == 404:          # a partition nothing has been written to yet
+                    continue
+                raise
+            ops = ops.get("operations", ops if isinstance(ops, list) else [])
+            total += sum(o.get("status") not in ("completed", "failed", "cancelled") for o in ops)
+        return total

@@ -2,7 +2,7 @@
 type: module
 status: active
 authority: describes
-summary: "memgate's Hindsight adapter: a client that labels, registers and tags every write and scopes every recall (first lock), and an operation-validator extension inside Hindsight that recomputes and overwrites recall tags, checks writes, and closes the side doors (second lock). 8 live integration tests pass, including bypass attempts and the high-assurance write seal."
+summary: "memgate's Hindsight adapter: a client that labels, registers and tags every write and scopes every recall (first lock), and an operation-validator extension inside Hindsight that recomputes and overwrites recall tags, checks writes, and closes the side doors (second lock). 9 live integration tests pass, including bypass attempts, the high-assurance write seal and partition placement; 27 spec tests call every validator hook directly (`memgate/tests/test_validator.py`, run in Hindsight's environment)."
 created: 2026-09-29
 updated: 2026-09-30
 tags: [module, memgate, hindsight]
@@ -17,7 +17,9 @@ tags: [module, memgate, hindsight]
 
 Code: `memgate/src/memgate/adapters/hindsight/client.py`.
 
-`HindsightMemory` is the only way agents' memory reaches Hindsight. One bank holds a world. Its operations:
+`HindsightMemory` is the only way agents' memory reaches Hindsight. Its operations are below.
+
+**Partitions (since 2026-09-30).** A world has one shared bank, for ordinary locations and personal memory, plus one bank per high-assurance location, named by `partition_bank` in `memgate/src/memgate/context.py`. `HindsightMemory.bank_for` sends each write to the partition of the high-assurance location it is labelled with, if any. A recall in a high-assurance location searches its partition and the shared bank (where personal memory lives) and merges the two by Hindsight's final score. A recall anywhere else never touches a partition. So a vault's memories never share ranking statistics, caches or consolidation with anything outside it. `HindsightMemory.partitions` lists the banks, and `HindsightMemory.pending_operations` counts across all of them.
 
 | Method | Does |
 | --- | --- |
@@ -38,9 +40,11 @@ Every request carries the gate secret plus the agent and location headers, from 
 
 Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` is loaded by Hindsight from HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION.
 
+- **Fails closed:** an exception inside the validator fails the request. An unknown agent or location is refused (see `Policy` in [[memgate Core]]). The world file is re-read when it changes (`Gate.refresh`), with no restart.
 - **Identity:** trusts only the caller's identity. A request without the memgate secret is refused, and Hindsight's own background work (consolidation) passes as internal.
 - **`validate_recall`:** recomputes the allowed IDs with the same world and registry, and **overwrites** the request's tags. Forged tags are ignored. `Gate` keeps a single `Policy`, so the compiled per-context cache ([[memgate Core]]) survives across requests: a repeat recall costs about 0.01 ms at 100k label sets.
-- **`validate_retain`:** each item needs exactly one registered label-set tag, and `Policy.may_write` must allow the writer to write it at its location (the same Cedar decision memgate's client makes first, including the high-assurance write seal). Observation scopes wider than "combined" are refused.
+- **`validate_retain`:** each item needs exactly one registered label-set tag, and `Policy.may_write` must allow the writer to write it at its location (the same Cedar decision memgate's client makes first, including the high-assurance write seal). Observation scopes wider than "combined" are refused. A memory labelled with a high-assurance location must go to that location's partition, and nothing else may (`partition_location`).
+- **Partitions in recall:** a partition is searched only from inside its location; from anywhere else the recall is refused.
 - **Side doors closed:**
   - reflect is refused, because its scope can't be enforced;
   - mental models are refused, because they blend a bank;

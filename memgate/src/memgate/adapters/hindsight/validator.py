@@ -30,7 +30,7 @@ from hindsight_api.extensions.operation_validator import (
     ValidationResult,
 )
 
-from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate
+from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_location
 
 NO_MATCH = "ls_none"  # a tag no item carries: recall returns nothing
 
@@ -72,6 +72,9 @@ class MemgateValidator(OperationValidatorExtension):
             return ValidationResult.accept()
         if not agent or not location:
             return ValidationResult.reject("recall needs an agent and a location")
+        part = partition_location(ctx.bank_id, self.gate.world)
+        if part is not None and part != location:
+            return ValidationResult.reject("a high-assurance partition is searched only from inside it")
         allowed = sorted(self.gate.policy.allowed_ids(agent, location)) or [NO_MATCH]
         return ValidationResult.accept_with(tags=allowed, tags_match="any_strict", tag_groups=[])
 
@@ -84,12 +87,16 @@ class MemgateValidator(OperationValidatorExtension):
         if role == "internal":
             return ValidationResult.accept()
         known = self.gate.registry.all()
+        part = partition_location(ctx.bank_id, self.gate.world)
         for item in ctx.contents:
             tags = item.get("tags") or []
             if len(tags) != 1 or tags[0] not in known:
                 return ValidationResult.reject("each item needs exactly one registered label-set tag")
             if item.get("observation_scopes") not in (None, "combined"):
                 return ValidationResult.reject("observation scopes that widen beyond a label set are not allowed")
+            ha = {l for l in known[tags[0]].locs if self.gate.world.high_assurance(l)}
+            if (part is None and ha) or (part is not None and part not in ha):
+                return ValidationResult.reject("memory stored in the wrong partition for its high-assurance label")
             if role != "admin":
                 if not agent or not location:
                     return ValidationResult.reject("a write needs an agent and a location")

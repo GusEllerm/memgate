@@ -37,6 +37,14 @@ class Policy:
         # (agent, location) -> (world fingerprint, compiled filter, allowed IDs, newest registry row seen)
         self._cache: dict[tuple[str, str], tuple] = {}
 
+    def _known(self, agent: str, location: str) -> bool:
+        """Fail closed: decide nothing about an agent or location the world doesn't list.
+
+        Cedar skips a policy whose evaluation errors, and a skipped forbid allows. A location missing
+        from the world has no entity, so the high-assurance write seal would error and be skipped.
+        The proofs assume every agent and location in a request exists; this makes that true."""
+        return agent in self.world.agents and location in self.world.locations
+
     def validate(self) -> list[str]:
         result = cedarpy.validate_policies(self.policies, self.schema)
         return [str(e) for e in result.errors]
@@ -82,6 +90,8 @@ class Policy:
 
         Cached per (agent, location): the registry only grows, so a repeat call checks only label sets
         registered since the last one. A change to the world invalidates the cache."""
+        if not self._known(agent, location):
+            return set()
         key, fp = (agent, location), self.world.fingerprint()
         cached = self._cache.get(key)
         if cached and cached[0] == fp:
@@ -99,6 +109,8 @@ class Policy:
 
     def allowed_ids_exact(self, agent: str, location: str) -> set[str]:
         """Check every registered label set with Cedar (the reference answer)."""
+        if not self._known(agent, location):
+            return set()
         label_sets = self.registry.all()
         if not label_sets:
             return set()
@@ -110,12 +122,16 @@ class Policy:
 
     def may_write(self, agent: str, location: str, labels: LabelSet) -> bool:
         """May `agent`, at `location`, store a memory under `labels`?"""
+        if not self._known(agent, location):
+            return False
         request = {"principal": _ref("Agent", agent), "action": _ref("Action", "write"),
                    "resource": _ref("LabelSet", labels.id), "context": {"location": _uid("Location", location)}}
         return cedarpy.is_authorized(request, self.policies, self._entities({labels.id: labels}), self.schema).allowed
 
     def may_carry_out(self, agent: str, location: str, source: LabelSet, memory_type: str) -> bool:
         """May `agent`, at `location`, carry a `memory_type` formed under `source` into personal memory?"""
+        if not self._known(agent, location):
+            return False
         request = {"principal": _ref("Agent", agent), "action": _ref("Action", "writePersonal"),
                    "resource": _ref("LabelSet", source.id),
                    "context": {"memoryType": memory_type, "location": _uid("Location", location)}}

@@ -39,7 +39,7 @@ tags: [module, benchmark, selective-memory]
   - **Ingest:** runs each system's jobs several at a time (--ingest-workers, default 4; the gateway still caps ALCF at 6), then waits for background processing.
   - **Probe:** asks every (agent, location, fact) "What is <topic>?". A probe records the rank at which the code first appears in the top 20 recalled memories.
   - **Score:** `summarise` reports leak rate (hits in the top 20 on must-not probes), plus recall at 20 and at 5 (should probes), overall, by probe kind and by scenario.
-  - **Side-effect audit** (S5): recalls made inside a high-assurance location run first, bracketed by a snapshot of each system's banks (`snapshot`: node, link, document and observation counts, last write, operation count). Any change is reported in side_effects.json.
+  - **Side-effect audit** (S5): recalls made inside a high-assurance location run first, bracketed by a snapshot of each system's banks (for memgate, the shared bank and every high-assurance partition) (`snapshot`: node, link, document and observation counts, last write, operation count). Any change is reported in side_effects.json.
 
 ## Limits of this version
 

@@ -19,7 +19,7 @@ import uuid
 
 import pytest
 
-from memgate.context import Gate
+from memgate.context import Gate, partition_bank
 from memgate.derivation import conversation_labels, personal_labels, personal_note_labels
 
 URL = os.environ.get("MEMGATE_HINDSIGHT_URL")
@@ -130,7 +130,8 @@ def test_high_assurance_write_seal(mem):
     note = mem.gate.registry.register(personal_note_labels("ada", "vault"))
     item = lambda tags: {"items": [{"content": "Ada notes something in the vault.", "tags": tags}]}
     assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([mine]), ada_in_vault)[0] == 403   # personal: sealed
-    assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([note]), ada_in_vault)[0] == 200   # a note stays inside
+    vault_bank = partition_bank(mem.bank, "vault")
+    assert _raw("POST", f"/v1/default/banks/{vault_bank}/memories", item([note]), ada_in_vault)[0] == 200  # a note stays inside
     with pytest.raises(PermissionError):                                                                # memgate's own check
         mem.carry_out("ada", "vault", personal_labels("ada"), "Something from the vault.", "opinion")
 
@@ -160,3 +161,24 @@ def test_retelling_leaves_a_trail(tmp_path):
     assert cy.sources[0].text is None
     ada = log.trail(w_abc, "ada", "lab", gate.policy)
     assert "7731" in ada.sources[0].text
+
+
+def test_high_assurance_partition(mem):
+    """Vault memories live in the vault's own bank; nothing else does, and only the vault searches it."""
+    vault_bank = partition_bank(mem.bank, "vault")
+    admin = {"x-memgate-secret": mem.gate.secret, "x-memgate-role": "admin"}
+    reg = mem.gate.registry.all()
+    docs = lambda bank: _raw("GET", f"/v1/default/banks/{bank}/documents?limit=500", None, admin)[1]["items"]
+    in_vault = lambda d: "vault" in reg[d["tags"][0]].locs
+    assert docs(vault_bank) and all(in_vault(d) for d in docs(vault_bank))      # the vault conversation and note
+    assert not any(in_vault(d) for d in docs(mem.bank))                          # none of it in the shared bank
+
+    ada_in_lab = {"x-memgate-secret": mem.gate.secret, "x-memgate-agent": "ada", "x-memgate-location": "lab"}
+    ada_in_vault = dict(ada_in_lab, **{"x-memgate-location": "vault"})
+    recall = {"query": "reactor dial setting", "budget": "low"}
+    assert _raw("POST", f"/v1/default/banks/{vault_bank}/memories/recall", recall, ada_in_lab)[0] == 403
+    lab = mem.gate.registry.register(conversation_labels("lab", ["ada", "bo"]))
+    vault = mem.gate.registry.register(conversation_labels("vault", ["ada", "bo"]))
+    item = lambda tags: {"items": [{"content": "Misplaced memory.", "tags": tags}]}
+    assert _raw("POST", f"/v1/default/banks/{vault_bank}/memories", item([lab]), ada_in_lab)[0] == 403    # ordinary into a partition
+    assert _raw("POST", f"/v1/default/banks/{mem.bank}/memories", item([vault]), ada_in_vault)[0] == 403  # vault into the shared bank

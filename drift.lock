@@ -3,7 +3,7 @@ version = 1
 [[bindings]]
 doc = "docs/vault/Concepts/Permission Layer.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "44e86c8f7d4a1f14"
+sig = "d2880ddf9df5b043"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
@@ -13,17 +13,22 @@ sig = "fffcea073ff9bb50"
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "44e86c8f7d4a1f14"
+sig = "d2880ddf9df5b043"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "bcd94b01fe399e2f"
+sig = "c47aad08c4bf6065"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/context.py"
-sig = "afad2b205fa65a06"
+sig = "c9d0b1c9a0623450"
+
+[[bindings]]
+doc = "docs/vault/Concepts/Trust Boundaries.md"
+target = "memgate/src/memgate/policy.py#Policy"
+sig = "19923e112fc28845"
 
 [[bindings]]
 doc = "docs/vault/Modules/ALCF Gateway.md"
@@ -263,7 +268,7 @@ sig = "23a60dbc8d892447"
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
 target = "benchmark/src/smbench/selective/systems.py#Memgate"
-sig = "383a7e93173ff7e0"
+sig = "a7c5671e8318a9df"
 
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
@@ -328,7 +333,7 @@ sig = "a35d2274ba53ac1b"
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
 target = "memgate/src/memgate/policy.py#Policy"
-sig = "0936cf7614ee1f83"
+sig = "19923e112fc28845"
 
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
@@ -344,6 +349,11 @@ sig = "002aa567b96c9022"
 doc = "docs/vault/Modules/memgate Core.md"
 target = "benchmark/src/smbench/selective/world.py#World"
 sig = "5d7a2c21724b9f4c"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Core.md"
+target = "memgate/src/memgate/context.py#Gate"
+sig = "433e6d4808affb83"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -398,12 +408,12 @@ sig = "8cae1407f03d8734"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/policy.py#Policy"
-sig = "0936cf7614ee1f83"
+sig = "19923e112fc28845"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/provenance.py#ProvenanceLog"
-sig = "51d86bcc42ccff20"
+sig = "c3e0fb82ca2b0ddc"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -448,7 +458,7 @@ sig = "820718580c860561"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "44e86c8f7d4a1f14"
+sig = "d2880ddf9df5b043"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -463,12 +473,12 @@ sig = "bf88f3ee6542be87"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "bcd94b01fe399e2f"
+sig = "c47aad08c4bf6065"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/context.py#Gate"
-sig = "8b9b221fd37aa897"
+sig = "433e6d4808affb83"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -477,13 +487,23 @@ sig = "0323221357c95a17"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/context.py#partition_bank"
+sig = "667633c2e83fa1eb"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/context.py#partition_location"
+sig = "bab0ab132abab9ae"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/policy.py#Policy"
-sig = "0936cf7614ee1f83"
+sig = "19923e112fc28845"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/provenance.py#ProvenanceLog"
-sig = "51d86bcc42ccff20"
+sig = "c3e0fb82ca2b0ddc"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -503,7 +523,7 @@ sig = "7ece2b720a1428c5"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "bcd94b01fe399e2f"
+sig = "c47aad08c4bf6065"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
@@ -513,4 +533,4 @@ sig = "8cae1407f03d8734"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
 target = "memgate/src/memgate/policy.py#Policy"
-sig = "0936cf7614ee1f83"
+sig = "19923e112fc28845"

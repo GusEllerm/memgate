@@ -67,6 +67,14 @@ memgate only (the baselines are unaffected), after the high-assurance write seal
 
 Report: benchmark/reports/selective-env-2026-09-30.json.
 
+**Again with high-assurance partitions (2026-09-30, run sel-env-2026-09-30b).** Each vault now has its own bank. Results were identical once more:
+- 0 of 1,446 leaked;
+- recall 174/174;
+- 8 carry-outs refused per world;
+- no side effects in either bank.
+
+In each world the vault's bank holds exactly its 4 memories (2 conversations, 2 notes), and the shared bank holds none of them. Report: benchmark/reports/selective-env-2026-09-30b.json.
+
 ## Reading it
 
 - **The permission rules hold end to end:**

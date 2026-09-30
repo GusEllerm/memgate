@@ -1,0 +1,164 @@
+{
+ "memgate": {
+  "kind:carried-fact": {
+   "probes": 24,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 24,
+   "should": 24
+  },
+  "kind:carried-opinion": {
+   "probes": 48,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 48,
+   "should": 48
+  },
+  "kind:carry-refused-fact": {
+   "probes": 48,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 48,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:carry-refused-ha": {
+   "probes": 24,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 24,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:carry-refused-opinion": {
+   "probes": 24,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 24,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:ha-witness-inside": {
+   "probes": 24,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 24,
+   "should": 24
+  },
+  "kind:ha-witness-outside": {
+   "probes": 72,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 72,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:non-witness": {
+   "probes": 960,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 960,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:note-elsewhere": {
+   "probes": 24,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 24,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:note-here": {
+   "probes": 6,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 6,
+   "should": 6
+  },
+  "kind:note-other-agent": {
+   "probes": 150,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 150,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-elsewhere": {
+   "probes": 144,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 144,
+   "recall": null,
+   "recall_at_5": null,
+   "hits": 0,
+   "should": 0
+  },
+  "kind:witness-here": {
+   "probes": 72,
+   "leak_rate": null,
+   "leaks": 0,
+   "must_not": 0,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 72,
+   "should": 72
+  },
+  "overall": {
+   "probes": 1620,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 1446,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 174,
+   "should": 174
+  },
+  "scenario:S4": {
+   "probes": 1080,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 936,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 144,
+   "should": 144
+  },
+  "scenario:S5": {
+   "probes": 540,
+   "leak_rate": 0.0,
+   "leaks": 0,
+   "must_not": 510,
+   "recall": 1.0,
+   "recall_at_5": 1.0,
+   "hits": 30,
+   "should": 30
+  }
+ }
+}
