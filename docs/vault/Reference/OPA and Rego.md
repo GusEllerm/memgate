@@ -5,7 +5,7 @@ authority: reference
 summary: "OPA/Rego (v1.21.0, CNCF graduated, maintainers now at Apple): our rules are easy to write; a naive loop over label sets is linear (350 ms per query at 100k) but an offline inverted index gives 0.38 ms with identical output. Partial evaluation to SQL/UCAST doesn't fit multi-participant sets. No formal proofs, only bounded exhaustive tests. Also covers Casbin and Oso."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, policy-engine, opa]
+tags: [memgate, reference, survey, policy-engine, opa]
 ---
 
 # OPA and Rego

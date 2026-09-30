@@ -5,7 +5,7 @@ authority: reference
 summary: "Cedar (v4.13.0, Apache-2.0): our label rules fit in a few validated policies; partial evaluation leaves a residual that compiles to array operators and matched a brute-force run over 100k label sets in 0.03 s; the SMT analyzer can prove the high-assurance seal. Partial evaluation and the filter compiler are experimental or ours to write."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, policy-engine, cedar]
+tags: [memgate, reference, survey, policy-engine, cedar]
 ---
 
 # Cedar

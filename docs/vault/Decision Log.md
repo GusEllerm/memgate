@@ -2,10 +2,10 @@
 type: decision-log
 status: active
 authority: log
-summary: "Decisions and open questions for agentic-memory. Only Gus moves a row from open or proposed to accepted."
+summary: "Decisions and open questions for memgate. Only Gus moves a row from open or proposed to accepted."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory]
+tags: [memgate]
 ---
 
 # Decision Log
@@ -18,7 +18,7 @@ Rows are open or proposed until Gus accepts them. Agent recommendations are mark
 | 2026-09-25 | Are locks strictly hierarchical (nested scopes), or can contexts overlap arbitrarily? | Overlapping labels: memory items carry a set of labels, a context unlocks whatever its labels allow (Gus) | accepted (Gus, 2026-09-25) | Hierarchy can still be expressed as labels. Attribute-based (ABAC-like) rather than a scope tree. |
 | 2026-09-25 | Must locked memory be hidden entirely, or may the agent know it exists? | Hidden entirely: filtered before it reaches the prompt (Claude) | accepted with condition (Gus, 2026-09-25) | Condition: only if per-item configurability (existence visible, content locked) can be added later without redesign. Candidates are checked for this. |
 | 2026-09-25 | Is the host project tied to a language, framework or model provider? | Not tied yet (Gus) | accepted (Gus, 2026-09-25) | Survey candidates on merit; stack decided later. |
-| 2026-09-25 | Repo visibility | Private (Claude) | accepted (Gus, 2026-09-25) | Private for now, as GusEllerm/agentic-memory. |
+| 2026-09-25 | Repo visibility | Private (Claude) | accepted (Gus, 2026-09-25) | Private for now, as GusEllerm/agentic-memory; renamed GusEllerm/memgate on 2026-09-30, still private. |
 | 2026-09-25 | Survey shape: given attribute-based contexts and overlapping labels, is the permission layer part of the memory system or separate? | Treat it as two layers surveyed separately: memory stores (judged on label-filtered retrieval and derived-data lineage) and policy engines that map context attributes to labels (Claude) | accepted (Gus, 2026-09-25) | Follows from the two accepted rows above. Trade-off: stores with built-in permissions get no extra credit. Policy engines are the second table in [[Architecture Survey]]. |
 | 2026-09-25 | Which named systems must the survey cover? | Falda (UChicago, Rick Stevens' group) and Redis's new agent memory system, alongside the architecture families (Gus) | accepted (Gus, 2026-09-25) | Rows in the named-systems table of [[Architecture Survey]]. |
 | 2026-09-25 | Where does the survey start? | Vector-store RAG with a hand-rolled rule table: the cheapest pairing that tests whether derived data can leak locked memory (Claude) | accepted (Gus, 2026-09-25) | |
@@ -66,3 +66,4 @@ Rows are open or proposed until Gus accepts them. Agent recommendations are mark
 | 2026-09-30 | Leakage through agents' own actions (files, tools, working context, messages) | Out of scope for the memory service; recorded as host requirements in [[Trust Boundaries]]: clear or seal working context on leaving a location, scope tools and storage by context labels, treat logs as labelled data. Possible memgate contribution: a context-taint query (the union of labels recalled in an agent-turn) so the host can refuse actions whose destination can't hold them (Claude; Gus asked that it be noted) | deferred to Ranch integration (Gus, 2026-09-30) | Gus, 2026-09-30: can't be solved by the memory service alone, but important to note. Consistent with the threat-model row: stopping messages leaving a high-assurance location is a different part of the project. |
 | 2026-09-30 | Per-type relaxation of derived labels: build it now? | Defer until the Ranch needs it. The default stays (union for identity and location, intersection for participants); the design already allows per-type relaxation, as the 2026-09-25 condition requires (Claude; chosen by Gus) | accepted (Gus, 2026-09-30) | Would be per-environment rules for which label types a derived memory may drop, with proofs and tests (about 1–2 days). |
 | 2026-09-30 | Where is 'what an agent recalled when it spoke' recorded? | In memgate: the host calls memgate's say() with the recall IDs, and the provenance log keeps the lineage, partitioned for high assurance (Claude; chosen by Gus) | accepted (Gus, 2026-09-30) | Already built ([[memgate Core]]). Closes the open question in [[Permission Layer]]. |
+| 2026-09-30 | Project name | memgate, for the project and the repo (GusEllerm/agentic-memory renamed GusEllerm/memgate); memgate was already the permission layer's working name (Gus) | accepted (Gus, 2026-09-30) | GitHub redirects the old URL. The local directory is still agentic-memory. The benchmark's own name is still open ([[Benchmark Plan]]). |

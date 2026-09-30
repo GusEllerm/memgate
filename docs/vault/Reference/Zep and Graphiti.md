@@ -5,7 +5,7 @@ authority: reference
 summary: "Graphiti (graphiti-core 0.30.2 @ 47f6482), Zep's open-source temporal knowledge graph: one partition key (group_id), no per-item permissions, graph walks that check only their end nodes, and entity and community summaries that mix every source. Label model needs a deep fork."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, knowledge-graph]
+tags: [memgate, reference, survey, knowledge-graph]
 ---
 
 # Zep and Graphiti

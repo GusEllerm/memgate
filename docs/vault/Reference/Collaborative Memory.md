@@ -5,7 +5,7 @@ authority: reference
 summary: "Collaborative Memory (Rezazadeh et al., Accenture, 2025): provenance-checked private and shared memory tiers, with access from time-varying user–agent–resource graphs. Its read rule matches ours; its shared-write policy is an LLM declassifier and derived fragments can lose labels. No code released."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, prior-work]
+tags: [memgate, reference, survey, prior-work]
 ---
 
 # Collaborative Memory

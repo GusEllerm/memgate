@@ -5,7 +5,7 @@ authority: reference
 summary: "LoCoMo pilot on conv-26 (152 questions), gpt-oss-120b answering, Nemotron 3 Ultra judging, k=20: Hindsight 70.4%, Mem0 61.2% (paired p≈0.04, one conversation). Full LoCoMo for both systems is about 2–3.5 hours of wall time under the 6-request cap."
 created: 2026-09-28
 updated: 2026-09-28
-tags: [agentic-memory, benchmark, locomo, results]
+tags: [memgate, benchmark, locomo, results]
 ---
 
 # Review: LoCoMo pilot, 2026-09-28

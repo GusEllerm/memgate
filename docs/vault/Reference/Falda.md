@@ -5,7 +5,7 @@ authority: reference
 summary: "Falda, evaluated as Rob Ross's fork (rbross-hpc/falda @ 0690078, 2026-09-05): four-tier SQLite memory with evidence links from atoms to source turns and physical per-store isolation. Tags exist but filter nothing; Core mixes a whole store; seven retrieval paths would need a label filter."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, falda]
+tags: [memgate, reference, survey, falda]
 ---
 
 # Falda

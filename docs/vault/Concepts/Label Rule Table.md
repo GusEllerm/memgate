@@ -5,7 +5,7 @@ authority: describes
 summary: "Minimal permission layer: rules over context attributes grant labels; an item is readable only if all its labels are granted; derived items carry the union of their sources' labels; enforced as a label-set-ID filter inside vector search."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, design, permissions, policy]
+tags: [memgate, design, permissions, policy]
 ---
 
 # Label Rule Table

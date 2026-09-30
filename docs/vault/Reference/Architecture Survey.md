@@ -5,7 +5,7 @@ authority: reference
 summary: "Two layers surveyed separately: memory stores (label-filtered retrieval, derived-data lineage) and policy engines (context attributes to allowed labels). None surveyed yet."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey]
+tags: [memgate, reference, survey]
 ---
 
 # Architecture Survey

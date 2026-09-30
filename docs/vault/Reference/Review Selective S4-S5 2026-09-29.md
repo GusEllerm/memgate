@@ -5,7 +5,7 @@ authority: reference
 summary: "Selective memory S4 (environments and carry-out) and S5 (high assurance) on three env worlds (1,620 probes per system): memgate leaked 0 of 1,446 with recall 174/174 at 20 and at 5; it refused exactly the 24 carry-outs the answer key forbids, and stored exactly what the key expects. No filter leaked 100%; per-agent stores leaked 23.2%, including every high-assurance fact asked about outside the vault. High-assurance recalls changed no bank for any system."
 created: 2026-09-29
 updated: 2026-09-30
-tags: [agentic-memory, benchmark, selective-memory, results, high-assurance]
+tags: [memgate, benchmark, selective-memory, results, high-assurance]
 ---
 
 # Review: selective memory S4 and S5, 2026-09-29

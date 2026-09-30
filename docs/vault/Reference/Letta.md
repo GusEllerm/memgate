@@ -5,7 +5,7 @@ authority: reference
 summary: "Letta today is letta-code (v0.33.1 @ d7fd0a6): memory as a git-backed Markdown filesystem the agent edits freely, with background reflection. No per-item labels, no local vector search, rewrites mix locations. The V1 server (blocks, archival tags) is archived and unsupported."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, letta]
+tags: [memgate, reference, survey, letta]
 ---
 
 # Letta

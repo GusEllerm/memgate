@@ -5,7 +5,7 @@ authority: reference
 summary: "Zanzibar-style engines (OpenFGA v1.21.0, SpiceDB v1.56.2): our rule fits but needs a workaround for 'all labels' and per-turn context; listing tops out around 1000 results; 10–95 ms per query at only 10–20k label sets; OpenFGA's in-memory store couldn't load 100k label sets in 20 minutes. No formal verification. They fight our flat attribute model."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, policy-engine, rebac]
+tags: [memgate, reference, survey, policy-engine, rebac]
 ---
 
 # OpenFGA and SpiceDB

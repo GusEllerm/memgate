@@ -5,7 +5,7 @@ authority: reference
 summary: "Redis Agent Memory (part of Redis Iris, managed, preview since 2026-05) and its open-source predecessor agent-memory-server V0. The managed product is closed and scopes by store plus a caller-supplied owner id; V0 already pre-filters tag sets inside the KNN query and is a good base for our label model, but is no longer the supported line."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, redis]
+tags: [memgate, reference, survey, redis]
 ---
 
 # Redis Agent Memory

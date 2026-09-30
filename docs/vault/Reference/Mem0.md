@@ -5,7 +5,7 @@ authority: reference
 summary: "Mem0 (OSS v2.2.0 @ 8127e8b, 2026-09): now additive-only fact extraction over 26 vector stores, with metadata filters pushed into the store. No source lineage, add-time lookups ignore labels (scope-mixing leak), no faithful export. A 300–600 line fork on Qdrant or pgvector."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, mem0]
+tags: [memgate, reference, survey, mem0]
 ---
 
 # Mem0

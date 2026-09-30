@@ -5,7 +5,7 @@ authority: reference
 summary: "Honcho (v3.2.1 @ c8e97bc, AGPL server): peer-centred memory where conclusions live in (observer, observed) collections copied at write time. Strong derived-from lineage and read-only recall, but no user labels, views are copies rather than read-time checks, and there's no export. Fork effort moderate to high."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, honcho]
+tags: [memgate, reference, survey, honcho]
 ---
 
 # Honcho

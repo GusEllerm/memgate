@@ -5,7 +5,7 @@ authority: reference
 summary: "Cognee (v1.6.1 @ eb90d03, Apache-2.0): knowledge graph + vector memory with dataset-level ACLs and a separate database per dataset; search runs once per readable dataset. Safe but coarse. Per-item labels break on name-keyed entities and union-merged tags, and search writes history and telemetry."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, cognee, knowledge-graph]
+tags: [memgate, reference, survey, cognee, knowledge-graph]
 ---
 
 # Cognee

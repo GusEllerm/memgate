@@ -5,7 +5,7 @@ authority: reference
 summary: "Full LoCoMo (10 conversations, 1,540 questions), gpt-oss-120b answering, Nemotron 3 Ultra judging, k=20: Hindsight 69.5% and Mem0 69.4%, statistically indistinguishable (paired p=0.96). The pilot's 9-point gap was one-conversation noise. 1 h 50 min wall time, ~10k requests, none failed."
 created: 2026-09-28
 updated: 2026-09-28
-tags: [agentic-memory, benchmark, locomo, results]
+tags: [memgate, benchmark, locomo, results]
 ---
 
 # Review: full LoCoMo, 2026-09-28

@@ -5,7 +5,7 @@ authority: describes
 summary: "Design of the permission layer (working name memgate): a system-agnostic core (label-set registry, Cedar policies, allowed-ID resolution, write labelling, derivation rules, cross-agent provenance, audit) plus a thin adapter per memory system, Hindsight first. Built on Cedar and the memory system's own storage; conceptually a special case of the Decentralized Label Model."
 created: 2026-09-29
 updated: 2026-09-29
-tags: [agentic-memory, design, permissions, memgate]
+tags: [memgate, design, permissions]
 ---
 
 # Permission Layer

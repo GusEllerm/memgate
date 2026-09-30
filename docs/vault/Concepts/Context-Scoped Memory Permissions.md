@@ -5,7 +5,7 @@ authority: describes
 summary: "The problem this project researches: an agent's memory where the active context unlocks and locks slices of it at a fine grain, and the draft requirements a memory system must meet."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, design, permissions]
+tags: [memgate, design, permissions]
 ---
 
 # Context-Scoped Memory Permissions

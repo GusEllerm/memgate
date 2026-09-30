@@ -1,6 +1,6 @@
 # Agentic Memory Research
 
-This vault is the long-term memory for **agentic-memory**. Agents and people write it as the code takes shape;
+This vault is the long-term memory for **memgate** (the repo was called agentic-memory until 2026-09-30). Agents and people write it as the code takes shape;
 `livedocs` keeps the notes honest: every note that names code in backticks is bound to that code, and a
 commit that changes the code is blocked until the note is updated or acknowledged.
 

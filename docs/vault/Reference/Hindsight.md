@@ -5,7 +5,7 @@ authority: reference
 summary: "Hindsight (v0.10.1 @ 415a8d7, MIT): Postgres/pgvector memory with facts → observations → mental models. Tag filters run inside SQL for three of four search arms, observations record their source facts, and a validator extension can overwrite a request's tags, so label-set IDs plus Cedar fit with no core changes. Opinions were removed in 2026."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, hindsight]
+tags: [memgate, reference, survey, hindsight]
 ---
 
 # Hindsight

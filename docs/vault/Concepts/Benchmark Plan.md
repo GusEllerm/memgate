@@ -5,7 +5,7 @@ authority: describes
 summary: "Plan for benchmarking the shortlisted memory systems: a publishable selective-memory benchmark (leaks, retelling, permitted recall, side effects), efficacy on LoCoMo/LongMemEval with gpt-oss-120b held fixed, and speed tests. All LLM traffic goes through one local ALCF gateway capped at 6 concurrent requests."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, design, benchmark]
+tags: [memgate, design, benchmark]
 ---
 
 # Benchmark Plan

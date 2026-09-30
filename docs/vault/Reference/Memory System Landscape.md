@@ -5,7 +5,7 @@ authority: reference
 summary: "Coverage check of popular agent memory systems as of 2026-09-25: open-source systems ranked by stars and downloads (checked via APIs), with triage against our model. Scoping and lineage notes are unverified background knowledge; benchmark scores are vendor claims only."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, landscape]
+tags: [memgate, reference, survey, landscape]
 ---
 
 # Memory System Landscape

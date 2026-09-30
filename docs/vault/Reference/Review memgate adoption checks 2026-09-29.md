@@ -5,7 +5,7 @@ authority: reference
 summary: "The two checks before adopting Hindsight with memgate, both passed. Recall cost: LoCoMo with all ten conversations in one memgate bank scored 69.2% against 69.5% for isolated banks (paired p = 0.81); without the filter, 14% of questions pulled in other conversations' memories. Reworded leaks: 0 of 3,312 must-not probes disclosed anything at answer level (positive control 98/98 flagged), no code in any recall channel, and 0 lineage violations across 9 banks, including 1,840 consolidated observations in the shared LoCoMo bank."
 created: 2026-09-29
 updated: 2026-09-30
-tags: [agentic-memory, benchmark, memgate, results, decision-input]
+tags: [memgate, benchmark, results, decision-input]
 ---
 
 # Review: memgate adoption checks, 2026-09-29

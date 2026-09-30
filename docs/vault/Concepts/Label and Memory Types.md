@@ -5,7 +5,7 @@ authority: describes
 summary: "Selective memory for a social simulation of agents: three label types (identity, location, participants); participants recall a discussion in its location; personal memory is always readable, and the environment decides what may enter it."
 created: 2026-09-25
 updated: 2026-09-30
-tags: [agentic-memory, design, permissions, memory-types]
+tags: [memgate, design, permissions, memory-types]
 ---
 
 # Label and Memory Types

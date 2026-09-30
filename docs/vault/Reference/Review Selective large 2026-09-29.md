@@ -5,7 +5,7 @@ authority: reference
 summary: "Selective memory S1–S3 on two large worlds (12 agents, 5 locations, 51 conversations with look-alike topics; 6,120 probes per system): memgate leaked 0 of 5,891 with recall 99.1% at 20 and at 5; no filter leaked 99%; per-agent stores leaked every witness-elsewhere probe. Every missed recall was a Hindsight extraction loss, not filtering. Recall is still near ceiling because queries name the topic."
 created: 2026-09-29
 updated: 2026-09-29
-tags: [agentic-memory, benchmark, selective-memory, results]
+tags: [memgate, benchmark, selective-memory, results]
 ---
 
 # Review: selective memory, large worlds, 2026-09-29

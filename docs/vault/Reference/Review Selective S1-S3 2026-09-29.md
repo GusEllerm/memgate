@@ -5,7 +5,7 @@ authority: reference
 summary: "First selective-memory run (S1–S3, 3 worlds, 486 probes per system): memgate leaked 0 of 420 must-not probes with 66/66 recall; no-filter leaked 420/420; per-agent stores leaked 132/420, every one a witness recalling outside the location. Small and retrieval-level; recall is at ceiling."
 created: 2026-09-29
 updated: 2026-09-29
-tags: [agentic-memory, benchmark, selective-memory, results]
+tags: [memgate, benchmark, selective-memory, results]
 ---
 
 # Review: selective memory S1–S3, 2026-09-29

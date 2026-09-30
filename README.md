@@ -1,4 +1,4 @@
-# agentic-memory
+# memgate
 
 Research into agentic memory systems for a host project that needs fine-grained,
 context-driven permissions over an agent's memory: the active context "unlocks"

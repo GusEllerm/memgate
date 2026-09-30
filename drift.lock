@@ -63,7 +63,12 @@ sig = "ddef8eb17427dfe3"
 [[bindings]]
 doc = "docs/vault/Modules/Benchmark Site.md"
 target = "benchmark/site/template.html"
-sig = "f537a471e127834e"
+sig = "06aef69f801f374f"
+
+[[bindings]]
+doc = "docs/vault/Modules/Benchmark Site.md"
+target = "benchmark/src/smbench/selective/dialogue.py#build"
+sig = "c399ddf98fd6b813"
 
 [[bindings]]
 doc = "docs/vault/Modules/Benchmark Site.md"

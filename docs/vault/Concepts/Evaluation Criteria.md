@@ -5,7 +5,7 @@ authority: describes
 summary: "The rubric each candidate memory architecture is scored against (1–5 per criterion), derived from the draft requirements."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, design, evaluation]
+tags: [memgate, design, evaluation]
 ---
 
 # Evaluation Criteria

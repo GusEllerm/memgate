@@ -5,7 +5,7 @@ authority: reference
 summary: "How eight vector stores filter nearest-neighbour search by label: when the filter runs, whether 'all of an item's labels are allowed' is expressible, and what derived-data leakage research says about embeddings and summaries."
 created: 2026-09-25
 updated: 2026-09-25
-tags: [agentic-memory, reference, survey, vector-store]
+tags: [memgate, reference, survey, vector-store]
 ---
 
 # Vector Store Label Filtering
