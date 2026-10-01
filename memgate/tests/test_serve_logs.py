@@ -28,3 +28,63 @@ def test_a_failed_database_connection_never_prints_the_password(tmp_path):
         output = (e.stdout or b"").decode(errors="replace") + (e.stderr or b"").decode(errors="replace")
     assert "memgate: Hindsight with the validator" in output          # it really started
     assert SENTINEL not in output
+
+
+def test_a_hostile_env_file_cannot_disable_the_validator(tmp_path):
+    """A .env where serve is started (and above Hindsight's working directory) tries to drop the validator
+    and swap the secret. memgate serve starts Hindsight in a private dir with an empty .env, so it can't."""
+    import time
+    import urllib.error
+    import urllib.request
+    hostile = ("HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION=\nMEMGATE_SECRET=evil\n"
+               "HINDSIGHT_API_LLM_TRACE_ENABLED=true\n")
+    (tmp_path / ".env").write_text(hostile)
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / ".env").write_text(hostile)                  # directly above the workdir
+    world = tmp_path / "world.json"
+    world.write_text('{"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["a"]}')
+    env = dict(os.environ, MEMGATE_WORLD=str(world), MEMGATE_REGISTRY=str(tmp_path / "data" / "r.sqlite"),
+               MEMGATE_SECRET="the-real-secret", MEMGATE_DB=f"pg0://memgate-envtest-{os.getpid()}",
+               MEMGATE_LLM_API_KEY="gateway", MEMGATE_LLM_BASE_URL=os.environ.get("MEMGATE_LLM_BASE_URL", "http://127.0.0.1:8411/v1"))
+    memgate = Path(sys.executable).parent / "memgate"
+    proc = subprocess.Popen([str(memgate), "serve", "--port", "18897"], cwd=tmp_path, env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    try:
+        for _ in range(180):
+            try:
+                urllib.request.urlopen("http://127.0.0.1:18897/health", timeout=2)
+                break
+            except OSError:
+                if proc.poll() is not None:
+                    pytest.fail("serve exited: " + proc.stdout.read()[-2000:])
+                time.sleep(1)
+        else:
+            pytest.fail("serve did not come up")
+
+        def status(headers):
+            req = urllib.request.Request("http://127.0.0.1:18897/v1/default/banks", headers=headers)
+            try:
+                return urllib.request.urlopen(req, timeout=10).status
+            except urllib.error.HTTPError as e:
+                return e.code
+        req = urllib.request.Request("http://127.0.0.1:18897/v1/default/banks/x", method="PUT", data=b'{"name":"x"}',
+                                     headers={"Content-Type": "application/json"})
+        try:
+            code = urllib.request.urlopen(req, timeout=10).status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403                                   # the validator is loaded: no secret, refused
+        req = urllib.request.Request("http://127.0.0.1:18897/v1/default/banks/x", method="PUT", data=b'{"name":"x"}',
+                                     headers={"Content-Type": "application/json", "x-memgate-secret": "evil",
+                                              "x-memgate-role": "admin"})
+        try:
+            code = urllib.request.urlopen(req, timeout=10).status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        assert code == 403                                   # and the hostile secret is not the one in force
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            proc.kill()

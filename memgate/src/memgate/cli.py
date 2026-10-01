@@ -18,7 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from memgate.context import HEADERS
+from memgate.context import HEADERS, serve_fingerprint
 
 
 def _env(name: str, default: str | None = None) -> str | None:
@@ -102,9 +102,22 @@ def cmd_serve(args) -> int:
         print("hindsight-api not found: install memgate with the hindsight extra (pip install 'memgate[hindsight]')",
               file=sys.stderr)
         return 2
+    binary = str(Path(binary).resolve())            # before the chdir below, so a relative path still works
     Path(registry).parent.mkdir(parents=True, exist_ok=True)
+    # Hindsight applies the first .env it finds walking up from its working directory, over the
+    # environment. Start it in a private directory whose own .env is empty, so nothing is found.
+    workdir = Path(args.workdir or Path(registry).resolve().parent / ".memgate-serve")
+    workdir.mkdir(parents=True, exist_ok=True)
+    workdir.chmod(0o700)
+    dotenv = workdir / ".env"
+    if not dotenv.exists():
+        dotenv.touch(mode=0o600)
+    if dotenv.stat().st_size:
+        print(f"refusing to start: {dotenv} is not empty. Hindsight would load it over memgate's settings; "
+              "memgate serve keeps that file empty on purpose.", file=sys.stderr)
+        return 1
     env = dict(os.environ)
-    env.update({
+    forced = {
         "MEMGATE_WORLD": str(Path(world).resolve()),
         "MEMGATE_REGISTRY": str(Path(registry).resolve()),
         "MEMGATE_SECRET": secret,
@@ -126,9 +139,13 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_LLM_TRACE_ENABLED": "false",     # traces would hold memory content outside the partitions
         "HINDSIGHT_API_AUDIT_LOG_ENABLED": "false",
         "HINDSIGHT_API_OTEL_TRACES_ENABLED": "false",
-    })
+    }
+    env.update(forced)
+    env["MEMGATE_SERVE_KEYS"] = ",".join(sorted(forced))
+    env["MEMGATE_SERVE_FINGERPRINT"] = serve_fingerprint(env, list(forced))
     print(f"memgate: Hindsight with the validator on http://{args.host}:{args.port} "
           f"(scope {args.scope}, database {redact_db_url(args.db)})", flush=True)
+    os.chdir(workdir)
     os.execve(binary, [binary], env)
     return 0  # not reached
 
@@ -181,6 +198,9 @@ def main(argv: list[str] | None = None) -> int:
                         "partitions (only them, for a separate high-assurance server)")
     s.add_argument("--world-check-interval", type=float, default=float(_env("MEMGATE_WORLD_CHECK_S", "1.0")),
                    help="seconds between checks of the world file for changes (0 = every decision)")
+    s.add_argument("--workdir", default=_env("MEMGATE_SERVE_DIR"),
+                   help="Hindsight's working directory (default: .memgate-serve beside the registry); it holds "
+                        "an empty .env so Hindsight never loads another one")
     s.add_argument("--hindsight-bin")
     s.set_defaults(func=cmd_serve)
 

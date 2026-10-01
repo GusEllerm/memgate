@@ -46,6 +46,16 @@ class Context:
         return conversation_labels(self.location, self.participants)
 
 
+def serve_fingerprint(env: dict[str, str], keys: list[str]) -> str:
+    """A digest of the settings `memgate serve` forces on Hindsight, so the validator can check, once
+    Hindsight has loaded any .env of its own, that none of them was changed (see memgate.cli)."""
+    import hashlib
+    h = hashlib.sha256()
+    for k in sorted(keys):
+        h.update(f"{k}={env.get(k, '')}\0".encode())
+    return h.hexdigest()
+
+
 # Each high-assurance location gets its own partition (a separate bank in the memory system), so its
 # memories never share ranking statistics, caches or consolidation with anything outside it.
 PARTITION_SEP = "--ha--"

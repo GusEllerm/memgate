@@ -185,3 +185,18 @@ def test_scope_comes_from_the_environment(tmp_path, monkeypatch, validator):
     monkeypatch.setenv("MEMGATE_SERVE_SCOPE", "everything")
     with pytest.raises(ValueError):
         MemgateValidator()
+
+
+def test_validator_refuses_to_run_if_serves_settings_were_changed(validator, monkeypatch):
+    """memgate serve fingerprints what it forces; a .env that changed any of it stops Hindsight starting."""
+    import os
+    from memgate.adapters.hindsight.validator import MemgateValidator
+    from memgate.context import serve_fingerprint
+    keys = ["MEMGATE_SECRET", "MEMGATE_WORLD", "HINDSIGHT_API_LLM_TRACE_ENABLED"]
+    monkeypatch.setenv("HINDSIGHT_API_LLM_TRACE_ENABLED", "false")
+    monkeypatch.setenv("MEMGATE_SERVE_KEYS", ",".join(keys))
+    monkeypatch.setenv("MEMGATE_SERVE_FINGERPRINT", serve_fingerprint(dict(os.environ), keys))
+    MemgateValidator()                                                   # untouched: starts
+    monkeypatch.setenv("HINDSIGHT_API_LLM_TRACE_ENABLED", "true")         # what a hostile .env would do
+    with pytest.raises(RuntimeError, match="changed after start"):
+        MemgateValidator()

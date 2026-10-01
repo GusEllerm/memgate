@@ -34,6 +34,7 @@ def test_serve_does_not_print_the_database_password(tmp_path, monkeypatch, capsy
         assert "hunter2" in env["HINDSIGHT_API_DATABASE_URL"]                # the child still gets the real URL
         raise SystemExit(0)
     monkeypatch.setattr(cli.os, "execve", no_exec)
+    monkeypatch.chdir(tmp_path)                 # serve changes directory before starting Hindsight; restore it after
     # --db's default is read from MEMGATE_DB when the parser is built, so build it after setting the env.
     with pytest.raises(SystemExit):
         cli.main(["serve", "--world", str(world), "--registry", str(tmp_path / "r.sqlite"),
@@ -60,3 +61,70 @@ def test_help_never_shows_the_database_url(monkeypatch, capsys):
     with pytest.raises(SystemExit):
         cli.main(["serve", "--help"])
     assert "hunter2" not in capsys.readouterr().out
+
+
+def _serve(tmp_path, monkeypatch, extra=()):
+    world = tmp_path / "world.json"
+    world.write_text('{"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["a"]}')
+    fake_bin = tmp_path / "hindsight-api"
+    fake_bin.write_text("#!/bin/sh\n")
+    fake_bin.chmod(0o755)
+    monkeypatch.setenv("MEMGATE_SECRET", "s")
+    seen = {}
+
+    def no_exec(binary, argv, env):
+        import os
+        seen.update(cwd=os.getcwd(), env=env)
+        raise SystemExit(0)
+    monkeypatch.setattr(cli.os, "execve", no_exec)
+    monkeypatch.chdir(tmp_path)
+    try:
+        rc = cli.main(["serve", "--world", str(world), "--registry", str(tmp_path / "data" / "r.sqlite"),
+                       "--hindsight-bin", str(fake_bin), *extra])
+    except SystemExit:
+        rc = None
+    return rc, seen
+
+
+def test_serve_starts_hindsight_in_a_private_dir_with_an_empty_env(tmp_path, monkeypatch):
+    import os
+    import stat
+    (tmp_path / ".env").write_text("HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION=\n")   # a hostile .env where serve is run
+    rc, seen = _serve(tmp_path, monkeypatch)
+    workdir = tmp_path / "data" / ".memgate-serve"
+    assert os.path.realpath(seen["cwd"]) == os.path.realpath(workdir)
+    assert (workdir / ".env").read_text() == ""
+    assert stat.S_IMODE(workdir.stat().st_mode) == 0o700 and stat.S_IMODE((workdir / ".env").stat().st_mode) == 0o600
+    from memgate.context import serve_fingerprint
+    keys = seen["env"]["MEMGATE_SERVE_KEYS"].split(",")
+    assert "HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION" in keys and "MEMGATE_SECRET" in keys
+    assert serve_fingerprint(seen["env"], keys) == seen["env"]["MEMGATE_SERVE_FINGERPRINT"]
+
+
+def test_serve_refuses_a_non_empty_env_in_its_workdir(tmp_path, monkeypatch, capsys):
+    workdir = tmp_path / "data" / ".memgate-serve"
+    workdir.mkdir(parents=True)
+    (workdir / ".env").write_text("HINDSIGHT_API_LLM_TRACE_ENABLED=true\n")
+    rc, seen = _serve(tmp_path, monkeypatch)
+    assert rc == 1 and not seen and "not empty" in capsys.readouterr().err
+
+
+def test_serve_resolves_a_relative_hindsight_bin_before_changing_directory(tmp_path, monkeypatch):
+    import os
+    (tmp_path / "bin").mkdir()
+    fake = tmp_path / "bin" / "hindsight-api"
+    fake.write_text("#!/bin/sh\n")
+    fake.chmod(0o755)
+    world = tmp_path / "world.json"
+    world.write_text('{"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["a"]}')
+    monkeypatch.setenv("MEMGATE_SECRET", "s")
+    monkeypatch.chdir(tmp_path)
+    seen = {}
+
+    def no_exec(binary, argv, env):
+        seen["binary"] = binary
+        raise SystemExit(0)
+    monkeypatch.setattr(cli.os, "execve", no_exec)
+    with pytest.raises(SystemExit):
+        cli.main(["serve", "--world", "world.json", "--registry", "data/r.sqlite", "--hindsight-bin", "bin/hindsight-api"])
+    assert os.path.isabs(seen["binary"]) and os.path.exists(seen["binary"])

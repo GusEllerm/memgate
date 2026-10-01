@@ -32,7 +32,8 @@ from hindsight_api.extensions.operation_validator import (
 
 import os
 
-from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_location
+from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_location,
+                             serve_fingerprint)
 
 NO_MATCH = "ls_none"  # a tag no item carries: recall returns nothing
 
@@ -51,6 +52,13 @@ def _headers(ctx) -> dict[str, str]:
 class MemgateValidator(OperationValidatorExtension):
     def __init__(self, config: dict | None = None):
         super().__init__(config or {})
+        # Started by `memgate serve`: refuse to run if anything it forced was changed afterwards (Hindsight
+        # applies a .env found from its working directory over the environment, before loading us). A
+        # raise here stops Hindsight from starting at all, which is the safe outcome.
+        keys = [k for k in os.environ.get("MEMGATE_SERVE_KEYS", "").split(",") if k]
+        if keys and serve_fingerprint(dict(os.environ), keys) != os.environ.get("MEMGATE_SERVE_FINGERPRINT"):
+            raise RuntimeError("the environment memgate serve set for Hindsight was changed after start "
+                               "(a .env above Hindsight's working directory?); refusing to run")
         self.gate = Gate.from_env()
         # Which banks this server holds (MEMGATE_SERVE_SCOPE): "all" (default), "shared" (no high-assurance
         # partitions) or "partitions" (only them), so a split deployment can never land a memory on the

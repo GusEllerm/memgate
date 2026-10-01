@@ -70,9 +70,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.3.1#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.3.2#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.3.1#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.3.2#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
@@ -84,6 +84,7 @@ memgate serve --port 8889                                      # Hindsight + mem
 ```
 
 - **`memgate serve`** starts Hindsight with memgate's validator: the second lock, inside the store. It refuses a non-loopback bind unless you pass `--allow-remote`. It turns off Hindsight's LLM traces, which would hold memory content outside the partitions.
+- **Always start Hindsight through `memgate serve`, never `hindsight-api` directly.** Hindsight applies the first `.env` it finds walking up from its working directory, over its environment. A stray or planted `.env` could drop the validator, change the database or turn traces on. `memgate serve` starts Hindsight in a private directory (`--workdir`; by default `.memgate-serve` beside the registry, mode 0700) holding an empty `.env`, and refuses to start if that file isn't empty. It also fingerprints every setting it forces, and the validator refuses to load (so Hindsight won't start) if any was changed. In a container, give that directory a volume or let `serve` create it, and don't add a `.env` to it.
 - **The LLM** is used by Hindsight to extract and consolidate memories (any OpenAI-compatible endpoint). **Embeddings** are local (BAAI/bge-small-en-v1.5 by default).
 - **The host process and the server must see the same three settings:** `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
 - **The database:** `pg0://name` is an embedded Postgres. For your own server, use a `postgresql://` URL in `MEMGATE_DB`, not the `--db` flag, so the password stays out of the process list. Put the password in the user part (`postgresql://user:password@host/db`): memgate and Hindsight both mask it in their output. `memgate serve` refuses a password in the query (`?password=`), because Hindsight 0.10.1 logs the query in clear. Give memgate its own database role, with access to its database only, so the server can't reach the host's other data. The database needs the `vector` (pgvector) and `pg_trgm` extensions; pre-create them if Hindsight's role may not.

@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.3.2 (2026-09-30)
+
+- **Security:** Hindsight loads the first `.env` it finds walking up from its working directory, with
+  `override=True`, so a stray or planted `.env` could drop memgate's validator, change the database or
+  turn traces on. `memgate serve` now starts Hindsight in a private directory (`--workdir`, default
+  `.memgate-serve` beside the registry, 0700) holding an empty `.env` (0600), and refuses to start if
+  it isn't empty. It also passes a fingerprint of every setting it forces
+  (`MEMGATE_SERVE_FINGERPRINT`); the validator checks it once Hindsight has loaded and refuses to load
+  if anything changed, which stops Hindsight from starting. Verified live: a hostile `.env` where
+  `serve` is run, and above its working directory, leaves the validator loaded and the real secret in
+  force. Launched directly from the same directory, Hindsight ran without the validator. Reported by
+  the CHORUS integration's review.
+- Never start Hindsight with `hindsight-api` directly under memgate; always use `memgate serve`.
+
 ## 0.3.1 (2026-09-30)
 
 - **Security:** `memgate serve` redacts the database URL it prints at startup: a password in the

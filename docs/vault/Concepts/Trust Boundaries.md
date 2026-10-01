@@ -29,7 +29,7 @@ memgate's guarantee is only as strong as the most trusted input an agent can inf
 
 | Input | Where it's used | Who supplies it today | What memgate checks | Status |
 | --- | --- | --- | --- | --- |
-| The shared secret | Every call to Hindsight (`HEADER_SECRET`) | memgate's client, held in-process | The validator refuses any call without it | **Sound if agents can't reach the process.** An agent whose tools run code in the same process could read it. Run memgate as its own service. |
+| The shared secret | Every call to Hindsight (`HEADER_SECRET`) | memgate's client, held in-process | The validator refuses any call without it | **Sound if agents can't reach the process.** An agent whose tools run code in the same process could read it. Run memgate as its own service. The server side must be started by `memgate serve`: Hindsight otherwise applies a `.env` found above its working directory over memgate's settings, which could drop the validator (closed in 0.3.2). |
 | Agent identity | recall, remember, keep_note, carry_out | The caller | Must be in the world: every decision about an unknown agent is refused (`Policy._known`, since 2026-09-30) | **Trusted input.** Must come from the host, never from the agent. |
 | Location | recall (what is readable), writes (what is labelled) | The caller | Must be in the world: every decision at an unknown location is refused, so a location missing from the world file can never bypass the write seal | **Trusted input.** The most important one: every read decision turns on it. Must come from the host. |
 | Participants | remember (the `with:` labels) | The caller | Writer must be among them (validator) | **Trusted input.** Who was present decides who can read later. Must come from the host. |

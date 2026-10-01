@@ -28,12 +28,12 @@ sig = "7e292a965b3b1097"
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "a042cfe7de9b7143"
+sig = "6a8d33fac061ff72"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/context.py"
-sig = "c3f8706279affb1f"
+sig = "b921fbf7a6aa85fa"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
@@ -508,7 +508,7 @@ sig = "fc7024f04f5ba0ac"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "a042cfe7de9b7143"
+sig = "6a8d33fac061ff72"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -553,12 +553,12 @@ sig = "65805f5240e82863"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/CHANGELOG.md"
-sig = "1c0fededdd66fec5"
+sig = "92ed78a2a1ea0f9c"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "55960c38dbc2d986"
+sig = "e42fa12f287035d0"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -583,7 +583,7 @@ sig = "7e292a965b3b1097"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/cli.py#cmd_serve"
-sig = "fca3f2560f6bde51"
+sig = "f1f9ee35baecd2a3"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -602,6 +602,11 @@ sig = "5364f419c55c5bd2"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
+target = "memgate/src/memgate/context.py#serve_fingerprint"
+sig = "b888fa980b85dc3e"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/world.py#Environment"
 sig = "654ab204da412950"
 
@@ -613,7 +618,7 @@ sig = "c161037c91c03766"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "plugins/memgate/skills/integrate-memgate/SKILL.md"
-sig = "041e64d61da8039e"
+sig = "f4c2b6cf8c9aed84"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
@@ -628,7 +633,7 @@ sig = "7ece2b720a1428c5"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "a042cfe7de9b7143"
+sig = "6a8d33fac061ff72"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
