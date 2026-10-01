@@ -17,8 +17,6 @@ from __future__ import annotations
 
 import json
 import time
-import urllib.error
-import urllib.request
 import uuid
 from dataclasses import dataclass
 
@@ -36,13 +34,10 @@ class Check:
 
 
 def _raw(url: str, method: str, path: str, body: dict | None, headers: dict) -> tuple[int, str]:
-    req = urllib.request.Request(f"{url}{path}", method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"Content-Type": "application/json", **headers})
-    try:
-        with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req, timeout=300) as r:   # never via a proxy
-            return r.status, r.read().decode(errors="replace")
-    except urllib.error.HTTPError as e:
-        return e.code, e.read().decode(errors="replace")
+    from memgate.adapters.hindsight.client import send      # http or unix, never via a proxy
+    status, raw = send(url, method, path, json.dumps(body).encode() if body is not None else None,
+                       {"Content-Type": "application/json", **headers}, 300)
+    return status, raw.decode(errors="replace")
 
 
 def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = None) -> list[Check]:

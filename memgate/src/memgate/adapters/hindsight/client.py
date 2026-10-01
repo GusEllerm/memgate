@@ -12,12 +12,21 @@ partition. Partitions can live on a server of their own (`partition_url`), for i
 `HindsightMemory` is synchronous (urllib, no dependencies); `AsyncHindsightMemory` is the same API
 for asyncio hosts (needs httpx: `pip install 'memgate[async]'`). Both share `_Core`, which holds
 every permission decision and does no I/O.
+
+A server address is `http://host:port` or `unix:/path/to/memgate.sock` (`memgate serve --socket`).
+Requests carry the shared secret, so they never go through a proxy, and over a socket the client
+first checks that the socket's directory is private and owned by this user: only this user could
+have created it, so nothing else can be listening there to collect the secret.
 """
 
 from __future__ import annotations
 
+import http.client
 import json
+import os
 import re
+import socket
+import stat
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -34,6 +43,57 @@ _BANK_IN_PATH = re.compile(r"^/v1/default/banks/([^/?]+)")
 # Requests carry memgate's shared secret, so they must never go through a proxy (urllib otherwise
 # honours HTTP_PROXY / HTTPS_PROXY from the environment, and a proxy would see the header).
 _DIRECT = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+
+def socket_path(base: str) -> str | None:
+    """The socket path of a `unix:` server address, or None for an http address."""
+    if not base.startswith("unix:"):
+        return None
+    path = base[len("unix:"):]
+    return "/" + path.lstrip("/") if path.startswith("//") else path
+
+
+def check_socket(path: str) -> None:
+    """Refuse a socket that someone other than this user could have created (PermissionError)."""
+    directory = os.path.dirname(os.path.abspath(path))
+    d = os.stat(directory)
+    if d.st_uid != os.getuid() or d.st_mode & 0o077:
+        raise PermissionError(f"refusing {path}: its directory must be private (0700) and owned by this user, "
+                              "so that nothing else can be listening there")
+    s = os.stat(path)
+    if not stat.S_ISSOCK(s.st_mode) or s.st_uid != os.getuid():
+        raise PermissionError(f"refusing {path}: not a socket owned by this user")
+
+
+class _UnixHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, path: str, timeout: float):
+        super().__init__("memgate", timeout=timeout)
+        self._path = path
+
+    def connect(self) -> None:
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.settimeout(self.timeout)
+        self.sock.connect(self._path)
+
+
+def send(base: str, method: str, path: str, body: bytes | None, headers: dict, timeout: float) -> tuple[int, bytes]:
+    """One HTTP request to a memgate server (http or unix address), never through a proxy."""
+    sock = socket_path(base)
+    if sock:
+        check_socket(sock)
+        conn = _UnixHTTPConnection(sock, timeout)
+        try:
+            conn.request(method, path, body=body, headers=headers)
+            r = conn.getresponse()
+            return r.status, r.read()
+        finally:
+            conn.close()
+    req = urllib.request.Request(f"{base}{path}", method=method, headers=headers, data=body)
+    try:
+        with _DIRECT.open(req, timeout=timeout) as r:
+            return r.status, r.read()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read()
 
 
 class HindsightError(RuntimeError):
@@ -164,15 +224,11 @@ class HindsightMemory(_Core):
 
     def _call(self, method: str, path: str, body: dict | None, *, agent: str | None = None,
               location: str | None = None, role: str = "agent") -> dict:
-        req = urllib.request.Request(f"{self._base_for(path)}{path}", method=method,
-                                     headers=self._headers(agent, location, role),
-                                     data=json.dumps(body).encode() if body is not None else None)
-        try:
-            with _DIRECT.open(req, timeout=self.timeout) as r:
-                raw = r.read()
-                return json.loads(raw) if raw else {}
-        except urllib.error.HTTPError as e:
-            raise HindsightError(e.code, e.read().decode(errors="replace")) from None
+        status, raw = send(self._base_for(path), method, path, json.dumps(body).encode() if body is not None else None,
+                           self._headers(agent, location, role), self.timeout)
+        if status >= 400:
+            raise HindsightError(status, raw.decode(errors="replace"))
+        return json.loads(raw) if raw else {}
 
     def create_bank(self) -> None:
         self._ensure(self.bank)
@@ -250,7 +306,20 @@ class AsyncHindsightMemory(_Core):
     def __init__(self, *args, **kwargs):
         import httpx
         super().__init__(*args, **kwargs)
-        self._http = httpx.AsyncClient(timeout=self.timeout, trust_env=False)    # never via a proxy (see _DIRECT)
+        self._httpx = httpx
+        self._clients: dict[str, object] = {}      # one per server address
+
+    def _client(self, base: str):
+        if base not in self._clients:
+            sock = socket_path(base)
+            transport = self._httpx.AsyncHTTPTransport(uds=sock) if sock else None
+            # trust_env=False: never via a proxy (see _DIRECT).
+            self._clients[base] = self._httpx.AsyncClient(timeout=self.timeout, trust_env=False, transport=transport)
+        return self._clients[base]
+
+    @property
+    def _http(self):
+        return self._client(self.base_url)
 
     async def __aenter__(self):
         return self
@@ -259,12 +328,19 @@ class AsyncHindsightMemory(_Core):
         await self.aclose()
 
     async def aclose(self) -> None:
-        await self._http.aclose()
+        for c in self._clients.values():
+            await c.aclose()
+        self._clients.clear()
 
     async def _call(self, method: str, path: str, body: dict | None, *, agent: str | None = None,
                     location: str | None = None, role: str = "agent") -> dict:
-        r = await self._http.request(method, f"{self._base_for(path)}{path}", headers=self._headers(agent, location, role),
-                                     content=json.dumps(body).encode() if body is not None else None)
+        base = self._base_for(path)
+        sock = socket_path(base)
+        if sock:
+            check_socket(sock)
+        r = await self._client(base).request(method, f"{'http://memgate' if sock else base}{path}",
+                                             headers=self._headers(agent, location, role),
+                                             content=json.dumps(body).encode() if body is not None else None)
         if r.status_code >= 400:
             raise HindsightError(r.status_code, r.text)
         return r.json() if r.content else {}

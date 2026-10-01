@@ -41,8 +41,9 @@ tags: [module, memgate, integration, knowledge-ranch]
   - `memgate check-world` (`check_world` in `memgate/src/memgate/worldcheck.py`): the world-file format, with every mistake reported. The ids `--ha--` are reserved.
   - `memgate conformance` (`run` in `memgate/src/memgate/conformance.py`): canaries in a throwaway bank on the live deployment, 15 checks (`split-scope` only with `--partition-url`), adapting to the host's world. Checks the world has no place for are skipped. The bank is deleted afterwards, and the exit code is non-zero on any failure.
   - `memgate secret`: a new shared secret.
+  - `memgate serve --socket` (since 0.4.0): serve on a Unix socket in a private directory instead of a port, the recommended deployment; clients and conformance take `unix:<path>`.
 - **Example:** `memgate/examples/quickstart.py` with `memgate/examples/world.json`.
-- **Release:** 0.3.2 (`memgate/CHANGELOG.md`). 0.3.1 and 0.3.2 are security patches: the printed database URL, and the `.env` bypass. 0.3.0 was made for the Knowledge Ranch plan (decision D15 in CHORUS's `docs/knowledge-ranch/design/memory.md`, drafted with the chorus-dev session). The server installs `memgate[hindsight]`, which pins Hindsight 0.10.1. The host installs the client alone, with `memgate[async]` for `AsyncHindsightMemory`. 0.3.0 added:
+- **Release:** 0.4.0 (`memgate/CHANGELOG.md`): the Unix-socket transport, and no proxies. 0.3.1 and 0.3.2 are security patches for the printed database URL and the `.env` bypass. All of these came from CHORUS's review rounds. 0.3.0 was made for the Knowledge Ranch plan (decision D15 in CHORUS's `docs/knowledge-ranch/design/memory.md`, drafted with the chorus-dev session). The server installs `memgate[hindsight]`, which pins Hindsight 0.10.1. The host installs the client alone, with `memgate[async]` for `AsyncHindsightMemory`. 0.3.0 added:
   - `carry_out(source=<Recalled>)`;
   - the async client;
   - a separate partition server (`partition_url`, and `memgate serve --scope`);

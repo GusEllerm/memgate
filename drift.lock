@@ -3,12 +3,12 @@ version = 1
 [[bindings]]
 doc = "docs/vault/Concepts/Permission Layer.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#AsyncHindsightMemory"
-sig = "9a7e23cb086e2f62"
+sig = "ff5bd5ae22013423"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Permission Layer.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "9970739ae4f313db"
+sig = "1c1dd21690841628"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
@@ -18,12 +18,12 @@ sig = "fffcea073ff9bb50"
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#AsyncHindsightMemory"
-sig = "9a7e23cb086e2f62"
+sig = "ff5bd5ae22013423"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "9970739ae4f313db"
+sig = "1c1dd21690841628"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
@@ -483,12 +483,12 @@ sig = "f9e8f1dc4a0f5550"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#AsyncHindsightMemory"
-sig = "9a7e23cb086e2f62"
+sig = "ff5bd5ae22013423"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "9970739ae4f313db"
+sig = "1c1dd21690841628"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -504,6 +504,16 @@ sig = "bf88f3ee6542be87"
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#_Core"
 sig = "fc7024f04f5ba0ac"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#check_socket"
+sig = "a7554c7a539fc9e7"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/client.py#send"
+sig = "afa018dff35a2adf"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -553,12 +563,12 @@ sig = "65805f5240e82863"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/CHANGELOG.md"
-sig = "14c3f38aee383e0e"
+sig = "b520fc4ff4ffa1c2"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "e42fa12f287035d0"
+sig = "686bf92289b82b84"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -573,17 +583,17 @@ sig = "f9e8f1dc4a0f5550"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#AsyncHindsightMemory"
-sig = "9a7e23cb086e2f62"
+sig = "ff5bd5ae22013423"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#HindsightMemory"
-sig = "9970739ae4f313db"
+sig = "1c1dd21690841628"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/cli.py#cmd_serve"
-sig = "f1f9ee35baecd2a3"
+sig = "d8155b434cd00746"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -618,7 +628,7 @@ sig = "c161037c91c03766"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "plugins/memgate/skills/integrate-memgate/SKILL.md"
-sig = "f4c2b6cf8c9aed84"
+sig = "1774437577a830b7"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"

@@ -44,12 +44,12 @@ Do not guess these. Ask the owner, give a recommendation, and record the answers
 
 ## 4. Deploy
 
-- Install the pinned release (v0.3.2), as two installs:
-  - the server, in its own environment: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.3.2#subdirectory=memgate"`;
+- Install the pinned release (v0.4.0), as two installs:
+  - the server, in its own environment: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.0#subdirectory=memgate"`;
   - the client, in the host: the same URL without `[hindsight]`, with `[async]` if the host is asyncio (`AsyncHindsightMemory`), otherwise use the sync client in `asyncio.to_thread`.
 - If high-assurance locations should be isolated on their own server, run a second `memgate serve --scope partitions` beside one with `--scope shared`, and pass `partition_url=` to the client. See the guide.
 - Generate the secret with `memgate secret` and store it where only the host can read it. Never put it where an agent process can see it.
-- Run `memgate serve` under the host's process supervision, bound to loopback, with the owner's LLM settings. The host process and the server must share `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
+- Run `memgate serve` under the host's process supervision, with the owner's LLM settings, on a Unix socket in a private directory (`--socket <0700 dir>/memgate.sock`, address `unix:<path>`), so no other process can pose as the server and collect the secret. Use a loopback port only if a socket is impossible. Run the host and the server as the same user. The host process and the server must share `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
 
 ## 5. One memory module in the host
 

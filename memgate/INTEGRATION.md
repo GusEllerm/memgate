@@ -70,9 +70,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.3.2#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.0#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.3.2#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.4.0#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
@@ -80,10 +80,12 @@ export MEMGATE_SECRET=$(memgate secret)                        # store it where 
 export MEMGATE_LLM_BASE_URL=https://your-llm/v1 MEMGATE_LLM_MODEL=your-model MEMGATE_LLM_API_KEY=...
 
 export MEMGATE_DB=pg0://memgate                                # or postgresql://... (needs vector and pg_trgm)
-memgate serve --port 8889                                      # Hindsight + memgate's validator, loopback only
+memgate serve --socket /srv/host/memgate-run/memgate.sock      # recommended: a Unix socket in a private (0700) dir
+# or: memgate serve --port 8889                                # a loopback port
 ```
 
 - **`memgate serve`** starts Hindsight with memgate's validator: the second lock, inside the store. It refuses a non-loopback bind unless you pass `--allow-remote`. It turns off Hindsight's LLM traces, which would hold memory content outside the partitions.
+- **Prefer a Unix socket** (`memgate serve --socket <dir>/memgate.sock`; clients use the address `unix:<dir>/memgate.sock`). The client sends the shared secret with every request, so it must know it is talking to memgate's server. Over a port, any local process that binds it first, or after the server stops, would receive the secret. Over a socket, the client checks before every request that the socket's directory is private (0700) and owned by the same user, so only that user's processes could have created it. `serve` creates the directory private, and refuses one that isn't. Socket paths are limited to about 100 bytes. Run the host and the server as the same user; in Docker, share the socket's directory as a volume between the two containers instead of using a network. Requests never go through an HTTP proxy, whichever transport you use.
 - **Always start Hindsight through `memgate serve`, never `hindsight-api` directly.** Hindsight applies the first `.env` it finds walking up from its working directory, over its environment. A stray or planted `.env` could drop the validator, change the database or turn traces on. `memgate serve` starts Hindsight in a private directory (`--workdir`; by default `.memgate-serve` beside the registry, mode 0700) holding an empty `.env`, and refuses to start if that file isn't empty. It also fingerprints every setting it forces, and the validator refuses to load (so Hindsight won't start) if any was changed. In a container, give that directory a volume or let `serve` create it, and don't add a `.env` to it.
 - **The LLM** is used by Hindsight to extract and consolidate memories (any OpenAI-compatible endpoint). **Embeddings** are local (BAAI/bge-small-en-v1.5 by default).
 - **The host process and the server must see the same three settings:** `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
@@ -99,7 +101,7 @@ from memgate import Context, Gate
 from memgate.adapters.hindsight import HindsightMemory
 
 gate = Gate.from_env()                                     # world (followed for changes), registry, secret
-mem = HindsightMemory(gate, bank="ranch", base_url="http://127.0.0.1:8889")
+mem = HindsightMemory(gate, bank="ranch", base_url="unix:/srv/host/memgate-run/memgate.sock")   # or http://127.0.0.1:8889
 mem.create_bank()
 
 ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # built by the host, from verified facts
@@ -129,7 +131,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 ## Verify
 
 1. `memgate check-world world.json`: the host's world file is usable.
-2. `memgate conformance --url http://127.0.0.1:8889`, with the same `MEMGATE_*` settings as the server; add `--partition-url` for a split deployment. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal), then deletes the bank. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
+2. `memgate conformance --url unix:/path/to/memgate.sock` (or an `http://` address), with the same `MEMGATE_*` settings as the server; add `--partition-url` for a split deployment. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal), then deletes the bank. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
 3. **Host-level tests memgate can't do for you:**
    - an agent's Context changes when it moves;
    - participants match who is really present;
@@ -144,7 +146,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.3.0)
+## Limits (0.4.0)
 
 - **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
 - **Identity and context verification are the host's** (see the contract).

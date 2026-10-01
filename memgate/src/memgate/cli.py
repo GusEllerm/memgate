@@ -92,7 +92,26 @@ def cmd_serve(args) -> int:
         print("serve needs the shared secret: MEMGATE_SECRET or --secret-file "
               f"(generate one with: python -c 'import secrets; print(secrets.token_urlsafe(32))')", file=sys.stderr)
         return 2
-    if args.host not in ("127.0.0.1", "localhost", "::1") and not args.allow_remote:
+    sock = None
+    if args.socket:
+        sock = Path(args.socket).resolve()
+        if len(str(sock).encode()) > 100:
+            print(f"socket path too long for the operating system ({len(str(sock))} bytes, at most 100): {sock}",
+                  file=sys.stderr)
+            return 2
+        sock.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        st = sock.parent.stat()
+        if st.st_uid != os.getuid() or st.st_mode & 0o077:
+            print(f"refusing to serve on {sock}: its directory must be private (0700) and owned by this user "
+                  f"(it is {oct(st.st_mode & 0o777)}). The directory is what proves the server's identity to "
+                  "the client.", file=sys.stderr)
+            return 2
+        if sock.is_socket():
+            sock.unlink()                                  # a stale socket from an earlier run
+        elif sock.exists():
+            print(f"refusing to serve on {sock}: something that isn't a socket is there", file=sys.stderr)
+            return 2
+    elif args.host not in ("127.0.0.1", "localhost", "::1") and not args.allow_remote:
         print(f"refusing to bind {args.host}: the memory store should only be reachable by memgate's host "
               "(pass --allow-remote if it sits behind the host's own network controls)", file=sys.stderr)
         return 2
@@ -143,9 +162,17 @@ def cmd_serve(args) -> int:
     env.update(forced)
     env["MEMGATE_SERVE_KEYS"] = ",".join(sorted(forced))
     env["MEMGATE_SERVE_FINGERPRINT"] = serve_fingerprint(env, list(forced))
-    print(f"memgate: Hindsight with the validator on http://{args.host}:{args.port} "
+    where = f"unix:{sock}" if sock else f"http://{args.host}:{args.port}"
+    print(f"memgate: Hindsight with the validator on {where} "
           f"(scope {args.scope}, database {redact_db_url(args.db)})", flush=True)
     os.chdir(workdir)
+    if sock:
+        # Hindsight's own launcher has no socket option; its ASGI app under uvicorn is the documented
+        # alternative (and what it runs itself with several workers). No TCP port is opened.
+        python = Path(binary).parent / "python"
+        python = str(python) if python.exists() else sys.executable
+        os.execve(python, [python, "-m", "uvicorn", "hindsight_api.server:app", "--uds", str(sock), "--ws", "wsproto",
+                           "--timeout-keep-alive", "30", "--timeout-graceful-shutdown", "5"], env)
     os.execve(binary, [binary], env)
     return 0  # not reached
 
@@ -185,6 +212,9 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--secret-file", help="file holding the shared secret (else MEMGATE_SECRET)")
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--allow-remote", action="store_true", help="allow binding a non-loopback address")
+    s.add_argument("--socket", default=_env("MEMGATE_SOCKET"),
+                   help="serve on this Unix socket instead of a port (its directory must be private, 0700); "
+                        "clients then use the address unix:<path>")
     s.add_argument("--port", type=int, default=int(_env("MEMGATE_PORT", "8889")))
     s.add_argument("--db", default=_env("MEMGATE_DB", "pg0://memgate"),
                    help="Hindsight database URL (pg0://name is an embedded Postgres)")

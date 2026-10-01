@@ -1,6 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 (2026-09-30)
+
+- **Unix-socket transport** (security: the server proves who it is). `memgate serve --socket PATH`
+  serves Hindsight on a Unix socket (Hindsight's ASGI app under uvicorn `--uds`; no TCP port). Clients
+  and `memgate conformance` take the address `unix:PATH`. Before every request over a socket, the
+  client checks the socket's directory is private (0700) and owned by this user, so nothing else can
+  be listening to collect the shared secret. Over a port, a process that binds it first could.
+  `serve` creates the directory private and refuses one that isn't. The async client uses httpx's
+  socket transport. Live: conformance passes over a socket. Requested by the CHORUS integration's
+  review.
 
 - **Security:** the clients and `memgate conformance` never send a request through a proxy. urllib
   honours `HTTP_PROXY` from the environment, and a proxy would see the shared secret in the request
