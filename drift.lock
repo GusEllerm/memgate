@@ -603,7 +603,7 @@ sig = "1edb5c833496a545"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "101942659f938892"
+sig = "590e22b0262d5add"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
