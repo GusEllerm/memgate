@@ -17,47 +17,92 @@
   "f3-0": {
    "id": "f3-0",
    "topic": "the key phrase for the bike lock",
-   "code": "WILLOW-6988"
+   "code": "WILLOW-6988",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code did bo3 provide for the bike lock?",
+    "indirect": "What was the code bo3 mentioned this morning for his ride's security device?"
+   }
   },
   "f3-1": {
    "id": "f3-1",
    "topic": "the name of the rescued cat",
-   "code": "MAPLE-5226"
+   "code": "MAPLE-5226",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What alphanumeric tag was assigned to the feline they rescued?",
+    "indirect": "What identifier did Dee give to the hallway animal she mentioned?"
+   }
   },
   "f3-2": {
    "id": "f3-2",
    "topic": "the recipe codeword for the cake contest",
-   "code": "HARBOR-7322"
+   "code": "HARBOR-7322",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the entry password for the cake contest?",
+    "indirect": "What is the alphanumeric identifier that Eli mentioned for the baking competition during our garden conversation?"
+   }
   },
   "f3-3": {
    "id": "f3-3",
    "topic": "the title chosen for the joint paper",
-   "code": "SAFFRON-6517"
+   "code": "SAFFRON-6517",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was assigned to the collaborative manuscript?",
+    "indirect": "What identifier did we decide on for our collaborative work that Eli mentioned during the garden conversation?"
+   }
   },
   "f3-4": {
    "id": "f3-4",
    "topic": "the codename for the field trip",
-   "code": "CEDAR-6347"
+   "code": "CEDAR-6347",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the secret identifier assigned to the upcoming excursion?",
+    "indirect": "What was the label we gave to the garden outing that we mentioned earlier today?"
+   }
   },
   "f3-5": {
    "id": "f3-5",
    "topic": "the password for the shared drive",
-   "code": "PIXEL-4459"
+   "code": "PIXEL-4459",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code to open the shared drive?",
+    "indirect": "What was the access code we talked about for the shared folder when we discussed uploading the photos?"
+   }
   },
   "f3-6": {
    "id": "f3-6",
    "topic": "the name of the prototype robot",
-   "code": "LUMEN-5668"
+   "code": "LUMEN-5668",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the model identifier of the prototype robot?",
+    "indirect": "What model did Ada refer to that assisted with the compost pile and gave a reminder about soil moisture?"
+   }
   },
   "f3-7": {
    "id": "f3-7",
    "topic": "the locker number for the spare keys",
-   "code": "QUILL-6637"
+   "code": "QUILL-6637",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code identifies the storage unit where the backup keys are kept?",
+    "indirect": "What is the code for the spare access items that were placed after the cleaning?"
+   }
   },
   "f3-8": {
    "id": "f3-8",
    "topic": "the name chosen for the new research project",
-   "code": "EMBER-2091"
+   "code": "EMBER-2091",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was assigned to the upcoming research initiative?",
+    "indirect": "What identifier was chosen for the new study that Ada mentioned after discussing the spare keys?"
+   }
   }
  },
  "conversations": [
@@ -114,7 +159,8 @@
      "speaker": "eli3",
      "text": "Same here\u2014just trying to wrap things up before the weekend."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-1",
@@ -172,7 +218,8 @@
      "speaker": "dee3",
      "text": "Good idea, she'll have a cozy spot while we work."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-2",
@@ -230,7 +277,8 @@
      "speaker": "eli3",
      "text": "Perfect. Good luck with the contest, and enjoy the garden while it lasts!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-3",
@@ -285,7 +333,8 @@
      "speaker": "eli3",
      "text": "I\u2019m hopeful; the data looks clean and the narrative feels fresh."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-4",
@@ -343,7 +392,8 @@
      "speaker": "cy3",
      "text": "Perfect, then we\u2019ll be ready for the trip."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-5",
@@ -401,7 +451,8 @@
      "speaker": "bo3",
      "text": "I did, they\u2019re beautiful. Maybe we can add a note about them in the report."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-6",
@@ -456,7 +507,8 @@
      "speaker": "cy3",
      "text": "Let\u2019s meet later and see how it works together."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-7",
@@ -516,7 +568,8 @@
      "speaker": "dee3",
      "text": "We should be fine. Let\u2019s meet by the whiteboard in ten minutes."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c3-8",
@@ -573,7 +626,12 @@
      "speaker": "eli3",
      "text": "Sounds like a plan. Let\u2019s reconvene after coffee and see where we stand."
     }
-   ]
+   ],
+   "carry_outs": []
   }
- ]
+ ],
+ "environments": {},
+ "location_env": {},
+ "high_assurance": [],
+ "notes": []
 }

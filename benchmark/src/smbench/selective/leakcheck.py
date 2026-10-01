@@ -2,6 +2,7 @@
 
     python -m smbench.selective.leakcheck lineage --banks sel-2026-09-29-memgate-w1 ...
     python -m smbench.selective.leakcheck answers --out results/selective/leakcheck-2026-09-29
+    python -m smbench.selective.leakcheck answers --out results/selective/leakcheck-indirect-2026-10-01 --probe indirect --sample 600
     python -m smbench.selective.leakcheck watch results/selective/leakcheck-2026-09-29   # live tally
 
 The probe runner counts a leak only when a fact's exact code is among the top-k recalled memories.
@@ -38,6 +39,7 @@ from pathlib import Path
 from openai import OpenAI
 
 from smbench.selective.dialogue import dataset_path
+from smbench.selective.questions import question_for
 from smbench.selective.world import World
 
 GATEWAY = "http://127.0.0.1:8411/v1"
@@ -188,13 +190,13 @@ class Checker:
     def check(self, row: dict) -> dict:
         w = self.world(row["run"], row["world"])
         f = w.facts[row["fact"]]
-        question = f"What is {f.topic}?"
+        question = question_for(w, row["fact"], self.args.probe)
         raw, pieces = self._recall(row, question)
         code = norm(f.code)
         answer = self._chat(self.args.model, ANSWER.format(agent=row["agent"], location=row["location"],
                                                            memory="\n".join(f"- {p}" for p in pieces) or "(nothing)",
                                                            question=question)).strip()
-        out = {**row, "question": question, "code": f.code, "response_has_code": code in norm(raw),
+        out = {**row, "probe": self.args.probe, "question": question, "code": f.code, "response_has_code": code in norm(raw),
                "pieces": len(pieces), "answer": answer, "answer_has_code": code in norm(answer)}
         if not row["expected"]:
             judged, label = "", None
@@ -220,7 +222,12 @@ def select(args) -> list[dict]:
         rows += [dict(r, control=True) for r in probes if r["system"] == "peragent" and r["hit"] and not r["expected"]]
     control = [r for r in rows if r.get("control")]
     keep = rng.sample(control, min(args.controls, len(control)))
-    return [r for r in rows if not r.get("control")] + keep
+    rows = [r for r in rows if not r.get("control")]
+    if args.sample:                      # a bounded re-check (e.g. with harder questions): must-not and should samples
+        must_not = [r for r in rows if not r["expected"]]
+        should = [r for r in rows if r["expected"]]
+        rows = rng.sample(must_not, min(args.sample, len(must_not))) + rng.sample(should, min(args.sample // 4, len(should)))
+    return rows + keep
 
 
 def summarise(done: list[dict]) -> dict:
@@ -262,6 +269,10 @@ def main() -> None:
     ap.add_argument("--model", default=ANSWER_MODEL)
     ap.add_argument("--judge", default=JUDGE_MODEL)
     ap.add_argument("--limit", type=int, default=0, help="stop after this many (smoke tests)")
+    ap.add_argument("--probe", choices=["direct", "paraphrase", "indirect"], default="direct",
+                    help="question style (paraphrase and indirect need questions.py to have run on the worlds)")
+    ap.add_argument("--sample", type=int, default=0,
+                    help="check a random sample of this many memgate must-not probes (plus a quarter as many should probes)")
     wp = sub.add_parser("watch")
     wp.add_argument("out", type=Path)
     wp.add_argument("--every", type=float, default=10)

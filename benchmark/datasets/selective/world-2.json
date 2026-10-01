@@ -17,47 +17,92 @@
   "f2-0": {
    "id": "f2-0",
    "topic": "the name chosen for the new research project",
-   "code": "RIDGE-9358"
+   "code": "RIDGE-9358",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designated code for the new research project?",
+    "indirect": "What is the designation that was selected for the new initiative mentioned when Fay discussed the environmental angle during the lab conversation?"
+   }
   },
   "f2-1": {
    "id": "f2-1",
    "topic": "the password for the old archive",
-   "code": "GARNET-7793"
+   "code": "GARNET-7793",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the previous archive?",
+    "indirect": "What was the code Eli mentioned that we might need later for the old records?"
+   }
   },
   "f2-2": {
    "id": "f2-2",
    "topic": "the code for the storeroom",
-   "code": "PIXEL-6929"
+   "code": "PIXEL-6929",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the storage room?",
+    "indirect": "What is the access string Eli provided for the place where I can get the extra pots?"
+   }
   },
   "f2-3": {
    "id": "f2-3",
    "topic": "the room booked for the secret party",
-   "code": "NECTAR-9689"
+   "code": "NECTAR-9689",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designation for the covert celebration venue?",
+    "indirect": "What code did Dee mention for the gathering they were organizing?"
+   }
   },
   "f2-4": {
    "id": "f2-4",
    "topic": "the locker number for the spare keys",
-   "code": "QUILL-9444"
+   "code": "QUILL-9444",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the spare key storage?",
+    "indirect": "What is the code you gave me for the shed's spare set?"
+   }
   },
   "f2-5": {
    "id": "f2-5",
    "topic": "the name picked for the garden pond",
-   "code": "ZEPHYR-8449"
+   "code": "ZEPHYR-8449",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What designation was given to the garden pond?",
+    "indirect": "What label did we choose for the water feature we talked about earlier in the conversation?"
+   }
   },
   "f2-6": {
    "id": "f2-6",
    "topic": "the recipe codeword for the cake contest",
-   "code": "FROST-6747"
+   "code": "FROST-6747",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the secret phrase used in the cake contest?",
+    "indirect": "What was the secret phrase Fay mentioned for the bake\u2011off?"
+   }
   },
   "f2-7": {
    "id": "f2-7",
    "topic": "the name of the prototype robot",
-   "code": "HARBOR-4634"
+   "code": "HARBOR-4634",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What designation was assigned to the prototype robot?",
+    "indirect": "What identifier did Eli give for the testing unit we talked about earlier?"
+   }
   },
   "f2-8": {
    "id": "f2-8",
    "topic": "the name of the rescued cat",
-   "code": "COBALT-6319"
+   "code": "COBALT-6319",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designation assigned to the rescued cat?",
+    "indirect": "What was the identifier given to the feline mentioned earlier in the conversation?"
+   }
   }
  },
  "conversations": [
@@ -117,7 +162,8 @@
      "speaker": "fay2",
      "text": "Sounds good. Let\u2019s catch up later and see how the samples look."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-1",
@@ -172,7 +218,8 @@
      "speaker": "eli2",
      "text": "Count me in. I'll bring the fresh mint from the herb patch."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-2",
@@ -230,7 +277,8 @@
      "speaker": "eli2",
      "text": "I'm looking forward to the harvest. Maybe we can have a little tasting later."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-3",
@@ -288,7 +336,8 @@
      "speaker": "fay2",
      "text": "Sounds perfect. I'll finish up the data entry and then we can head over."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-4",
@@ -346,7 +395,8 @@
      "speaker": "dee2",
      "text": "It's thriving, the leaves are a lovely shade of green."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-5",
@@ -404,7 +454,8 @@
      "speaker": "fay2",
      "text": "Great idea, it'll make the water edge even more lively."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-6",
@@ -459,7 +510,8 @@
      "speaker": "fay2",
      "text": "We should bring some fresh herbs to the potluck later."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-7",
@@ -519,7 +571,8 @@
      "speaker": "fay2",
      "text": "Sounds like a plan. See you in a few!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c2-8",
@@ -580,7 +633,12 @@
      "speaker": "dee2",
      "text": "Me too, maybe we can schedule a demo after lunch."
     }
-   ]
+   ],
+   "carry_outs": []
   }
- ]
+ ],
+ "environments": {},
+ "location_env": {},
+ "high_assurance": [],
+ "notes": []
 }

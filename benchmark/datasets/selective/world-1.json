@@ -17,47 +17,92 @@
   "f1-0": {
    "id": "f1-0",
    "topic": "the name of the rescued cat",
-   "code": "PIXEL-4584"
+   "code": "PIXEL-4584",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What designation was given to the cat that was rescued?",
+    "indirect": "What was the identifier mentioned for the animal that cy1 helped with last week in the shelter?"
+   }
   },
   "f1-1": {
    "id": "f1-1",
    "topic": "the password for the old archive",
-   "code": "HARBOR-2638"
+   "code": "HARBOR-2638",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the secret code needed to unlock the old archive?",
+    "indirect": "What was the code Dee gave for the old storage?"
+   }
   },
   "f1-2": {
    "id": "f1-2",
    "topic": "the label on the sealed crate",
-   "code": "ORBIT-9205"
+   "code": "ORBIT-9205",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier is displayed on the sealed crate?",
+    "indirect": "What was the alphanumeric identifier on the box we talked about in the garden when discussing the new shipment?"
+   }
   },
   "f1-3": {
    "id": "f1-3",
    "topic": "the name chosen for the new research project",
-   "code": "GARNET-9181"
+   "code": "GARNET-9181",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designation given to the new research project?",
+    "indirect": "What is the code that Eli mentioned for the new initiative discussed earlier?"
+   }
   },
   "f1-4": {
    "id": "f1-4",
    "topic": "the key phrase for the bike lock",
-   "code": "FROST-4977"
+   "code": "FROST-4977",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the combination needed to unlock the bike?",
+    "indirect": "What was the code we discussed for securing the thing you ride?"
+   }
   },
   "f1-5": {
    "id": "f1-5",
    "topic": "the call sign for the radio test",
-   "code": "QUILL-7788"
+   "code": "QUILL-7788",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designated code for the radio test?",
+    "indirect": "What was the identifier we mentioned for the transmission trial?"
+   }
   },
   "f1-6": {
    "id": "f1-6",
    "topic": "the locker number for the spare keys",
-   "code": "WILLOW-7014"
+   "code": "WILLOW-7014",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference code for the spare keys storage unit?",
+    "indirect": "What code did Eli provide for the spare lock access?"
+   }
   },
   "f1-7": {
    "id": "f1-7",
    "topic": "the recipe codeword for the cake contest",
-   "code": "COBALT-9330"
+   "code": "COBALT-9330",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the secret code assigned to the bake\u2011off?",
+    "indirect": "What was the identifier we mentioned for the bake\u2011off in our cafe conversation?"
+   }
   },
   "f1-8": {
    "id": "f1-8",
    "topic": "the nickname for the new telescope",
-   "code": "RIDGE-2768"
+   "code": "RIDGE-2768",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What informal designation was assigned to the new telescope?",
+    "indirect": "What was the label they assigned to the new observing instrument we discussed during the cafe conversation?"
+   }
   }
  },
  "conversations": [
@@ -114,7 +159,8 @@
      "speaker": "fay1",
      "text": "That sounds wonderful; let us know how it goes. I might join you for a walk afterward."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-1",
@@ -168,7 +214,8 @@
      "speaker": "dee1",
      "text": "Sounds like a plan. See you soon!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-2",
@@ -223,7 +270,8 @@
      "speaker": "fay1",
      "text": "Let\u2019s finish watering the herbs and then see what the crate holds."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-3",
@@ -282,7 +330,8 @@
      "speaker": "bo1",
      "text": "We should all share a salad from the garden soon. It'll be a nice end to the day."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-4",
@@ -340,7 +389,8 @@
      "speaker": "eli1",
      "text": "Sounds wonderful. Let\u2019s catch up later and swap stories over another coffee."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-5",
@@ -394,7 +444,8 @@
      "speaker": "ada1",
      "text": "Exactly. Let\u2019s order another round of drinks and keep the conversation going."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-6",
@@ -453,7 +504,8 @@
      "speaker": "eli1",
      "text": "Looking forward to it. Let's grab another round of coffee before we head out."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-7",
@@ -513,7 +565,8 @@
      "speaker": "fay1",
      "text": "Sounds perfect, see you then."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c1-8",
@@ -574,7 +627,12 @@
      "speaker": "ada1",
      "text": "We should all grab a slice after work and compare notes."
     }
-   ]
+   ],
+   "carry_outs": []
   }
- ]
+ ],
+ "environments": {},
+ "location_env": {},
+ "high_assurance": [],
+ "notes": []
 }

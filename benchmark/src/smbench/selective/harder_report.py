@@ -20,8 +20,16 @@ RUNS = {
                          "peragent": "sel-env-indirect-baselines-{d}"}},
     "large": {"direct": {s: "sel-large-2026-09-29" for s in ("memgate", "nofilter", "peragent")},
               "paraphrase": {s: "sel-large-paraphrase-{d}" for s in ("memgate", "nofilter", "peragent")},
-              "indirect": {s: "sel-large-indirect-{d}" for s in ("memgate", "nofilter", "peragent")}},
+              "indirect": {s: "sel-large-indirect-{d}" for s in ("memgate", "nofilter", "peragent")},
+              "multi": {s: "sel-large-multi-{d}" for s in ("memgate", "nofilter", "peragent")}},
 }
+RUNS["env"]["multi"] = {"memgate": "sel-env-multi-memgate-{d}", "nofilter": "sel-env-multi-baselines-{d}",
+                       "peragent": "sel-env-multi-baselines-{d}"}
+# The same worlds on Mem0 (systems_mem0.py): ingested once per system, then re-probed per style.
+for style in ("direct", "paraphrase", "indirect", "multi"):
+    for sysname in ("mem0-nofilter", "mem0-peragent", "mem0-memgate"):
+        RUNS["env"].setdefault(style, {})[sysname] = (f"sel-env-{sysname}-{{d}}" if style == "direct"
+                                                      else f"sel-env-{sysname}-{style}-{{d}}")
 
 
 def main() -> None:
@@ -38,14 +46,15 @@ def main() -> None:
                 s = json.loads(path.read_text())[system]
                 out["sizes"].setdefault(size, {}).setdefault(style, {})[system] = {
                     "run": run.format(d=args.date), "overall": s["overall"],
-                    "by_kind": {k[5:]: v for k, v in s.items() if k.startswith("kind:")}}
+                    "by_kind": {k[5:]: v for k, v in s.items() if k.startswith("kind:")},
+                    "by_pair": {k[5:]: v for k, v in s.items() if k.startswith("pair:")}}
     dest = Path("reports") / f"selective-harder-{args.date}.json"
     dest.write_text(json.dumps(out, indent=1))
     for size, styles in out["sizes"].items():
         for style, systems in styles.items():
             for system, r in systems.items():
                 o = r["overall"]
-                print(f"{size:5} {style:10} {system:9} leak {o['leak_rate']:.1%} ({o['leaks']}/{o['must_not']})  "
+                print(f"{size:5} {style:10} {system:13} leak {o['leak_rate']:.1%} ({o['leaks']}/{o['must_not']})  "
                       f"recall@20 {o['recall']:.1%}  @5 {o['recall_at_5']:.1%}  ({o['should']} should)")
     print(f"wrote {dest}")
 

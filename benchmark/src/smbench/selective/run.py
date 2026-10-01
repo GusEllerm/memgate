@@ -36,6 +36,15 @@ def make_system(name: str, run: str, args):
     if name == "memgate":
         from memgate.context import Gate
         return systems.Memgate(args.gated, run, Gate.from_env())
+    if name.startswith("mem0-"):                       # needs the mem0 environment (systems_mem0.py)
+        from smbench.selective import systems_mem0
+        if name == "mem0-nofilter":
+            return systems_mem0.Mem0NoFilter(run)
+        if name == "mem0-peragent":
+            return systems_mem0.Mem0PerAgent(run)
+        if name == "mem0-memgate":
+            from memgate.context import Gate
+            return systems_mem0.Mem0Memgate(run, Gate.from_env())
     raise ValueError(name)
 
 
@@ -49,11 +58,60 @@ def probe(system, world, agent, loc, fid, k, style: str = "direct") -> dict:
             "scenario": scenario, "probe": style, "rank": rank, "hit": rank is not None, "n_retrieved": len(texts)}
 
 
+MULTI = """I need two things. First: {q1} Second: {q2}"""
+
+
+def multi_probes(world, exp: dict, rng, per_pair: int = 6) -> list[tuple[str, str, str, str]]:
+    """Pairs of facts asked about in one question, per (agent, location): up to `per_pair` of them, spread
+    over both-should, mixed and both-must-not pairs (a question that may be answered in part)."""
+    out = []
+    facts = list(world.facts)
+    for agent in world.agents:
+        for loc in world.locations:
+            should = [f for f in facts if exp[(agent, loc, f)]]
+            must_not = [f for f in facts if not exp[(agent, loc, f)]]
+            kinds = []
+            if len(should) >= 2:
+                kinds += [("both-should", should, should)] * (per_pair // 3)
+            if should and must_not:
+                kinds += [("mixed", should, must_not)] * (per_pair // 3)
+            if len(must_not) >= 2:
+                kinds += [("both-must-not", must_not, must_not)] * (per_pair - 2 * (per_pair // 3))
+            seen = set()
+            for _, a, b in kinds:
+                for _ in range(10):
+                    f1, f2 = rng.choice(a), rng.choice(b)
+                    if f1 != f2 and (f1, f2) not in seen and (f2, f1) not in seen:
+                        seen.add((f1, f2))
+                        out.append((agent, loc, f1, f2))
+                        break
+    return out
+
+
+def probe_pair(system, world, agent, loc, f1, f2, k, exp: dict) -> list[dict]:
+    """One question about two facts; one row per fact, so leak and recall count per fact as usual."""
+    question = MULTI.format(q1=question_for(world, f1, "paraphrase"), q2=question_for(world, f2, "paraphrase"))
+    texts = system.recall(world, agent, loc, question, k)
+    pair_type = {(True, True): "both-should", (False, False): "both-must-not"}.get((exp[(agent, loc, f1)], exp[(agent, loc, f2)]), "mixed")
+    rows = []
+    for fid in (f1, f2):
+        f = world.facts[fid]
+        scenario = next((c.scenario for c in world.conversations if fid in c.facts), "S5")
+        rank = next((i + 1 for i, t in enumerate(texts) if f.code in t), None)
+        rows.append({"system": system.name, "world": world.seed, "agent": agent, "location": loc, "fact": fid,
+                     "scenario": scenario, "probe": "multi", "pair": f"{f1}+{f2}", "pair_type": pair_type,
+                     "rank": rank, "hit": rank is not None, "n_retrieved": len(texts)})
+    return rows
+
+
 def summarise(rows: list[dict]) -> dict:
     out: dict = {}
     groups = defaultdict(list)
     for r in rows:
-        for key in [("overall",), ("kind", r["kind"]), ("scenario", r["scenario"])]:
+        keys = [("overall",), ("kind", r["kind"]), ("scenario", r["scenario"])]
+        if r.get("pair_type"):
+            keys.append(("pair", r["pair_type"]))
+        for key in keys:
             groups[(r["system"],) + key].append(r)
     for key, rs in sorted(groups.items()):
         must_not = [r for r in rs if not r["expected"]]
@@ -75,14 +133,16 @@ def main() -> None:
     p.add_argument("--seeds", type=int, nargs="+", default=[1, 2, 3])
     p.add_argument("--size", choices=["small", "large", "env"], default="small")
     p.add_argument("--ingest-workers", type=int, default=4, help="stores in flight at once (the gateway still caps ALCF at 6)")
-    p.add_argument("--systems", nargs="+", default=["nofilter", "peragent", "memgate"])
+    p.add_argument("--systems", nargs="+", default=["nofilter", "peragent", "memgate"],
+                   help="Hindsight: nofilter peragent memgate; Mem0 (run in .venvs/mem0): mem0-nofilter mem0-peragent mem0-memgate")
     p.add_argument("--k", type=int, default=20)
     p.add_argument("--hindsight", default="http://127.0.0.1:8888")
     p.add_argument("--gated", default="http://127.0.0.1:8890")
     p.add_argument("--skip-ingest", action="store_true")
     p.add_argument("--banks-from", help="probe the banks of this earlier run (implies --skip-ingest); results go to --run")
-    p.add_argument("--probe", choices=["direct", "paraphrase", "indirect"], default="direct",
-                   help="question style: direct names the topic; paraphrase and indirect come from questions.py")
+    p.add_argument("--probe", choices=["direct", "paraphrase", "indirect", "multi"], default="direct",
+                   help="question style: direct names the topic; paraphrase and indirect come from questions.py; "
+                        "multi asks about two facts at once (their paraphrases), sampled per agent and location")
     args = p.parse_args()
     if args.banks_from:
         args.skip_ingest = True
@@ -112,8 +172,20 @@ def main() -> None:
             ha = [j for j in exp if j[1] in w.high_assurance]
             rest = [j for j in exp if j[1] not in w.high_assurance]
             before = s.snapshot(w) if ha and hasattr(s, "snapshot") else None
+            if args.probe == "multi":
+                import random
+                pairs = multi_probes(w, exp, random.Random(w.seed))
+                ha = [j for j in pairs if j[1] in w.high_assurance]
+                rest = [j for j in pairs if j[1] not in w.high_assurance]
             for batch in (ha, rest):
                 with ThreadPoolExecutor(6) as pool:
+                    if args.probe == "multi":
+                        for pair_rows in pool.map(lambda j: probe_pair(s, w, *j, args.k, exp), batch):
+                            for row in pair_rows:
+                                row["expected"] = exp[(row["agent"], row["location"], row["fact"])]
+                                row["kind"] = oracle.probe_kind(w, row["agent"], row["location"], row["fact"])
+                                rows.append(row)
+                        continue
                     for (a, l, f), row in zip(batch, pool.map(lambda j: probe(s, w, *j, args.k, args.probe), batch)):
                         row["expected"] = exp[(a, l, f)]
                         row["kind"] = oracle.probe_kind(w, a, l, f)

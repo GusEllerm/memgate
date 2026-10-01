@@ -1,0 +1,315 @@
+{
+ "control:peragent": {
+  "kind:carry-refused-fact": {
+   "must_not": 3,
+   "response_has_code": 3,
+   "answer_has_code": 1,
+   "VALUE": 1,
+   "HINT": 0,
+   "NONE": 2,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:carry-refused-ha": {
+   "must_not": 1,
+   "response_has_code": 1,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 1,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:carry-refused-opinion": {
+   "must_not": 1,
+   "response_has_code": 1,
+   "answer_has_code": 1,
+   "VALUE": 1,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:ha-witness-outside": {
+   "must_not": 3,
+   "response_has_code": 3,
+   "answer_has_code": 3,
+   "VALUE": 3,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:witness-elsewhere": {
+   "must_not": 92,
+   "response_has_code": 92,
+   "answer_has_code": 74,
+   "VALUE": 74,
+   "HINT": 0,
+   "NONE": 18,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "overall": {
+   "must_not": 100,
+   "response_has_code": 100,
+   "answer_has_code": 79,
+   "VALUE": 79,
+   "HINT": 0,
+   "NONE": 21,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "run:sel-2026-09-29": {
+   "must_not": 12,
+   "response_has_code": 12,
+   "answer_has_code": 11,
+   "VALUE": 11,
+   "HINT": 0,
+   "NONE": 1,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "run:sel-env-2026-09-29": {
+   "must_not": 17,
+   "response_has_code": 17,
+   "answer_has_code": 10,
+   "VALUE": 10,
+   "HINT": 0,
+   "NONE": 7,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "run:sel-large-2026-09-29": {
+   "must_not": 71,
+   "response_has_code": 71,
+   "answer_has_code": 58,
+   "VALUE": 58,
+   "HINT": 0,
+   "NONE": 13,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  }
+ },
+ "memgate": {
+  "kind:carried-fact": {
+   "must_not": 0,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 5,
+   "answer_recall": 0.2
+  },
+  "kind:carried-opinion": {
+   "must_not": 0,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 14,
+   "answer_recall": 0.2857
+  },
+  "kind:carry-refused-fact": {
+   "must_not": 4,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 4,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:carry-refused-ha": {
+   "must_not": 4,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 4,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:carry-refused-opinion": {
+   "must_not": 1,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 1,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:ha-witness-inside": {
+   "must_not": 0,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 8,
+   "answer_recall": 0.625
+  },
+  "kind:ha-witness-outside": {
+   "must_not": 18,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 18,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:non-witness": {
+   "must_not": 299,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 299,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:note-elsewhere": {
+   "must_not": 4,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 4,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:note-other-agent": {
+   "must_not": 33,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 33,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:retold-to-newcomer": {
+   "must_not": 0,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 1,
+   "answer_recall": 1.0
+  },
+  "kind:untold-to-newcomer": {
+   "must_not": 3,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 3,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:witness-elsewhere": {
+   "must_not": 234,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 234,
+   "unjudged": 0,
+   "should": 0,
+   "answer_recall": null
+  },
+  "kind:witness-here": {
+   "must_not": 0,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 0,
+   "unjudged": 0,
+   "should": 122,
+   "answer_recall": 0.8852
+  },
+  "overall": {
+   "must_not": 600,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 600,
+   "unjudged": 0,
+   "should": 150,
+   "answer_recall": 0.7933
+  },
+  "run:sel-2026-09-29": {
+   "must_not": 75,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 75,
+   "unjudged": 0,
+   "should": 18,
+   "answer_recall": 1.0
+  },
+  "run:sel-env-2026-09-29": {
+   "must_not": 252,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 252,
+   "unjudged": 0,
+   "should": 53,
+   "answer_recall": 0.5472
+  },
+  "run:sel-large-2026-09-29": {
+   "must_not": 273,
+   "response_has_code": 0,
+   "answer_has_code": 0,
+   "VALUE": 0,
+   "HINT": 0,
+   "NONE": 273,
+   "unjudged": 0,
+   "should": 79,
+   "answer_recall": 0.9114
+  }
+ },
+ "settings": {
+  "probe": "indirect",
+  "sample": "600 memgate must-not + 150 should, random over the small, large and env runs of 2026-09-29; 100 per-agent leaks as positive control",
+  "answer_model": "openai/gpt-oss-120b",
+  "judge_model": "nemotron-3-ultra",
+  "recall_include": [
+   "entities",
+   "chunks",
+   "source_facts",
+   "trace"
+  ]
+ }
+}

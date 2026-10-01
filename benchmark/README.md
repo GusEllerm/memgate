@@ -8,7 +8,7 @@ Benchmarks for **selective agent memory**: memory where the agent's context (who
 | --- | --- |
 | ALCF gateway (6-request cap, token, retries, request log) | built, tested against a fake upstream |
 | Memory-system adapters | Hindsight, Mem0, memgate (labels on); Falda and AgentCore not started |
-| Selective-memory benchmark (worlds, Cedar oracle, suites S1–S5, harder probes, answer-level leak check) | built and run; S6–S7 to come |
+| Selective-memory benchmark (worlds, Cedar oracle, suites S1–S5, harder probes incl. multi-fact, answer-level leak check) | built and run on Hindsight and on Mem0 (`systems_mem0.py`, in `.venvs/mem0`); S6–S7 to come |
 | Efficacy runs | LoCoMo full (Hindsight, Mem0; memgate labels on/off); LongMemEval not started |
 | Speed (Cedar decisions, 1k–1M label sets) | built and run (`smbench.speed.cedar`); filtered search and partition fan-out not started |
 
