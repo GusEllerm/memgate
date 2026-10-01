@@ -127,3 +127,26 @@ def test_prov_json_export(log, registry):
     assert {"prov:generatedEntity": "mg:w_cy", "prov:usedEntity": "mg:w_abc"} in doc["wasDerivedFrom"].values()
     assert "mg:agent-cy" in doc["agent"]
     assert "prov:value" in log.export_prov(include_text=True)["entity"]["mg:w_ab"]
+
+
+def test_a_write_recorded_again_replaces_itself(log, registry):
+    ab = conversation_labels("lab", ["ada", "bo"])
+    write(log, registry, "w_old", "ada", "lab", ab, "source one")
+    write(log, registry, "w_new", "ada", "lab", ab, "source two")
+    write(log, registry, "w_seg", "ada", "lab", ab, "draft", kind="conversation", derived_from=["w_old"])
+    write(log, registry, "w_seg", "bo", "lab", ab, "final", kind="conversation", derived_from=["w_new"])
+    with sqlite3.connect(log._path("shared")) as db:
+        assert db.execute("SELECT author, text FROM entity WHERE id = 'w_seg'").fetchall() == [("bo", "final")]
+    assert log.sources_of("w_seg", ["shared"]) == ["w_new"]              # the old sources are gone
+    assert log.descendants("w_old") == []
+    assert log.descendants("w_new") == [("w_seg", 1)]
+
+
+def test_write_ids_carry_their_label_set():
+    from memgate.provenance import write_id_for, write_id_label_set
+    ls = conversation_labels("lab", ["ada", "bo"]).id
+    assert write_id_for(ls, "k") == write_id_for(ls, "k") != write_id_for(ls, "j")
+    assert write_id_for(ls) != write_id_for(ls)
+    assert write_id_label_set(write_id_for(ls, "k")) == ls == write_id_label_set(write_id_for(ls))
+    assert write_id_label_set("w_0123456789abcdef") is None                # the pre-0.4.1 form
+    assert write_id_label_set("ls_x") is None and write_id_label_set("w_ls__") is None

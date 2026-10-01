@@ -200,3 +200,25 @@ def test_validator_refuses_to_run_if_serves_settings_were_changed(validator, mon
     monkeypatch.setenv("HINDSIGHT_API_LLM_TRACE_ENABLED", "true")         # what a hostile .env would do
     with pytest.raises(RuntimeError, match="changed after start"):
         MemgateValidator()
+
+
+# -- a reused write ID stays within its label set ------------------------------------------------------
+def test_retain_refuses_update_mode(validator):
+    ls = validator.gate.registry.register(personal_labels("ada"))
+    for mode in ("append", "replace"):
+        item = {"content": "x", "tags": [ls], "update_mode": mode}
+        ctx = RetainContext(bank_id=BANK, contents=[item], request_context=rc("ada", "lab"))
+        assert not run(validator.validate_retain(ctx)).allowed
+
+
+def test_retain_refuses_a_write_id_minted_under_another_label_set(validator):
+    from memgate.provenance import write_id_for
+    mine = validator.gate.registry.register(personal_labels("ada"))
+    theirs = validator.gate.registry.register(conversation_labels("lab", ["bo", "dee"]))
+    for doc, ok in [(write_id_for(mine, "k"), True), (write_id_for(mine), True), (None, True),
+                    (write_id_for(theirs, "k"), False), ("w_0123456789abcdef", False), ("anything", False)]:
+        item = {"content": "x", "tags": [mine]}
+        if doc is not None:
+            item["document_id"] = doc
+        ctx = RetainContext(bank_id=BANK, contents=[item], request_context=rc("ada", "lab"))
+        assert run(validator.validate_retain(ctx)).allowed is ok, doc

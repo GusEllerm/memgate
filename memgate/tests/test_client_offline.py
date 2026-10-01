@@ -1,6 +1,7 @@
 """The clients' decisions and routing, with the transport replaced by a recorder (no server needed)."""
 
 import asyncio
+import sqlite3
 
 import pytest
 
@@ -150,3 +151,24 @@ def test_requests_never_go_through_a_proxy(gate, monkeypatch):
     assert seen == []                                     # ...and the proxy never saw the secret
     pytest.importorskip("httpx")
     assert AsyncHindsightMemory(gate, bank="b")._http._trust_env is False
+
+
+def test_a_key_makes_a_write_repeatable_within_its_label_set(world, registry, tmp_path):
+    from memgate.provenance import ProvenanceLog, write_id_label_set
+    gate = Gate(world, registry, "s")
+    log = ProvenanceLog(tmp_path, gate)
+    mem, rec = sync_client(gate, provenance=log)
+    ctx = Context("ada", "lab", ("ada", "bo"))
+    first = mem.remember(ctx, "draft", key="segment-7")
+    again = mem.remember(ctx, "final", key="segment-7")
+    assert first == again                                                   # the same key: the same write
+    assert write_id_label_set(first) == ctx.conversation().id              # the ID carries its label set
+    assert [b["items"][0]["document_id"] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")] == [first, first]
+    other = mem.remember(Context("ada", "lab", ("ada", "cy")), "final", key="segment-7")
+    assert other != first                                                   # another label set: another write
+    note = mem.keep_note(Context("ada", "lab"), "mine", key="segment-7")
+    assert write_id_label_set(note) != write_id_label_set(first)
+    assert mem.remember(ctx, "x") != mem.remember(ctx, "x")                # no key: every write is new
+    assert write_id_label_set(mem.remember(ctx, "x")) == ctx.conversation().id
+    with sqlite3.connect(tmp_path / "provenance-shared.sqlite") as db:
+        assert db.execute("SELECT text FROM entity WHERE id = ?", (first,)).fetchall() == [("final",)]

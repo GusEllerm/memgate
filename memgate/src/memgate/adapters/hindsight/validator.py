@@ -8,8 +8,9 @@ Load it in the Hindsight server with:
 
 Only memgate holds the secret; agents never call Hindsight directly. Even so, the validator trusts
 nothing but the caller's identity: it recomputes the allowed label sets itself and overwrites every
-recall's tags with them, checks every retained item's label set, and refuses the operations that
-read around the tag filter (reflect, mental models, raw memory listing, export).
+recall's tags with them, checks every retained item's label set (and that a reused write ID stays
+within it), and refuses the operations that read around the tag filter (reflect, mental models, raw
+memory listing, export).
 """
 
 from __future__ import annotations
@@ -34,6 +35,7 @@ import os
 
 from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Gate, partition_location,
                              serve_fingerprint)
+from memgate.provenance import write_id_label_set
 
 NO_MATCH = "ls_none"  # a tag no item carries: recall returns nothing
 
@@ -125,6 +127,13 @@ class MemgateValidator(OperationValidatorExtension):
                 return ValidationResult.reject("each item needs exactly one registered label-set tag")
             if item.get("observation_scopes") not in (None, "combined"):
                 return ValidationResult.reject("observation scopes that widen beyond a label set are not allowed")
+            # A document_id names the document this write replaces (Hindsight upserts by it), so it must
+            # have been minted under this same label set; and an append would fold the existing document's
+            # text into this write, re-extracting it under this write's label set.
+            if item.get("update_mode") is not None:
+                return ValidationResult.reject("update_mode is not allowed: it would fold another document into this write")
+            if (doc := item.get("document_id")) is not None and write_id_label_set(doc) != tags[0]:
+                return ValidationResult.reject("a write ID must carry the label set it is written under")
             ha = {l for l in known[tags[0]].locs if self.gate.world.high_assurance(l)}
             if (part is None and ha) or (part is not None and part not in ha):
                 return ValidationResult.reject("memory stored in the wrong partition for its high-assurance label")

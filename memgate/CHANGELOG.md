@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.1 (2026-10-01)
+
+- **Idempotent writes.** `remember` and `keep_note` take `key=`: the write ID is derived from the key
+  and the label set (`w_<label set>_<hash>`), so a write re-sent with the same key under the same
+  label set replaces its earlier self (Hindsight upserts by document_id, and a byte-identical re-send
+  extracts nothing new) instead of storing a second copy. The provenance log replaces the write's row
+  and sources too. A host that delivers at least once (an outbox drained after a crash) gets
+  exactly-once storage. Every write ID, keyed or not, now carries its label set.
+- **Security (validator):** `validate_retain` refuses any `update_mode` (an append would fold another
+  document's text into this write and re-extract it under this write's label set) and any
+  `document_id` not minted under the item's own label set (a reused ID would replace, and so erase,
+  another label set's document). Neither was reachable before 0.4.1, since only memgate's clients
+  hold the secret and never sent either; with caller keys the check matters. Found by the CHORUS
+  integration's review of its phase-2 plan.
+
 ## 0.4.0 (2026-09-30)
 
 - **Unix-socket transport** (security: the server proves who it is). `memgate serve --socket PATH`

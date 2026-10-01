@@ -36,7 +36,7 @@ from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_
                              Gate, partition_bank)
 from memgate.derivation import personal_labels, personal_note_labels
 from memgate.labels import LabelSet
-from memgate.provenance import ProvenanceLog, new_id
+from memgate.provenance import ProvenanceLog, write_id_for
 
 _BANK_IN_PATH = re.compile(r"^/v1/default/banks/([^/?]+)")
 
@@ -153,12 +153,14 @@ class _Core:
 
     # -- decisions (no I/O) ------------------------------------------------------------------------
     def _plan_write(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
-                    about: str | None) -> tuple[str, dict, str, str]:
-        """Check and label a write: (bank, request body, label-set ID, write ID). Raises PermissionError."""
+                    about: str | None, key: str | None = None) -> tuple[str, dict, str, str]:
+        """Check and label a write: (bank, request body, label-set ID, write ID). Raises PermissionError.
+        With a `key`, the write ID is derived from it (see `write_id_for`), so the same key under the
+        same label set re-sent replaces the earlier write (Hindsight upserts by document_id)."""
         if not self.gate.policy.may_write(agent, location, labels):
             raise PermissionError(f"{agent} may not write {labels} at {location}")
         ls_id = self.gate.registry.register(labels)
-        write_id = new_id("w")
+        write_id = write_id_for(ls_id, key)
         item = {"content": text, "tags": [ls_id], "context": about, "document_id": write_id,
                 "timestamp": when.isoformat() if when else None}
         return self.bank_for(labels), {"items": [item]}, ls_id, write_id
@@ -239,24 +241,28 @@ class HindsightMemory(_Core):
             self._created.add(bank)
 
     def _retain(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
-                about: str | None, kind: str, turns=(), derived_from=()) -> str:
-        bank, body, ls_id, write_id = self._plan_write(agent, location, labels, text, when, about)
+                about: str | None, kind: str, turns=(), derived_from=(), key: str | None = None) -> str:
+        bank, body, ls_id, write_id = self._plan_write(agent, location, labels, text, when, about, key)
         self._ensure(bank)
         self._call("POST", f"/v1/default/banks/{bank}/memories", body, agent=agent, location=location)
         self._after_write(agent, location, ls_id, write_id, kind, text, turns, derived_from)
         return write_id
 
     def remember(self, ctx: Context, text: str, *, when: datetime | None = None, about: str | None = None,
-                 turns: list[str] = ()) -> str:
+                 turns: list[str] = (), key: str | None = None) -> str:
         """Store something said or seen in `ctx`'s conversation (its location, among its participants).
         `about` is a short description for the memory system; `turns` are the provenance IDs of the
-        turns (see `say`) it was formed from. Returns the write ID."""
-        return self._retain(ctx.agent, ctx.location, ctx.conversation(), text, when, about, "conversation", turns=turns)
+        turns (see `say`) it was formed from. `key`, if given, makes the write idempotent: the same
+        key from the same conversation re-sent replaces the earlier write (same write ID) instead of
+        storing it twice. Returns the write ID."""
+        return self._retain(ctx.agent, ctx.location, ctx.conversation(), text, when, about, "conversation",
+                            turns=turns, key=key)
 
-    def keep_note(self, ctx: Context, text: str, *, when: datetime | None = None) -> str:
-        """A personal note that stays where it was written (e.g. inside a high-assurance location)."""
+    def keep_note(self, ctx: Context, text: str, *, when: datetime | None = None, key: str | None = None) -> str:
+        """A personal note that stays where it was written (e.g. inside a high-assurance location).
+        `key` as in `remember`."""
         return self._retain(ctx.agent, ctx.location, personal_note_labels(ctx.agent, ctx.location), text, when,
-                            "personal note", "note")
+                            "personal note", "note", key=key)
 
     def carry_out(self, ctx: Context, text: str, memory_type: str, *, source: LabelSet | Recalled | str | None = None,
                   when: datetime | None = None, source_writes: list[str] = ()) -> str:
@@ -354,22 +360,23 @@ class AsyncHindsightMemory(_Core):
             self._created.add(bank)
 
     async def _retain(self, agent: str, location: str, labels: LabelSet, text: str, when: datetime | None,
-                      about: str | None, kind: str, turns=(), derived_from=()) -> str:
-        bank, body, ls_id, write_id = self._plan_write(agent, location, labels, text, when, about)
+                      about: str | None, kind: str, turns=(), derived_from=(), key: str | None = None) -> str:
+        bank, body, ls_id, write_id = self._plan_write(agent, location, labels, text, when, about, key)
         await self._ensure(bank)
         await self._call("POST", f"/v1/default/banks/{bank}/memories", body, agent=agent, location=location)
         self._after_write(agent, location, ls_id, write_id, kind, text, turns, derived_from)
         return write_id
 
     async def remember(self, ctx: Context, text: str, *, when: datetime | None = None, about: str | None = None,
-                       turns: list[str] = ()) -> str:
+                       turns: list[str] = (), key: str | None = None) -> str:
         """See `HindsightMemory.remember`."""
-        return await self._retain(ctx.agent, ctx.location, ctx.conversation(), text, when, about, "conversation", turns=turns)
+        return await self._retain(ctx.agent, ctx.location, ctx.conversation(), text, when, about, "conversation",
+                                  turns=turns, key=key)
 
-    async def keep_note(self, ctx: Context, text: str, *, when: datetime | None = None) -> str:
+    async def keep_note(self, ctx: Context, text: str, *, when: datetime | None = None, key: str | None = None) -> str:
         """See `HindsightMemory.keep_note`."""
         return await self._retain(ctx.agent, ctx.location, personal_note_labels(ctx.agent, ctx.location), text, when,
-                                  "personal note", "note")
+                                  "personal note", "note", key=key)
 
     async def carry_out(self, ctx: Context, text: str, memory_type: str, *,
                         source: LabelSet | Recalled | str | None = None, when: datetime | None = None,

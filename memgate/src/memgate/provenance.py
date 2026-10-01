@@ -26,6 +26,7 @@ Trails are shown to an asker through the same rules as recall:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 from contextlib import contextmanager
@@ -84,6 +85,25 @@ SELECT g.entity_id, u.entity_id FROM generated_by g
 
 def new_id(prefix: str) -> str:
     return f"{prefix}_{uuid.uuid4().hex[:16]}"
+
+
+def write_id_for(label_set: str, key: str | None = None) -> str:
+    """A write's ID (Hindsight's document_id): `w_<label set ID>_<16 hex>`.
+
+    The tail is random, or derived from the caller's `key`, so a write re-sent with the same key
+    under the same label set gets the same ID and replaces its earlier self instead of duplicating
+    it. The label set is part of the ID so the validator can check that a reused ID never reaches
+    a document written under another label set (`write_id_label_set`)."""
+    tail = hashlib.sha256(key.encode()).hexdigest()[:16] if key is not None else uuid.uuid4().hex[:16]
+    return f"w_{label_set}_{tail}"
+
+
+def write_id_label_set(write_id: str) -> str | None:
+    """The label set a write ID was minted under, or None if the ID is not of memgate's form."""
+    if not write_id.startswith("w_ls_"):
+        return None
+    label_set, _, tail = write_id[2:].rpartition("_")
+    return label_set if label_set and tail else None
 
 
 @dataclass
@@ -196,7 +216,11 @@ class ProvenanceLog:
 
     def record_write(self, write_id: str, author: str, location: str, label_set: str, kind: str, text: str, *,
                      turns: list[str] = (), derived_from: list[str] = ()) -> None:
-        stmts = [("INSERT INTO entity VALUES (?,?,?,?,?,?,?)", (write_id, time.time(), kind, author, location, label_set, text))]
+        """A write ID recorded before is the same memory written again (`write_id_for` with a key): its
+        row and its sources are replaced, and whatever was built from it still points at it."""
+        stmts = [(f"DELETE FROM {t} WHERE entity_id = ?", (write_id,)) for t in ("generated_by", "derived_from", "lineage")]
+        stmts += [("INSERT OR REPLACE INTO entity VALUES (?,?,?,?,?,?,?)",
+                   (write_id, time.time(), kind, author, location, label_set, text))]
         stmts += [("INSERT OR IGNORE INTO generated_by VALUES (?,?)", (write_id, t)) for t in turns]
         stmts += [("INSERT OR IGNORE INTO derived_from VALUES (?,?)", (write_id, s)) for s in derived_from]
         stmts += [("INSERT OR IGNORE INTO lineage VALUES (?,?)", (write_id, s)) for s in derived_from]
