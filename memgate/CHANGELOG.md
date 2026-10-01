@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Security:** the clients and `memgate conformance` never send a request through a proxy. urllib
+  honours `HTTP_PROXY` from the environment, and a proxy would see the shared secret in the request
+  header. The sync client uses a proxy-free opener, and the async client sets `trust_env=False`.
+  Reported by the CHORUS integration's review.
+
 ## 0.3.2 (2026-09-30)
 
 - **Security:** Hindsight loads the first `.env` it finds walking up from its working directory, with

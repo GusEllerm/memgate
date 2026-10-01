@@ -120,3 +120,33 @@ def test_world_check_interval_from_the_environment(tmp_path, monkeypatch):
     assert Gate.from_env().check_every == 1.0
     monkeypatch.setenv("MEMGATE_WORLD_CHECK_S", "0.1")
     assert Gate.from_env().check_every == 0.1
+
+
+def test_requests_never_go_through_a_proxy(gate, monkeypatch):
+    """The secret travels in a header, so HTTP_PROXY must never route a request through a proxy."""
+    import http.server
+    import threading
+    seen = []
+
+    class Proxy(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            seen.append(dict(self.headers))
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"{}")
+
+        def log_message(self, *a):
+            pass
+    proxy = http.server.HTTPServer(("127.0.0.1", 0), Proxy)
+    threading.Thread(target=proxy.serve_forever, daemon=True).start()
+    monkeypatch.setenv("HTTP_PROXY", f"http://127.0.0.1:{proxy.server_port}")
+    monkeypatch.setenv("http_proxy", f"http://127.0.0.1:{proxy.server_port}")
+    monkeypatch.delenv("NO_PROXY", raising=False)
+    monkeypatch.delenv("no_proxy", raising=False)
+    mem = HindsightMemory(gate, bank="b", base_url="http://memgate.invalid:9", timeout=2)
+    with pytest.raises(OSError):                          # goes straight for the (unreachable) server...
+        mem._call("GET", "/v1/default/banks/b/stats", None, role="admin")
+    proxy.shutdown()
+    assert seen == []                                     # ...and the proxy never saw the secret
+    pytest.importorskip("httpx")
+    assert AsyncHindsightMemory(gate, bank="b")._http._trust_env is False

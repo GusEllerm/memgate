@@ -39,7 +39,7 @@ def _raw(url: str, method: str, path: str, body: dict | None, headers: dict) -> 
     req = urllib.request.Request(f"{url}{path}", method=method, data=json.dumps(body).encode() if body is not None else None,
                                  headers={"Content-Type": "application/json", **headers})
     try:
-        with urllib.request.urlopen(req, timeout=300) as r:
+        with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req, timeout=300) as r:   # never via a proxy
             return r.status, r.read().decode(errors="replace")
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode(errors="replace")

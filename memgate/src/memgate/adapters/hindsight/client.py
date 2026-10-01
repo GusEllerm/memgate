@@ -31,6 +31,10 @@ from memgate.provenance import ProvenanceLog, new_id
 
 _BANK_IN_PATH = re.compile(r"^/v1/default/banks/([^/?]+)")
 
+# Requests carry memgate's shared secret, so they must never go through a proxy (urllib otherwise
+# honours HTTP_PROXY / HTTPS_PROXY from the environment, and a proxy would see the header).
+_DIRECT = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
 
 class HindsightError(RuntimeError):
     def __init__(self, status: int, body: str):
@@ -164,7 +168,7 @@ class HindsightMemory(_Core):
                                      headers=self._headers(agent, location, role),
                                      data=json.dumps(body).encode() if body is not None else None)
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as r:
+            with _DIRECT.open(req, timeout=self.timeout) as r:
                 raw = r.read()
                 return json.loads(raw) if raw else {}
         except urllib.error.HTTPError as e:
@@ -246,7 +250,7 @@ class AsyncHindsightMemory(_Core):
     def __init__(self, *args, **kwargs):
         import httpx
         super().__init__(*args, **kwargs)
-        self._http = httpx.AsyncClient(timeout=self.timeout)
+        self._http = httpx.AsyncClient(timeout=self.timeout, trust_env=False)    # never via a proxy (see _DIRECT)
 
     async def __aenter__(self):
         return self
