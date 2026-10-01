@@ -20,109 +20,181 @@
    "id": "f21-0",
    "topic": "the password for the storeroom",
    "code": "HARBOR-3269",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the storeroom?",
+    "indirect": "What was the access code cy21 mentioned for the room whose lock was acting up?"
+   }
   },
   "f21-1": {
    "id": "f21-1",
    "topic": "the name chosen for the print room",
    "code": "GARNET1-3187",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What label was recommended for the printing area?",
+    "indirect": "What identifier did cy21 propose for the area used for producing documents, mentioned during our morning lab discussion?"
+   }
   },
   "f21-2": {
    "id": "f21-2",
    "topic": "the label on the tool chest",
    "code": "FROST-2539",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier is printed on the side of the tool chest?",
+    "indirect": "What is the identifier on the storage box we moved last week?"
+   }
   },
   "f21-3": {
    "id": "f21-3",
    "topic": "the combination for the kiln",
    "code": "NECTAR3-4058",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the kiln's passcode?",
+    "indirect": "What was the code Ada mentioned for the firing equipment when we discussed the glaze test earlier today?"
+   }
   },
   "f21-4": {
    "id": "f21-4",
    "topic": "the label on the storeroom",
    "code": "COBALT1-3307",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier is displayed on the storage room's sign?",
+    "indirect": "What was the code Dee mentioned when checking the storage area?"
+   }
   },
   "f21-5": {
    "id": "f21-5",
    "topic": "the password for the west stairwell",
    "code": "WILLOW-2177",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code for the west stairwell?",
+    "indirect": "What is the secret code that Fay mentioned for the emergency exit area during our discussion?"
+   }
   },
   "f21-6": {
    "id": "f21-6",
    "topic": "the booking reference for the storeroom",
    "code": "GARNET-3073",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reservation code for the storeroom?",
+    "indirect": "What identifier did Fay give me for the storage area we discussed earlier?"
+   }
   },
   "f21-7": {
    "id": "f21-7",
    "topic": "the combination for the field kit",
    "code": "ORBIT2-5981",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code that opens the field kit?",
+    "indirect": "What was the lock code we agreed on for the equipment when we discussed it earlier in the conversation?"
+   }
   },
   "f21-8": {
    "id": "f21-8",
    "topic": "the password for the field kit",
    "code": "QUILL2-7492",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the field kit?",
+    "indirect": "What was the code you provided for the equipment we mentioned earlier?"
+   }
   },
   "f21-9": {
    "id": "f21-9",
    "topic": "the combination for the storeroom",
    "code": "LUMEN1-3721",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the storeroom?",
+    "indirect": "What was the access code Bo mentioned for the room they needed to open during their morning lab chat?"
+   }
   },
   "f21-10": {
    "id": "f21-10",
    "topic": "the booking reference for the greenhouse door",
    "code": "CEDAR2-3974",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the reservation code for the greenhouse entryway?",
+    "indirect": "What was the code Dee proposed for the plant enclosure entry we discussed earlier?"
+   }
   },
   "f21-11": {
    "id": "f21-11",
    "topic": "the combination for the lab safe",
    "code": "COBALT3-1756",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the laboratory safe?",
+    "indirect": "What was the code we noted earlier when we talked about checking that secure storage?"
+   }
   },
   "f21-12": {
    "id": "f21-12",
    "topic": "the booking reference for the telescope dome",
    "code": "RIDGE-9271",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the reservation code for the telescope dome?",
+    "indirect": "What was the identifier we decided on for the observatory shelter reservation that came up during our gallery conversation?"
+   }
   },
   "f21-13": {
    "id": "f21-13",
    "topic": "the password for the lab safe",
    "code": "QUILL3-8600",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the combination that opens the lab safe?",
+    "indirect": "What was the code you gave me for the equipment storage earlier today?"
+   }
   },
   "f21-14": {
    "id": "f21-14",
    "topic": "the booking reference for the bike shed",
    "code": "PIXEL-2040",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the reservation code for the bike shed?",
+    "indirect": "What is the reservation code we agreed on for the two-wheeler storage?"
+   }
   },
   "f21-15": {
    "id": "f21-15",
    "topic": "the booking reference for the field kit",
    "code": "MAPLE1-4822",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reservation code for the field kit?",
+    "indirect": "What is the identifier Eli gave for the equipment we need?"
+   }
   },
   "f21-16": {
    "id": "f21-16",
    "topic": "the password for the rooftop garden",
    "code": "NECTAR1-5143",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code for the rooftop garden?",
+    "indirect": "What is the access code that Eli suggested for the plant area mentioned in the conversation?"
+   }
   },
   "f21-17": {
    "id": "f21-17",
    "topic": "the combination for the greenhouse door",
    "code": "HARBOR2-1686",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the code needed to open the greenhouse entry?",
+    "indirect": "What was the access code that was provided earlier for the entry to the plant enclosure?"
+   }
   }
  },
  "conversations": [

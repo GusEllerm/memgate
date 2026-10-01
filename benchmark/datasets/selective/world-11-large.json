@@ -25,257 +25,512 @@
   "f11-0": {
    "id": "f11-0",
    "topic": "the name chosen for the reading room",
-   "code": "MAPLE3-2214"
+   "code": "MAPLE3-2214",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What designation was given to the reading room?",
+    "indirect": "What is the identifier they selected for the quiet data\u2011crunching area mentioned earlier?"
+   }
   },
   "f11-1": {
    "id": "f11-1",
    "topic": "the combination for the rooftop garden",
-   "code": "RIDGE3-2133"
+   "code": "RIDGE3-2133",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code do you need to access the rooftop garden?",
+    "indirect": "What was the code we mentioned for the herb spot we talked about this afternoon?"
+   }
   },
   "f11-2": {
    "id": "f11-2",
    "topic": "the booking reference for the freezer",
-   "code": "HARBOR1-1763"
+   "code": "HARBOR1-1763",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference code for the freezer reservation?",
+    "indirect": "What is the code Ada mentioned for the lab equipment she needed?"
+   }
   },
   "f11-3": {
    "id": "f11-3",
    "topic": "the combination for the seminar room",
-   "code": "QUILL3-3155"
+   "code": "QUILL3-3155",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the seminar room?",
+    "indirect": "What was the access code Ivo gave for the meeting area earlier in the conversation?"
+   }
   },
   "f11-4": {
    "id": "f11-4",
    "topic": "the label on the darkroom",
-   "code": "MOSAIC1-9551"
+   "code": "MOSAIC1-9551",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the identifier printed on the darkroom?",
+    "indirect": "What is the identifier that Fay mentioned while inspecting the garden shed?"
+   }
   },
   "f11-5": {
    "id": "f11-5",
    "topic": "the name chosen for the darkroom",
-   "code": "FROST3-6856"
+   "code": "FROST3-6856",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier did they assign to the darkroom?",
+    "indirect": "What was the identifier we chose for the photo\u2011development space mentioned earlier?"
+   }
   },
   "f11-6": {
    "id": "f11-6",
    "topic": "the combination for the darkroom",
-   "code": "GARNET1-2226"
+   "code": "GARNET1-2226",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the lock code for the darkroom?",
+    "indirect": "What was the lock code you gave for the room you were heading to before starting the exposure run?"
+   }
   },
   "f11-7": {
    "id": "f11-7",
    "topic": "the booking reference for the telescope dome",
-   "code": "SAFFRON-2186"
+   "code": "SAFFRON-2186",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reservation code for the telescope dome?",
+    "indirect": "What is the code cy11 mentioned for the observatory enclosure earlier today?"
+   }
   },
   "f11-8": {
    "id": "f11-8",
    "topic": "the combination for the west stairwell",
-   "code": "MAPLE1-6597"
+   "code": "MAPLE1-6597",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the west stairwell?",
+    "indirect": "What was the access code cy11 shared for the left\u2011hand exit in the library?"
+   }
   },
   "f11-9": {
    "id": "f11-9",
    "topic": "the booking reference for the sample fridge",
-   "code": "ORBIT-1495"
+   "code": "ORBIT-1495",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference code associated with the sample fridge?",
+    "indirect": "What code did we note for the cold storage unit we talked about when checking its status?"
+   }
   },
   "f11-10": {
    "id": "f11-10",
    "topic": "the password for the bike shed",
-   "code": "CEDAR3-7264"
+   "code": "CEDAR3-7264",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the bike shed?",
+    "indirect": "What was the access code Kai mentioned for the storage space we discussed earlier in the workshop?"
+   }
   },
   "f11-11": {
    "id": "f11-11",
    "topic": "the password for the lab safe",
-   "code": "RIDGE1-2314"
+   "code": "RIDGE1-2314",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the lab safe?",
+    "indirect": "What was the access code we mentioned for the storage area during the workshop?"
+   }
   },
   "f11-12": {
    "id": "f11-12",
    "topic": "the combination for the archive cabinet",
-   "code": "HARBOR2-7364"
+   "code": "HARBOR2-7364",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the archive cabinet?",
+    "indirect": "What was the code Gus gave for the locked storage unit we talked about earlier in the lab?"
+   }
   },
   "f11-13": {
    "id": "f11-13",
    "topic": "the combination for the loading dock",
-   "code": "GARNET-9498"
+   "code": "GARNET-9498",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the loading dock?",
+    "indirect": "What was the code you gave me for the area where I needed to pick up the boxes of journals?"
+   }
   },
   "f11-14": {
    "id": "f11-14",
    "topic": "the booking reference for the greenhouse door",
-   "code": "NECTAR2-4771"
+   "code": "NECTAR2-4771",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference code for accessing the greenhouse door?",
+    "indirect": "What is the code Hana gave for the entry we need to unlock this afternoon?"
+   }
   },
   "f11-15": {
    "id": "f11-15",
    "topic": "the label on the greenhouse door",
-   "code": "EMBER-8967"
+   "code": "EMBER-8967",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identification code is shown on the greenhouse entrance?",
+    "indirect": "What was the code you mentioned for the plant growth area entry?"
+   }
   },
   "f11-16": {
    "id": "f11-16",
    "topic": "the booking reference for the kiln",
-   "code": "COBALT2-4318"
+   "code": "COBALT2-4318",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the kiln's reservation code?",
+    "indirect": "What is the code cy11 provided for the heat\u2011treating unit mentioned earlier?"
+   }
   },
   "f11-17": {
    "id": "f11-17",
    "topic": "the combination for the storeroom",
-   "code": "PIXEL3-6356"
+   "code": "PIXEL3-6356",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the storeroom?",
+    "indirect": "What was the access code Hana gave for the garden supply area mentioned earlier?"
+   }
   },
   "f11-18": {
    "id": "f11-18",
    "topic": "the combination for the tool chest",
-   "code": "PIXEL2-4281"
+   "code": "PIXEL2-4281",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the lock code for the tool chest?",
+    "indirect": "What was the code you gave for the garden storage you checked earlier?"
+   }
   },
   "f11-19": {
    "id": "f11-19",
    "topic": "the code for the loading dock",
-   "code": "TUNDRA3-4438"
+   "code": "TUNDRA3-4438",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the loading dock's access code?",
+    "indirect": "What was the access identifier I mentioned for the staff handling shipments that I talked about earlier?"
+   }
   },
   "f11-20": {
    "id": "f11-20",
    "topic": "the combination for the print room",
-   "code": "MOSAIC3-2050"
+   "code": "MOSAIC3-2050",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the print room?",
+    "indirect": "What was the alphanumeric string Fay gave me for accessing the copy area that she mentioned while we were chatting in the cafe?"
+   }
   },
   "f11-21": {
    "id": "f11-21",
    "topic": "the password for the kiln",
-   "code": "RIDGE-5508"
+   "code": "RIDGE-5508",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code do you need to access the kiln?",
+    "indirect": "What was the code Hana gave for the firing equipment earlier in the conversation?"
+   }
   },
   "f11-22": {
    "id": "f11-22",
    "topic": "the code for the kiln",
-   "code": "CEDAR1-9091"
+   "code": "CEDAR1-9091",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the kiln's access number?",
+    "indirect": "What identifier did Kai mention for the workshop equipment he said he needed to check on later?"
+   }
   },
   "f11-23": {
    "id": "f11-23",
    "topic": "the code for the freezer",
-   "code": "WILLOW2-1515"
+   "code": "WILLOW2-1515",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access key for the freezer?",
+    "indirect": "What password did Fay give for the cold storage unit when Bo asked about checking its temperature?"
+   }
   },
   "f11-24": {
    "id": "f11-24",
    "topic": "the booking reference for the tool chest",
-   "code": "LUMEN-6803"
+   "code": "LUMEN-6803",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference number for the tool chest?",
+    "indirect": "What identifier did Kai give for the equipment container we talked about earlier?"
+   }
   },
   "f11-25": {
    "id": "f11-25",
    "topic": "the label on the tool chest",
-   "code": "TUNDRA2-7638"
+   "code": "TUNDRA2-7638",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the identification code marked on the tool chest?",
+    "indirect": "What was the identifier on the storage unit by the workbench that Kai mentioned?"
+   }
   },
   "f11-26": {
    "id": "f11-26",
    "topic": "the label on the storeroom",
-   "code": "QUILL2-3308"
+   "code": "QUILL2-3308",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code is displayed on the storeroom door?",
+    "indirect": "What was the identifier you mentioned for the supply area during the coffee conversation?"
+   }
   },
   "f11-27": {
    "id": "f11-27",
    "topic": "the code for the telescope dome",
-   "code": "ZEPHYR1-9771"
+   "code": "ZEPHYR1-9771",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access key required to operate the telescope dome?",
+    "indirect": "What was the identifier we mentioned for the sky\u2011viewing enclosure when we talked about opening it smoothly?"
+   }
   },
   "f11-28": {
    "id": "f11-28",
    "topic": "the booking reference for the west stairwell",
-   "code": "WILLOW3-5194"
+   "code": "WILLOW3-5194",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was assigned to the west stairwell?",
+    "indirect": "What is the alphanumeric code Dee gave for the location the maintenance team should record?"
+   }
   },
   "f11-29": {
    "id": "f11-29",
    "topic": "the name chosen for the rooftop garden",
-   "code": "HARBOR-3934"
+   "code": "HARBOR-3934",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designated identifier for the rooftop garden?",
+    "indirect": "What was the designation chosen for the break spot we mentioned after talking about the experiment?"
+   }
   },
   "f11-30": {
    "id": "f11-30",
    "topic": "the combination for the sample fridge",
-   "code": "LUMEN2-9198"
+   "code": "LUMEN2-9198",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the sample fridge?",
+    "indirect": "What was the access code mentioned for the unit that holds the seed packets?"
+   }
   },
   "f11-31": {
    "id": "f11-31",
    "topic": "the label on the lab safe",
-   "code": "EMBER1-7356"
+   "code": "EMBER1-7356",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the alphanumeric code shown on the laboratory safe?",
+    "indirect": "What was the identifier we mentioned for the new battery prototype during our library discussion?"
+   }
   },
   "f11-32": {
    "id": "f11-32",
    "topic": "the combination for the lab safe",
-   "code": "HARBOR3-1110"
+   "code": "HARBOR3-1110",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the lab safe?",
+    "indirect": "What was the code Kai mentioned for the research area lock?"
+   }
   },
   "f11-33": {
    "id": "f11-33",
    "topic": "the label on the boat house",
-   "code": "COBALT-8597"
+   "code": "COBALT-8597",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier is displayed on the boat house?",
+    "indirect": "What was the identifier Ivo mentioned for the dock building earlier?"
+   }
   },
   "f11-34": {
    "id": "f11-34",
    "topic": "the password for the greenhouse door",
-   "code": "MOSAIC2-3023"
+   "code": "MOSAIC2-3023",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code is needed to open the greenhouse door?",
+    "indirect": "What is the entry code Kai mentioned we\u2019d need to get into the plant area when letting the team in later?"
+   }
   },
   "f11-35": {
    "id": "f11-35",
    "topic": "the booking reference for the darkroom",
-   "code": "SAFFRON2-9797"
+   "code": "SAFFRON2-9797",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reservation ID for the darkroom?",
+    "indirect": "What is the identifier Eli gave for the photo project\u2019s room that was mentioned earlier?"
+   }
   },
   "f11-36": {
    "id": "f11-36",
    "topic": "the code for the storeroom",
-   "code": "WILLOW1-2356"
+   "code": "WILLOW1-2356",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code needed to enter the storeroom?",
+    "indirect": "What was the access string Ada gave Eli for the area where spare parts are kept?"
+   }
   },
   "f11-37": {
    "id": "f11-37",
    "topic": "the booking reference for the field kit",
-   "code": "PIXEL-8223"
+   "code": "PIXEL-8223",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference number associated with the field kit?",
+    "indirect": "What is the code that Fay mentioned for the equipment she just prepared?"
+   }
   },
   "f11-38": {
    "id": "f11-38",
    "topic": "the code for the tool chest",
-   "code": "COBALT1-7904"
+   "code": "COBALT1-7904",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the tool chest?",
+    "indirect": "What is the access string Eli mentioned for the storage unit that holds the wrench set?"
+   }
   },
   "f11-39": {
    "id": "f11-39",
    "topic": "the code for the field kit",
-   "code": "EMBER3-8027"
+   "code": "EMBER3-8027",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the identifier for the field kit?",
+    "indirect": "What is the identifier Ada mentioned for the set of tools we need to record in the inventory?"
+   }
   },
   "f11-40": {
    "id": "f11-40",
    "topic": "the code for the bike shed",
-   "code": "FROST2-3832"
+   "code": "FROST2-3832",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the bike shed?",
+    "indirect": "What was the lock combination we mentioned for securing the outdoor storage after the rain?"
+   }
   },
   "f11-41": {
    "id": "f11-41",
    "topic": "the combination for the freezer",
-   "code": "COBALT3-3301"
+   "code": "COBALT3-3301",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code is required to unlock the freezer?",
+    "indirect": "What was the code Dee gave for the cold storage unit we needed to open to store the samples earlier?"
+   }
   },
   "f11-42": {
    "id": "f11-42",
    "topic": "the password for the rooftop garden",
-   "code": "GARNET3-9070"
+   "code": "GARNET3-9070",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the entry code for the rooftop garden?",
+    "indirect": "What was the access code cy11 shared with ivo11 for the elevated outdoor area they mentioned during their library chat?"
+   }
   },
   "f11-43": {
    "id": "f11-43",
    "topic": "the label on the freezer",
-   "code": "ORBIT3-4627"
+   "code": "ORBIT3-4627",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier is attached to the freezer?",
+    "indirect": "What was the code written on the cold storage unit that Kai referenced during their library conversation?"
+   }
   },
   "f11-44": {
    "id": "f11-44",
    "topic": "the code for the lab safe",
-   "code": "MOSAIC-9628"
+   "code": "MOSAIC-9628",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access key for the lab safe?",
+    "indirect": "What is the alphanumeric identifier Kai gave that would let us retrieve the samples we need for the experiment after the meeting?"
+   }
   },
   "f11-45": {
    "id": "f11-45",
    "topic": "the combination for the boat house",
-   "code": "MAPLE2-9424"
+   "code": "MAPLE2-9424",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the boat house?",
+    "indirect": "What was the code Ivo gave for the lakeside storage when we were talking about the panel wiring?"
+   }
   },
   "f11-46": {
    "id": "f11-46",
    "topic": "the name chosen for the storeroom",
-   "code": "EMBER2-5202"
+   "code": "EMBER2-5202",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the designated code for the storeroom?",
+    "indirect": "What was the code Ivo mentioned for the location where we\u2019ll label the shelves?"
+   }
   },
   "f11-47": {
    "id": "f11-47",
    "topic": "the name chosen for the west stairwell",
-   "code": "LUMEN3-9924"
+   "code": "LUMEN3-9924",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was given to the west stairwell?",
+    "indirect": "What was the code we selected for the left\u2011hand passage we talked about earlier?"
+   }
   },
   "f11-48": {
    "id": "f11-48",
    "topic": "the password for the telescope dome",
-   "code": "FROST-9588"
+   "code": "FROST-9588",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the telescope dome?",
+    "indirect": "What was the access code Jun mentioned for the night\u2011sky viewing enclosure that came up during our chat about the west stairwell name?"
+   }
   },
   "f11-49": {
    "id": "f11-49",
    "topic": "the booking reference for the server rack",
-   "code": "SAFFRON3-9244"
+   "code": "SAFFRON3-9244",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference code associated with the server rack reservation?",
+    "indirect": "What identifier did Gus mention for the equipment we need to set up earlier in the conversation?"
+   }
   },
   "f11-50": {
    "id": "f11-50",
    "topic": "the password for the seminar room",
-   "code": "MAPLE-1080"
+   "code": "MAPLE-1080",
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access credential required to enter the seminar area?",
+    "indirect": "What was the access key we noted for the event location earlier?"
+   }
   }
  },
  "conversations": [
@@ -335,7 +590,8 @@
      "speaker": "hana11",
      "text": "Great plan. Let's wrap up our runs and head over\u2014I'll bring the notes for MAPLE3-2214 so we can double\u2011check the signage later."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-1",
@@ -393,7 +649,8 @@
      "speaker": "lea11",
      "text": "Nice! Let\u2019s catch up again after lunch and compare notes on the garden."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-2",
@@ -451,7 +708,8 @@
      "speaker": "dee11",
      "text": "Enjoy your reading and good luck with the freezer booking!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-3",
@@ -509,7 +767,8 @@
      "speaker": "ivo11",
      "text": "Just a quiet dinner and maybe a short walk around the pond."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-4",
@@ -567,7 +826,8 @@
      "speaker": "hana11",
      "text": "Great idea! It\u2019ll add scent and attract more pollinators."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-5",
@@ -625,7 +885,8 @@
      "speaker": "hana11",
      "text": "I grabbed a sandwich earlier, so I'm good. Ready to dive back in after a short break."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-6",
@@ -683,7 +944,8 @@
      "speaker": "kai11",
      "text": "Sure thing, let\u2019s meet by the water cooler in a bit."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-7",
@@ -738,7 +1000,8 @@
      "speaker": "fay11",
      "text": "Awesome, let's meet in the control room in a few minutes."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-8",
@@ -797,7 +1060,8 @@
      "speaker": "ada11",
      "text": "Sounds perfect. Let\u2019s catch up tomorrow and share what we discovered."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-9",
@@ -852,7 +1116,8 @@
      "speaker": "hana11",
      "text": "Alright, let\u2019s reconvene after lunch and see where we stand."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-10",
@@ -910,7 +1175,8 @@
      "speaker": "kai11",
      "text": "Thanks, I'll check them out. See you later around the workbench."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-11",
@@ -968,7 +1234,8 @@
      "speaker": "jun11",
      "text": "Sounds good. See you in a bit."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-12",
@@ -1026,7 +1293,8 @@
      "speaker": "gus11",
      "text": "See you soon."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-13",
@@ -1084,7 +1352,8 @@
      "speaker": "ivo11",
      "text": "See you, enjoy the coffee!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-14",
@@ -1143,7 +1412,8 @@
      "speaker": "ada11",
      "text": "Got it, thanks Hana. I'll make sure the door is unlocked for the afternoon."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-15",
@@ -1201,7 +1471,8 @@
      "speaker": "kai11",
      "text": "Will do. Catch you later, Jun."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-16",
@@ -1259,7 +1530,8 @@
      "speaker": "cy11",
      "text": "That's a relief! I could use a fresh cup before the afternoon run."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-17",
@@ -1314,7 +1586,8 @@
      "speaker": "lea11",
      "text": "That sounds perfect, I could use a break."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-18",
@@ -1372,7 +1645,8 @@
      "speaker": "kai11",
      "text": "Sounds lovely. Let's take a break and enjoy the sunshine."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-19",
@@ -1430,7 +1704,8 @@
      "speaker": "fay11",
      "text": "I'd love that, see you at the cafe later."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-20",
@@ -1488,7 +1763,8 @@
      "speaker": "fay11",
      "text": "Definitely. After the print room, maybe we can brainstorm over another cup."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-21",
@@ -1546,7 +1822,8 @@
      "speaker": "lea11",
      "text": "It's coming together nicely; the light in the studio feels perfect today."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-22",
@@ -1604,7 +1881,8 @@
      "speaker": "kai11",
      "text": "Alright, I should head to the workshop soon. Catch you later!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-23",
@@ -1662,7 +1940,8 @@
      "speaker": "fay11",
      "text": "Perfect, a good cup will keep the energy up. Let\u2019s finish up and then head to the break room."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-24",
@@ -1720,7 +1999,8 @@
      "speaker": "kai11",
      "text": "Good idea. Let me know if you need any extra tools while you\u2019re at it."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-25",
@@ -1778,7 +2058,8 @@
      "speaker": "kai11",
      "text": "Sounds good. Let me know if you need any help with the tools later."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-26",
@@ -1836,7 +2117,8 @@
      "speaker": "dee11",
      "text": "Sounds lovely. Let\u2019s catch up later and swap stories about the day."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-27",
@@ -1894,7 +2176,8 @@
      "speaker": "kai11",
      "text": "Absolutely, let's make sure the dome opens smoothly with that code."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-28",
@@ -1949,7 +2232,8 @@
      "speaker": "lea11",
      "text": "I\u2019m planning to grab a cup after I finish labeling the latest batch, thanks for the reminder!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-29",
@@ -2007,7 +2291,8 @@
      "speaker": "ada11",
      "text": "Thanks, Ivo. See you in a moment."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-30",
@@ -2065,7 +2350,8 @@
      "speaker": "lea11",
      "text": "Alright, let\u2019s grab the tools and get it set up before lunch."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-31",
@@ -2120,7 +2406,8 @@
      "speaker": "gus11",
      "text": "Same here. Let's catch up later and compare notes. Have a good afternoon!"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-32",
@@ -2178,7 +2465,8 @@
      "speaker": "kai11",
      "text": "Great, I\u2019ll meet you by the espresso machine in a few minutes."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-33",
@@ -2233,7 +2521,8 @@
      "speaker": "kai11",
      "text": "Will do, thanks! Let's catch up after the review."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-34",
@@ -2291,7 +2580,8 @@
      "speaker": "lea11",
      "text": "Sounds like a plan. Let\u2019s finish our coffees and head out."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-35",
@@ -2345,7 +2635,8 @@
      "speaker": "bo11",
      "text": "I missed it, but I heard it was beautiful. Maybe we can catch the next one together."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-36",
@@ -2403,7 +2694,8 @@
      "speaker": "eli11",
      "text": "Everything's lining up nicely, just need to run a final test before we wrap up."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-37",
@@ -2461,7 +2753,8 @@
      "speaker": "fay11",
      "text": "Sounds perfect. I might join you if I finish this report in time."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-38",
@@ -2516,7 +2809,8 @@
      "speaker": "eli11",
      "text": "Sounds like a solid plan. Let\u2019s catch up later and share what we discovered."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-39",
@@ -2574,7 +2868,8 @@
      "speaker": "hana11",
      "text": "Just a relaxed hike and maybe some reading. How about you?"
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-40",
@@ -2632,7 +2927,8 @@
      "speaker": "hana11",
      "text": "Absolutely, a quick break would be refreshing."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-41",
@@ -2687,7 +2983,8 @@
      "speaker": "hana11",
      "text": "Sounds perfect. Let\u2019s meet in the break room after we finish the current runs."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-42",
@@ -2745,7 +3042,8 @@
      "speaker": "cy11",
      "text": "Sounds like a plan. Let me know if you need any extra seeds for your project."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-43",
@@ -2803,7 +3101,8 @@
      "speaker": "kai11",
      "text": "Nice! Let's find a quiet corner and keep at it."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-44",
@@ -2858,7 +3157,8 @@
      "speaker": "ivo11",
      "text": "Sounds like a productive afternoon\u2014let's make the most of this quiet time."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-45",
@@ -2918,7 +3218,8 @@
      "speaker": "ivo11",
      "text": "Cool, see you there."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-46",
@@ -2975,7 +3276,8 @@
      "speaker": "ivo11",
      "text": "Same here, I think we\u2019re all set for the next build phase."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-47",
@@ -3035,7 +3337,8 @@
      "speaker": "jun11",
      "text": "Sounds like a plan. Let me know if you need anything else."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-48",
@@ -3092,7 +3395,8 @@
      "speaker": "jun11",
      "text": "Probably just a quiet evening with a walk in the park later."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-49",
@@ -3160,7 +3464,8 @@
      "speaker": "gus11",
      "text": "Anytime, Dee."
     }
-   ]
+   ],
+   "carry_outs": []
   },
   {
    "id": "c11-50",
@@ -3221,7 +3526,12 @@
      "speaker": "dee11",
      "text": "Sounds like a plan. Let's reconvene after a quick break."
     }
-   ]
+   ],
+   "carry_outs": []
   }
- ]
+ ],
+ "environments": {},
+ "location_env": {},
+ "high_assurance": [],
+ "notes": []
 }

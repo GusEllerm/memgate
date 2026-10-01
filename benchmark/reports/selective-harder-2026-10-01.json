@@ -1,0 +1,1912 @@
+{
+ "date": "2026-10-01",
+ "k": 20,
+ "sizes": {
+  "env": {
+   "direct": {
+    "memgate": {
+     "run": "sel-env-2026-09-30b",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.0,
+      "leaks": 0,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 1.0,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    },
+    "nofilter": {
+     "run": "sel-env-2026-09-29",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 1.0,
+      "leaks": 1446,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 1.0,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 1.0,
+       "leaks": 48,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 1.0,
+       "leaks": 72,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 1.0,
+       "leaks": 960,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 1.0,
+       "leaks": 150,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 1.0,
+       "leaks": 144,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    },
+    "peragent": {
+     "run": "sel-env-2026-09-29",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.2324,
+      "leaks": 336,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 1.0,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 1.0,
+       "leaks": 48,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 1.0,
+       "leaks": 72,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 1.0,
+       "leaks": 144,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    }
+   },
+   "paraphrase": {
+    "memgate": {
+     "run": "sel-env-paraphrase-memgate-2026-10-01",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.0,
+      "leaks": 0,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 1.0,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    },
+    "nofilter": {
+     "run": "sel-env-paraphrase-baselines-2026-10-01",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 1.0,
+      "leaks": 1446,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 0.9655,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.9167,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 1.0,
+       "leaks": 48,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 1.0,
+       "leaks": 72,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 1.0,
+       "leaks": 960,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 1.0,
+       "leaks": 150,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 1.0,
+       "leaks": 144,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.9722,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    },
+    "peragent": {
+     "run": "sel-env-paraphrase-baselines-2026-10-01",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.2324,
+      "leaks": 336,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 0.9713,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.9167,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 1.0,
+       "leaks": 48,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 1.0,
+       "leaks": 72,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 1.0,
+       "leaks": 144,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.9861,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    }
+   },
+   "indirect": {
+    "memgate": {
+     "run": "sel-env-indirect-memgate-2026-10-01",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.0,
+      "leaks": 0,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 0.8908,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.8333,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.8333,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.9028,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    },
+    "nofilter": {
+     "run": "sel-env-indirect-baselines-2026-10-01",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.944,
+      "leaks": 1365,
+      "must_not": 1446,
+      "recall": 0.9483,
+      "recall_at_5": 0.6609,
+      "hits": 165,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.8333,
+       "recall_at_5": 0.5,
+       "hits": 20,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.75,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 0.9167,
+       "leaks": 44,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.6667,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 1.0,
+       "leaks": 72,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.9583,
+       "leaks": 920,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 0.8333,
+       "leaks": 20,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.8333,
+       "recall_at_5": 0.5,
+       "hits": 5,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.8333,
+       "leaks": 125,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 0.9444,
+       "leaks": 136,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.9444,
+       "recall_at_5": 0.6667,
+       "hits": 68,
+       "should": 72
+      }
+     }
+    },
+    "peragent": {
+     "run": "sel-env-indirect-baselines-2026-10-01",
+     "overall": {
+      "probes": 1620,
+      "leak_rate": 0.2324,
+      "leaks": 336,
+      "must_not": 1446,
+      "recall": 1.0,
+      "recall_at_5": 0.8161,
+      "hits": 174,
+      "should": 174
+     },
+     "by_kind": {
+      "carried-fact": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.8333,
+       "hits": 24,
+       "should": 24
+      },
+      "carried-opinion": {
+       "probes": 48,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.9167,
+       "hits": 48,
+       "should": 48
+      },
+      "carry-refused-fact": {
+       "probes": 48,
+       "leak_rate": 1.0,
+       "leaks": 48,
+       "must_not": 48,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-ha": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "carry-refused-opinion": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "ha-witness-inside": {
+       "probes": 24,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.8333,
+       "hits": 24,
+       "should": 24
+      },
+      "ha-witness-outside": {
+       "probes": 72,
+       "leak_rate": 1.0,
+       "leaks": 72,
+       "must_not": 72,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "non-witness": {
+       "probes": 960,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 960,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-elsewhere": {
+       "probes": 24,
+       "leak_rate": 1.0,
+       "leaks": 24,
+       "must_not": 24,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "note-here": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.6667,
+       "hits": 6,
+       "should": 6
+      },
+      "note-other-agent": {
+       "probes": 150,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 150,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 144,
+       "leak_rate": 1.0,
+       "leaks": 144,
+       "must_not": 144,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 72,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.75,
+       "hits": 72,
+       "should": 72
+      }
+     }
+    }
+   }
+  },
+  "large": {
+   "direct": {
+    "memgate": {
+     "run": "sel-large-2026-09-29",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.0,
+      "leaks": 0,
+      "must_not": 5891,
+      "recall": 0.9913,
+      "recall_at_5": 0.9913,
+      "hits": 227,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.991,
+       "recall_at_5": 0.991,
+       "hits": 221,
+       "should": 223
+      }
+     }
+    },
+    "nofilter": {
+     "run": "sel-large-2026-09-29",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.9902,
+      "leaks": 5833,
+      "must_not": 5891,
+      "recall": 0.9913,
+      "recall_at_5": 0.9738,
+      "hits": 227,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.9899,
+       "leaks": 4895,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 1.0,
+       "leaks": 30,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.9913,
+       "leaks": 908,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.991,
+       "recall_at_5": 0.9731,
+       "hits": 221,
+       "should": 223
+      }
+     }
+    },
+    "peragent": {
+     "run": "sel-large-2026-09-29",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.1541,
+      "leaks": 908,
+      "must_not": 5891,
+      "recall": 0.9913,
+      "recall_at_5": 0.9913,
+      "hits": 227,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.9913,
+       "leaks": 908,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.991,
+       "recall_at_5": 0.991,
+       "hits": 221,
+       "should": 223
+      }
+     }
+    }
+   },
+   "paraphrase": {
+    "memgate": {
+     "run": "sel-large-paraphrase-2026-10-01",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.0,
+      "leaks": 0,
+      "must_not": 5891,
+      "recall": 0.9913,
+      "recall_at_5": 0.9913,
+      "hits": 227,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.991,
+       "recall_at_5": 0.991,
+       "hits": 221,
+       "should": 223
+      }
+     }
+    },
+    "nofilter": {
+     "run": "sel-large-paraphrase-2026-10-01",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.9902,
+      "leaks": 5833,
+      "must_not": 5891,
+      "recall": 0.9913,
+      "recall_at_5": 0.8646,
+      "hits": 227,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.9899,
+       "leaks": 4895,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 1.0,
+       "leaks": 30,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.9913,
+       "leaks": 908,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.991,
+       "recall_at_5": 0.861,
+       "hits": 221,
+       "should": 223
+      }
+     }
+    },
+    "peragent": {
+     "run": "sel-large-paraphrase-2026-10-01",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.1541,
+      "leaks": 908,
+      "must_not": 5891,
+      "recall": 0.9913,
+      "recall_at_5": 0.9869,
+      "hits": 227,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 1.0,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.9913,
+       "leaks": 908,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.991,
+       "recall_at_5": 0.9865,
+       "hits": 221,
+       "should": 223
+      }
+     }
+    }
+   },
+   "indirect": {
+    "memgate": {
+     "run": "sel-large-indirect-2026-10-01",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.0,
+      "leaks": 0,
+      "must_not": 5891,
+      "recall": 0.9563,
+      "recall_at_5": 0.7162,
+      "hits": 219,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 1.0,
+       "recall_at_5": 0.3333,
+       "hits": 6,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.9552,
+       "recall_at_5": 0.7265,
+       "hits": 213,
+       "should": 223
+      }
+     }
+    },
+    "nofilter": {
+     "run": "sel-large-indirect-2026-10-01",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.7354,
+      "leaks": 4332,
+      "must_not": 5891,
+      "recall": 0.7336,
+      "recall_at_5": 0.4716,
+      "hits": 168,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.7361,
+       "leaks": 3640,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.6667,
+       "recall_at_5": 0.3333,
+       "hits": 4,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.6667,
+       "leaks": 20,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.7336,
+       "leaks": 672,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.7354,
+       "recall_at_5": 0.4753,
+       "hits": 164,
+       "should": 223
+      }
+     }
+    },
+    "peragent": {
+     "run": "sel-large-indirect-2026-10-01",
+     "overall": {
+      "probes": 6120,
+      "leak_rate": 0.1249,
+      "leaks": 736,
+      "must_not": 5891,
+      "recall": 0.8035,
+      "recall_at_5": 0.5852,
+      "hits": 184,
+      "should": 229
+     },
+     "by_kind": {
+      "non-witness": {
+       "probes": 4945,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 4945,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "retold-to-newcomer": {
+       "probes": 6,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.5,
+       "recall_at_5": 0.3333,
+       "hits": 3,
+       "should": 6
+      },
+      "untold-to-newcomer": {
+       "probes": 30,
+       "leak_rate": 0.0,
+       "leaks": 0,
+       "must_not": 30,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-elsewhere": {
+       "probes": 916,
+       "leak_rate": 0.8035,
+       "leaks": 736,
+       "must_not": 916,
+       "recall": null,
+       "recall_at_5": null,
+       "hits": 0,
+       "should": 0
+      },
+      "witness-here": {
+       "probes": 223,
+       "leak_rate": null,
+       "leaks": 0,
+       "must_not": 0,
+       "recall": 0.8117,
+       "recall_at_5": 0.5919,
+       "hits": 181,
+       "should": 223
+      }
+     }
+    }
+   }
+  }
+ }
+}

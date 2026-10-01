@@ -20,109 +20,181 @@
    "id": "f23-0",
    "topic": "the combination for the kiln",
    "code": "ZEPHYR2-9833",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the kiln?",
+    "indirect": "What was the code Eli provided for the ceramic firing unit mentioned in the lab conversation?"
+   }
   },
   "f23-1": {
    "id": "f23-1",
    "topic": "the label on the darkroom",
    "code": "LUMEN3-3910",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the designated code for the darkroom sign?",
+    "indirect": "What code did Dee propose for the signage in the light\u2011sensitive room?"
+   }
   },
   "f23-2": {
    "id": "f23-2",
    "topic": "the password for the reading room",
    "code": "TUNDRA2-4710",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code grants access to the reading room?",
+    "indirect": "What was the code cy23 gave me for the place in the gallery where we look up references?"
+   }
   },
   "f23-3": {
    "id": "f23-3",
    "topic": "the combination for the boat house",
    "code": "CEDAR1-2019",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code for the boat house?",
+    "indirect": "What was the access code you said should be used for the lakeside structure we talked about earlier?"
+   }
   },
   "f23-4": {
    "id": "f23-4",
    "topic": "the combination for the server rack",
    "code": "FROST2-8484",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the server rack?",
+    "indirect": "What was the code we noted for the hardware enclosure when we were discussing the rooftop garden access?"
+   }
   },
   "f23-5": {
    "id": "f23-5",
    "topic": "the code for the rooftop garden",
    "code": "TUNDRA-7747",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access identifier for the rooftop garden?",
+    "indirect": "What identifier did Dee say should be used for the building's top\u2011level planting area?"
+   }
   },
   "f23-6": {
    "id": "f23-6",
    "topic": "the code for the archive cabinet",
    "code": "COBALT1-7674",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the archive cabinet?",
+    "indirect": "What was the combination Fay gave for the locked storage unit in the records area?"
+   }
   },
   "f23-7": {
    "id": "f23-7",
    "topic": "the booking reference for the sample fridge",
    "code": "RIDGE3-6724",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the code assigned to the sample fridge?",
+    "indirect": "What identifier did Fay suggest for the test appliance we mentioned in the logistics discussion?"
+   }
   },
   "f23-8": {
    "id": "f23-8",
    "topic": "the password for the darkroom",
    "code": "NECTAR3-5484",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What access code is required to get into the darkroom?",
+    "indirect": "What was the access code we mentioned for the room that required it?"
+   }
   },
   "f23-9": {
    "id": "f23-9",
    "topic": "the name chosen for the boat house",
    "code": "LUMEN1-7349",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What was the final designation given to the boat house?",
+    "indirect": "What identifier did they settle on for the storage building mentioned earlier in the lab conversation?"
+   }
   },
   "f23-10": {
    "id": "f23-10",
    "topic": "the name chosen for the tool chest",
    "code": "QUILL2-1701",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What designation was proposed for the tool chest?",
+    "indirect": "What label was proposed for the equipment locker during the lab discussion?"
+   }
   },
   "f23-11": {
    "id": "f23-11",
    "topic": "the booking reference for the field kit",
    "code": "ZEPHYR1-5185",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the identifier assigned to the field kit?",
+    "indirect": "What is the identifier that Fay provided for the equipment they discussed earlier in the gallery?"
+   }
   },
   "f23-12": {
    "id": "f23-12",
    "topic": "the name chosen for the telescope dome",
    "code": "COBALT3-9827",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What designation was suggested for the telescope dome?",
+    "indirect": "What identifier did Fay propose for the observatory enclosure during the gallery conversation?"
+   }
   },
   "f23-13": {
    "id": "f23-13",
    "topic": "the code for the west stairwell",
    "code": "NECTAR-7291",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access key for the west stairwell?",
+    "indirect": "What identifier did Fay give for the left\u2011side emergency exit earlier in the conversation?"
+   }
   },
   "f23-14": {
    "id": "f23-14",
    "topic": "the label on the loading dock",
    "code": "CEDAR2-4559",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What code should be displayed at the loading dock?",
+    "indirect": "What identifier did Fay say the receiving area should have?"
+   }
   },
   "f23-15": {
    "id": "f23-15",
    "topic": "the password for the bike shed",
    "code": "PIXEL3-7079",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the bike storage?",
+    "indirect": "What was the code Eli provided for the storage unit we discussed earlier in the conversation?"
+   }
   },
   "f23-16": {
    "id": "f23-16",
    "topic": "the password for the boat house",
    "code": "HARBOR3-2808",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code for the boat house?",
+    "indirect": "What was the access code we agreed on for the lakeside storage area that we mentioned during our chat?"
+   }
   },
   "f23-17": {
    "id": "f23-17",
    "topic": "the name chosen for the west stairwell",
    "code": "MOSAIC1-2981",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was assigned to the west stairwell?",
+    "indirect": "What identifier was assigned to the left\u2011hand passage discussed earlier?"
+   }
   }
  },
  "conversations": [

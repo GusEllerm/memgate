@@ -1,6 +1,8 @@
 """Run the selective-memory benchmark (suites S1–S3).
 
     uv run python -m smbench.selective.run --run sel-2026-09-29 --seeds 1 2 3 --systems nofilter peragent memgate
+    uv run python -m smbench.selective.run --run sel-env-indirect --banks-from sel-env-2026-09-30b --size env \
+        --seeds 21 22 23 --probe indirect        # re-probe an earlier run's banks with harder questions
 
 For each seeded world: write (or load) the dataset, ingest every conversation into each system, wait
 for background processing, then probe every (agent, location, fact) with a question about the fact's
@@ -21,6 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from smbench.selective import dialogue, oracle, systems
+from smbench.selective.questions import question_for
 
 RESULTS = Path("results/selective")
 
@@ -36,14 +39,14 @@ def make_system(name: str, run: str, args):
     raise ValueError(name)
 
 
-def probe(system, world, agent, loc, fid, k) -> dict:
+def probe(system, world, agent, loc, fid, k, style: str = "direct") -> dict:
     f = world.facts[fid]
-    texts = system.recall(world, agent, loc, f"What is {f.topic}?", k)
+    texts = system.recall(world, agent, loc, question_for(world, fid, style), k)
     # Notes (S5) belong to no conversation.
     scenario = next((c.scenario for c in world.conversations if fid in c.facts), "S5")
     rank = next((i + 1 for i, t in enumerate(texts) if f.code in t), None)   # 1-based rank of the first hit
     return {"system": system.name, "world": world.seed, "agent": agent, "location": loc, "fact": fid,
-            "scenario": scenario, "rank": rank, "hit": rank is not None, "n_retrieved": len(texts)}
+            "scenario": scenario, "probe": style, "rank": rank, "hit": rank is not None, "n_retrieved": len(texts)}
 
 
 def summarise(rows: list[dict]) -> dict:
@@ -77,13 +80,18 @@ def main() -> None:
     p.add_argument("--hindsight", default="http://127.0.0.1:8888")
     p.add_argument("--gated", default="http://127.0.0.1:8890")
     p.add_argument("--skip-ingest", action="store_true")
+    p.add_argument("--banks-from", help="probe the banks of this earlier run (implies --skip-ingest); results go to --run")
+    p.add_argument("--probe", choices=["direct", "paraphrase", "indirect"], default="direct",
+                   help="question style: direct names the topic; paraphrase and indirect come from questions.py")
     args = p.parse_args()
+    if args.banks_from:
+        args.skip_ingest = True
 
     out = RESULTS / args.run
     out.mkdir(parents=True, exist_ok=True)
     worlds = [dialogue.build(s, args.size) for s in args.seeds]
     print(f"{len(worlds)} worlds, {sum(len(w.conversations) for w in worlds)} conversations", flush=True)
-    syss = [make_system(n, args.run, args) for n in args.systems]
+    syss = [make_system(n, args.banks_from or args.run, args) for n in args.systems]
     if not args.skip_ingest:
         for s in syss:
             for w in worlds:
@@ -106,7 +114,7 @@ def main() -> None:
             before = s.snapshot(w) if ha and hasattr(s, "snapshot") else None
             for batch in (ha, rest):
                 with ThreadPoolExecutor(6) as pool:
-                    for (a, l, f), row in zip(batch, pool.map(lambda j: probe(s, w, *j, args.k), batch)):
+                    for (a, l, f), row in zip(batch, pool.map(lambda j: probe(s, w, *j, args.k, args.probe), batch)):
                         row["expected"] = exp[(a, l, f)]
                         row["kind"] = oracle.probe_kind(w, a, l, f)
                         rows.append(row)
@@ -126,6 +134,8 @@ def main() -> None:
         (out / "side_effects.json").write_text(json.dumps(audit, indent=1))
     summary = summarise(rows)
     (out / "summary.json").write_text(json.dumps(summary, indent=1))
+    (out / "settings.json").write_text(json.dumps({"probe": args.probe, "banks_from": args.banks_from, "k": args.k,
+                                                   "size": args.size, "seeds": args.seeds, "systems": args.systems}, indent=1))
     for system, groups in summary.items():
         o = groups["overall"]
         print(f"{system:9} leak {o['leaks']}/{o['must_not']} ({o['leak_rate']:.1%})  recall@20 {o['hits']}/{o['should']} ({o['recall']:.1%})  recall@5 {o['recall_at_5']:.1%}")

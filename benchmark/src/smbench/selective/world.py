@@ -50,6 +50,7 @@ class Fact:
     topic: str
     code: str
     kind: str = "fact"          # "fact" or "opinion": environments may let one out and not the other
+    questions: dict = field(default_factory=dict)   # harder probe questions by style (questions.py)
 
     @property
     def sentence(self) -> str:

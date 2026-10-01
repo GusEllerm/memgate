@@ -7,9 +7,10 @@ Benchmarks for **selective agent memory**: memory where the agent's context (who
 | Part | State |
 | --- | --- |
 | ALCF gateway (6-request cap, token, retries, request log) | built, tested against a fake upstream |
-| Memory-system adapters (Hindsight, Mem0, Falda; AgentCore reference) | not started |
-| Selective-memory world generator and Cedar oracle | not started |
-| Efficacy runs (LoCoMo, LongMemEval) | not started |
+| Memory-system adapters | Hindsight, Mem0, memgate (labels on); Falda and AgentCore not started |
+| Selective-memory benchmark (worlds, Cedar oracle, suites S1–S5, harder probes, answer-level leak check) | built and run; S6–S7 to come |
+| Efficacy runs | LoCoMo full (Hindsight, Mem0; memgate labels on/off); LongMemEval not started |
+| Speed (Cedar decisions, 1k–1M label sets) | built and run (`smbench.speed.cedar`); filtered search and partition fan-out not started |
 
 ## ALCF gateway
 
@@ -36,6 +37,14 @@ export OPENAI_API_KEY=gateway
 | `openai/gpt-oss-20b` | cheap tests | Sophia (vLLM) |
 
 Send `X-Run-Id` and `X-System` headers to label requests. Each request is logged as a JSON line in `results/gateway/requests.jsonl`. `GET /health` shows requests in flight, requests queued, and totals.
+
+## Running
+
+- LoCoMo: `scripts/run_locomo_full.sh`. Selective memory: `python -m smbench.selective.run` (see its docstring), with
+  `python -m smbench.selective.questions` adding the harder probe questions to a saved world, and
+  `python -m smbench.selective.leakcheck` for the lineage and answer-level checks.
+- Speed, no LLM needed: `python -m smbench.speed.cedar --out results/speed/<run>`.
+- The selective and speed modules need memgate and cedarpy; `.venvs/hindsight` has them (`PYTHONPATH=src .venvs/hindsight/bin/python -m ...`).
 
 ## Tests
 

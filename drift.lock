@@ -1,6 +1,16 @@
 version = 1
 
 [[bindings]]
+doc = "docs/vault/Concepts/Benchmark Plan.md"
+target = "benchmark/src/smbench/locomo/run.py#Runner"
+sig = "4b22ed06501643cb"
+
+[[bindings]]
+doc = "docs/vault/Concepts/Benchmark Plan.md"
+target = "benchmark/src/smbench/selective/world.py#Fact"
+sig = "50e52f6af7b2fb8d"
+
+[[bindings]]
 doc = "docs/vault/Concepts/Permission Layer.md"
 target = "memgate/src/memgate/adapters/hindsight/client.py#AsyncHindsightMemory"
 sig = "26e03a2099577431"
@@ -287,6 +297,11 @@ sig = "52b4cac017de0005"
 
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
+target = "benchmark/src/smbench/selective/questions.py#why_invalid"
+sig = "027170ca6fd6d3be"
+
+[[bindings]]
+doc = "docs/vault/Modules/Selective Memory Benchmark.md"
 target = "benchmark/src/smbench/selective/run.py#summarise"
 sig = "23a60dbc8d892447"
 
@@ -323,7 +338,7 @@ sig = "9f578287decc21d2"
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
 target = "benchmark/src/smbench/selective/world.py"
-sig = "baec71458d3632cb"
+sig = "afd6d37674c53d54"
 
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
@@ -333,7 +348,7 @@ sig = "ddd3277609692222"
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"
 target = "benchmark/src/smbench/selective/world.py#Fact"
-sig = "b6af9039a61f25fb"
+sig = "50e52f6af7b2fb8d"
 
 [[bindings]]
 doc = "docs/vault/Modules/Selective Memory Benchmark.md"

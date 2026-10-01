@@ -20,109 +20,181 @@
    "id": "f22-0",
    "topic": "the combination for the west stairwell",
    "code": "ORBIT2-5362",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the west stairwell?",
+    "indirect": "What was the code Ada gave for the lock she was stuck on this morning?"
+   }
   },
   "f22-1": {
    "id": "f22-1",
    "topic": "the code for the reading room",
    "code": "SAFFRON1-2068",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access combination for the reading room?",
+    "indirect": "What was the lock combination Bo mentioned for the area that stores the extra paperwork?"
+   }
   },
   "f22-2": {
    "id": "f22-2",
    "topic": "the password for the freezer",
    "code": "HARBOR1-1930",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the freezer?",
+    "indirect": "What was the code we discussed for the cold storage unit earlier?"
+   }
   },
   "f22-3": {
    "id": "f22-3",
    "topic": "the code for the lab safe",
    "code": "FROST3-1491",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the combination that opens the lab safe?",
+    "indirect": "What was the password bo22 proposed for the secure storage unit mentioned earlier?"
+   }
   },
   "f22-4": {
    "id": "f22-4",
    "topic": "the booking reference for the kiln",
    "code": "WILLOW2-5587",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the reference number associated with the kiln?",
+    "indirect": "What identifier did Eli give for the piece of equipment we talked about earlier?"
+   }
   },
   "f22-5": {
    "id": "f22-5",
    "topic": "the name chosen for the reading room",
    "code": "FROST2-1692",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What designation did bo22 suggest for the reading space?",
+    "indirect": "What label did we decide on for the quiet space we talked about earlier?"
+   }
   },
   "f22-6": {
    "id": "f22-6",
    "topic": "the password for the lab safe",
    "code": "CEDAR1-5539",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What code is required to open the lab safe?",
+    "indirect": "What is the code Ada mentioned she needed to access the secure storage later in her shift?"
+   }
   },
   "f22-7": {
    "id": "f22-7",
    "topic": "the label on the seminar room",
    "code": "GARNET-1066",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the designated identifier for the seminar room?",
+    "indirect": "During our talk about the signage for the presentation space, what identifier did Fay say should be used?"
+   }
   },
   "f22-8": {
    "id": "f22-8",
    "topic": "the code for the sample fridge",
    "code": "LUMEN2-8421",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the sample fridge's reference number?",
+    "indirect": "What is the identifier for the example refrigerator mentioned earlier?"
+   }
   },
   "f22-9": {
    "id": "f22-9",
    "topic": "the label on the boat house",
    "code": "SAFFRON2-8258",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the identifier displayed on the boat house?",
+    "indirect": "What was the identifier on the dockside shed that was mentioned earlier in the conversation?"
+   }
   },
   "f22-10": {
    "id": "f22-10",
    "topic": "the label on the lab safe",
    "code": "FROST1-9758",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What code is displayed on the lab safe?",
+    "indirect": "What is the code that Fay recommended for the chemical storage unit mentioned earlier?"
+   }
   },
   "f22-11": {
    "id": "f22-11",
    "topic": "the name chosen for the bike shed",
    "code": "COBALT1-6608",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was assigned to the bike shed?",
+    "indirect": "What was the identifier we selected for that storage unit we discussed earlier?"
+   }
   },
   "f22-12": {
    "id": "f22-12",
    "topic": "the combination for the storeroom",
    "code": "TUNDRA-5243",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code for the storeroom?",
+    "indirect": "What was the access code that bo22 mentioned should be used for the storage area during the gallery conversation?"
+   }
   },
   "f22-13": {
    "id": "f22-13",
    "topic": "the code for the rooftop garden",
    "code": "NECTAR1-2756",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access key for the rooftop garden?",
+    "indirect": "What is the identifier for the irrigation system setup that was mentioned earlier?"
+   }
   },
   "f22-14": {
    "id": "f22-14",
    "topic": "the password for the seminar room",
    "code": "MOSAIC3-3875",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the access code for the seminar space?",
+    "indirect": "What is the access code that Fay proposed for the meeting area when we discussed updating the access list?"
+   }
   },
   "f22-15": {
    "id": "f22-15",
    "topic": "the password for the boat house",
    "code": "RIDGE1-5310",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What is the access code for the boat house?",
+    "indirect": "What was the entry credential Eli mentioned earlier for the watercraft storage?"
+   }
   },
   "f22-16": {
    "id": "f22-16",
    "topic": "the code for the server rack",
    "code": "QUILL3-4085",
-   "kind": "opinion"
+   "kind": "opinion",
+   "questions": {
+    "paraphrase": "What is the identifier assigned to the server rack?",
+    "indirect": "What is the identifier cy22 recommended for the hardware unit they discussed in the vault?"
+   }
   },
   "f22-17": {
    "id": "f22-17",
    "topic": "the name chosen for the greenhouse door",
    "code": "WILLOW1-5550",
-   "kind": "fact"
+   "kind": "fact",
+   "questions": {
+    "paraphrase": "What identifier was assigned to the greenhouse entrance?",
+    "indirect": "What identifier did we select for the entry point we talked about earlier?"
+   }
   }
  },
  "conversations": [

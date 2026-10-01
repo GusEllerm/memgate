@@ -22,4 +22,6 @@ External facts and dated reviews. Notes named `Review …` are snapshots.
 - [[Review Selective S1-S3 2026-09-29]]
 - [[Review Selective large 2026-09-29]]
 - [[Review Selective S4-S5 2026-09-29]]
+- [[Review Selective harder probes 2026-10-01]]
+- [[Review Speed Cedar 2026-10-01]]
 - [[Review memgate adoption checks 2026-09-29]]
