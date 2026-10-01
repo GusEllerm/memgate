@@ -81,7 +81,7 @@ memgate controls what an agent can *recall*. It can't control what an agent *doe
 - **Content encoded in permitted output.** A permitted carry-out or message can carry more than it appears to.
 
 **Channels that come with the platform:**
-- **The simulation's own records.** Logs, traces and transcripts written by the host. Our gateway logs request metadata only, not prompts. Hindsight's LLM trace is off. memgate's provenance log keeps high-assurance records in a separate partition.
+- **The simulation's own records.** Logs, traces and transcripts written by the host. Our gateway logs request metadata only, not prompts. Hindsight's LLM trace is off, its log level is warning and recall queries are redacted from its log (memgate 0.4.2). memgate's provenance log keeps high-assurance records in a separate partition.
 - **The model provider,** which sees every prompt.
 
 We can't solve these by building only the memory service. All of this is deferred to the Ranch integration (Decision Log, 2026-09-30). But the same model extends past memory, and memgate can supply the pieces.

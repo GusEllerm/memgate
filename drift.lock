@@ -28,7 +28,7 @@ sig = "36c583ef1465064b"
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "8e95608e6e2d518a"
+sig = "e83b791b8d4bb158"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Trust Boundaries.md"
@@ -528,7 +528,17 @@ sig = "afa018dff35a2adf"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "8e95608e6e2d518a"
+sig = "e83b791b8d4bb158"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/validator.py#RedactQueries"
+sig = "7a89ff857577e530"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
+target = "memgate/src/memgate/adapters/hindsight/validator.py#install_log_redaction"
+sig = "e023aceb2ce1966b"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -588,12 +598,12 @@ sig = "0739eccc28a2c855"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/CHANGELOG.md"
-sig = "bf7db25d9f65c378"
+sig = "1edb5c833496a545"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "5ea945f54c24dd7e"
+sig = "101942659f938892"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -617,8 +627,13 @@ sig = "36c583ef1465064b"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
+target = "memgate/src/memgate/adapters/hindsight/validator.py#RedactQueries"
+sig = "7a89ff857577e530"
+
+[[bindings]]
+doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/cli.py#cmd_serve"
-sig = "d8155b434cd00746"
+sig = "f8510c3b8c060057"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -668,7 +683,7 @@ sig = "7ece2b720a1428c5"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
 target = "memgate/src/memgate/adapters/hindsight/validator.py#MemgateValidator"
-sig = "8e95608e6e2d518a"
+sig = "e83b791b8d4bb158"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"

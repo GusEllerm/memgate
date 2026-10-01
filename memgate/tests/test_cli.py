@@ -128,3 +128,14 @@ def test_serve_resolves_a_relative_hindsight_bin_before_changing_directory(tmp_p
     with pytest.raises(SystemExit):
         cli.main(["serve", "--world", "world.json", "--registry", "data/r.sqlite", "--hindsight-bin", "bin/hindsight-api"])
     assert os.path.isabs(seen["binary"]) and os.path.exists(seen["binary"])
+
+
+def test_serve_keeps_hindsight_quiet_about_memory_text(tmp_path, monkeypatch, capsys):
+    """Hindsight logs recall queries at INFO; serve forces WARNING (fingerprinted, so a .env can't raise it)."""
+    _, seen = _serve(tmp_path, monkeypatch)
+    assert seen["env"]["HINDSIGHT_API_LOG_LEVEL"] == "warning"
+    assert "HINDSIGHT_API_LOG_LEVEL" in seen["env"]["MEMGATE_SERVE_KEYS"].split(",")
+    assert "labelled data" not in capsys.readouterr().err
+    _, seen = _serve(tmp_path, monkeypatch, ("--hindsight-log-level", "info"))
+    assert seen["env"]["HINDSIGHT_API_LOG_LEVEL"] == "info"
+    assert "labelled data" in capsys.readouterr().err                   # asked for, and said out loud

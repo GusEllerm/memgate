@@ -158,7 +158,13 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_LLM_TRACE_ENABLED": "false",     # traces would hold memory content outside the partitions
         "HINDSIGHT_API_AUDIT_LOG_ENABLED": "false",
         "HINDSIGHT_API_OTEL_TRACES_ENABLED": "false",
+        # Hindsight logs the start of every recall query at INFO: conversation text in the server's log.
+        # The validator also redacts queries from whatever is logged (RedactQueries), at any level.
+        "HINDSIGHT_API_LOG_LEVEL": args.hindsight_log_level,
     }
+    if args.hindsight_log_level in ("info", "debug", "trace"):
+        print(f"memgate: Hindsight log level {args.hindsight_log_level}: its log will hold memory and query text "
+              "(queries redacted); treat it as labelled data", file=sys.stderr)
     env.update(forced)
     env["MEMGATE_SERVE_KEYS"] = ",".join(sorted(forced))
     env["MEMGATE_SERVE_FINGERPRINT"] = serve_fingerprint(env, list(forced))
@@ -231,6 +237,10 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--workdir", default=_env("MEMGATE_SERVE_DIR"),
                    help="Hindsight's working directory (default: .memgate-serve beside the registry); it holds "
                         "an empty .env so Hindsight never loads another one")
+    s.add_argument("--hindsight-log-level", choices=["critical", "error", "warning", "info", "debug", "trace"],
+                   default=_env("MEMGATE_HINDSIGHT_LOG_LEVEL", "warning"),
+                   help="Hindsight's log level (default warning: at info and below Hindsight logs memory and "
+                        "query text, which is labelled data)")
     s.add_argument("--hindsight-bin")
     s.set_defaults(func=cmd_serve)
 

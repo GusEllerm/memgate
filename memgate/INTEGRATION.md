@@ -70,9 +70,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.1#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.2#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.4.1#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.4.2#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
@@ -87,6 +87,7 @@ memgate serve --socket /srv/host/memgate-run/memgate.sock      # recommended: a 
 - **`memgate serve`** starts Hindsight with memgate's validator: the second lock, inside the store. It refuses a non-loopback bind unless you pass `--allow-remote`. It turns off Hindsight's LLM traces, which would hold memory content outside the partitions.
 - **Prefer a Unix socket** (`memgate serve --socket <dir>/memgate.sock`; clients use the address `unix:<dir>/memgate.sock`). The client sends the shared secret with every request, so it must know it is talking to memgate's server. Over a port, any local process that binds it first, or after the server stops, would receive the secret. Over a socket, the client checks before every request that the socket's directory is private (0700) and owned by the same user, so only that user's processes could have created it. `serve` creates the directory private, and refuses one that isn't. Socket paths are limited to about 100 bytes. Run the host and the server as the same user; in Docker, share the socket's directory as a volume between the two containers instead of using a network. Requests never go through an HTTP proxy, whichever transport you use.
 - **Always start Hindsight through `memgate serve`, never `hindsight-api` directly.** Hindsight applies the first `.env` it finds walking up from its working directory, over its environment. A stray or planted `.env` could drop the validator, change the database or turn traces on. `memgate serve` starts Hindsight in a private directory (`--workdir`; by default `.memgate-serve` beside the registry, mode 0700) holding an empty `.env`, and refuses to start if that file isn't empty. It also fingerprints every setting it forces, and the validator refuses to load (so Hindsight won't start) if any was changed. In a container, give that directory a volume or let `serve` create it, and don't add a `.env` to it.
+- **Hindsight's log holds no memory text.** Hindsight 0.10.1 logs the start of every recall query at INFO (conversation text, and from inside a high-assurance location its sealed text). `memgate serve` sets Hindsight's log level to WARNING (fingerprinted like its other settings, so a `.env` cannot raise it), and the validator redacts recall queries from whatever Hindsight logs at any level, including a failed recall's ERROR line. `--hindsight-log-level info` (or `MEMGATE_HINDSIGHT_LOG_LEVEL`) turns the operational log back on for debugging; serve then warns that the log is labelled data, since memory text other than queries may appear in it.
 - **The LLM** is used by Hindsight to extract and consolidate memories (any OpenAI-compatible endpoint). **Embeddings** are local (BAAI/bge-small-en-v1.5 by default).
 - **The host process and the server must see the same three settings:** `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
 - **The database:** `pg0://name` is an embedded Postgres. For your own server, use a `postgresql://` URL in `MEMGATE_DB`, not the `--db` flag, so the password stays out of the process list. Put the password in the user part (`postgresql://user:password@host/db`): memgate and Hindsight both mask it in their output. `memgate serve` refuses a password in the query (`?password=`), because Hindsight 0.10.1 logs the query in clear. Give memgate its own database role, with access to its database only, so the server can't reach the host's other data. The database needs the `vector` (pgvector) and `pg_trgm` extensions; pre-create them if Hindsight's role may not.
@@ -147,7 +148,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.4.1)
+## Limits (0.4.2)
 
 - **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
 - **Identity and context verification are the host's** (see the contract).

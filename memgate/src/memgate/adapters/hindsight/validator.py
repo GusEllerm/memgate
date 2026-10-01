@@ -16,6 +16,8 @@ memory listing, export).
 from __future__ import annotations
 
 import hmac
+import logging
+import re
 
 from hindsight_api.extensions.operation_validator import (
     BankReadContext,
@@ -39,6 +41,43 @@ from memgate.provenance import write_id_label_set
 
 NO_MATCH = "ls_none"  # a tag no item carries: recall returns nothing
 
+# Hindsight 0.10.1 logs the start of every recall query (`Query: '<text>...'`, `for query: <text>...`),
+# at INFO and, when a recall fails, at ERROR. A query is conversation text, and the host contract makes
+# logs labelled data, so the server never writes it: `memgate serve` sets Hindsight's level to WARNING,
+# and this filter redacts the query from whatever is logged at any level.
+_QUERY_PATTERNS = (
+    (re.compile(r"Query: '.*?\.\.\.' \((?=budget=)", re.S), "Query: [redacted] ("),
+    (re.compile(r"for query: .*?\.\.\.(?=, tags=|\n|$)", re.S), "for query: [redacted]"),
+)
+
+
+class RedactQueries(logging.Filter):
+    """Removes recall query text from Hindsight's log records (installed by `MemgateValidator`)."""
+
+    @staticmethod
+    def redact(text: str) -> str:
+        for pattern, repl in _QUERY_PATTERNS:
+            text = pattern.sub(repl, text)
+        return text
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if record.name.startswith("hindsight_api"):
+            message = record.getMessage()
+            redacted = self.redact(message)
+            if redacted != message:
+                record.msg, record.args = redacted, ()
+        return True
+
+
+def install_log_redaction() -> None:
+    """Put `RedactQueries` on the root logger and every handler it has, once. Filters on a logger apply
+    only to records logged to it directly, and Hindsight's handler is on the root logger (its
+    `configure_logging` runs before the validator loads), so the handlers are where it must sit."""
+    targets = [logging.getLogger(), *logging.getLogger().handlers]
+    for t in targets:
+        if not any(isinstance(f, RedactQueries) for f in t.filters):
+            t.addFilter(RedactQueries())
+
 # Bank reads that don't return memory content.
 SAFE_READS = {
     BankReadOperation.GET_OPERATION_STATUS, BankReadOperation.LIST_OPERATIONS,
@@ -61,6 +100,7 @@ class MemgateValidator(OperationValidatorExtension):
         if keys and serve_fingerprint(dict(os.environ), keys) != os.environ.get("MEMGATE_SERVE_FINGERPRINT"):
             raise RuntimeError("the environment memgate serve set for Hindsight was changed after start "
                                "(a .env above Hindsight's working directory?); refusing to run")
+        install_log_redaction()
         self.gate = Gate.from_env()
         # Which banks this server holds (MEMGATE_SERVE_SCOPE): "all" (default), "shared" (no high-assurance
         # partitions) or "partitions" (only them), so a split deployment can never land a memory on the

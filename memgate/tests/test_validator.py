@@ -222,3 +222,44 @@ def test_retain_refuses_a_write_id_minted_under_another_label_set(validator):
             item["document_id"] = doc
         ctx = RetainContext(bank_id=BANK, contents=[item], request_context=rc("ada", "lab"))
         assert run(validator.validate_retain(ctx)).allowed is ok, doc
+
+
+# -- the server's log never holds a recall query ------------------------------------------------------
+QUERY_LINES = [
+    ("[RECALL ranch-12345-abcdef] Query: 'the lab safe combination is 4471 and...' (budget=mid, max_tokens=4096, tags=['ls_x'])",
+     "[RECALL ranch-12345-abcdef] Query: [redacted] (budget=mid, max_tokens=4096, tags=['ls_x'])"),
+    ("[RECALL ranch] Starting recall for query: the lab safe combination is 4471..., tags=['ls_x'], tags_match=any_strict",
+     "[RECALL ranch] Starting recall for query: [redacted], tags=['ls_x'], tags_match=any_strict"),
+    ("[RECALL ranch] Starting recall for query: the lab safe combination is 4471...",
+     "[RECALL ranch] Starting recall for query: [redacted]"),
+    ("[REFLECT r1] Starting agentic reflect for query: what is the combination?...",
+     "[REFLECT r1] Starting agentic reflect for query: [redacted]"),
+    ("[RECALL ranch] Complete: 3 facts (120 tok) | 0.412s", "[RECALL ranch] Complete: 3 facts (120 tok) | 0.412s"),
+]
+
+
+@pytest.mark.parametrize("line, shown", QUERY_LINES)
+def test_queries_are_redacted_from_hindsights_log(validator, line, shown, caplog):
+    import logging
+    from memgate.adapters.hindsight.validator import install_log_redaction
+    install_log_redaction()        # what the validator did at load; pytest's capture handler is newer than that
+    with caplog.at_level(logging.DEBUG):
+        logging.getLogger("hindsight_api.engine.memory_engine").info("\n" + line)         # Hindsight's buffered form
+        logging.getLogger("hindsight_api.engine.memory_engine").error(line)               # and the failure path
+        logging.getLogger("other").info(line)                                              # not Hindsight: untouched
+    assert [r.getMessage() for r in caplog.records] == ["\n" + shown, shown, line]
+
+
+def test_redaction_is_installed_once_on_root_and_its_handlers(validator, monkeypatch):
+    import logging
+    from memgate.adapters.hindsight.validator import RedactQueries, install_log_redaction
+    root = logging.getLogger()
+    h = logging.StreamHandler()
+    root.addHandler(h)
+    try:
+        install_log_redaction()
+        install_log_redaction()
+        assert sum(isinstance(f, RedactQueries) for f in root.filters) == 1
+        assert sum(isinstance(f, RedactQueries) for f in h.filters) == 1
+    finally:
+        root.removeHandler(h)

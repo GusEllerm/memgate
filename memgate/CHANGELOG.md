@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.2 (2026-10-01)
+
+- **Security: Hindsight's log holds no recall queries.** Hindsight 0.10.1 logs the first 50 characters
+  of every recall query at INFO, and the whole recall log at ERROR when a recall fails. A query is
+  conversation text (a host typically recalls with the newest message), and inside a high-assurance
+  location it is sealed text, written outside the partition. `memgate serve` now sets
+  `HINDSIGHT_API_LOG_LEVEL=warning` (fingerprinted with its other forced settings, so a `.env` cannot
+  raise it; `--hindsight-log-level` / `MEMGATE_HINDSIGHT_LOG_LEVEL` overrides it, with a warning that
+  the log is then labelled data). The validator also installs a logging filter (`RedactQueries`) that
+  removes the query from Hindsight's recall and reflect log lines at any level, so the ERROR path is
+  covered too. Verified live: a recall's text never reaches the server's output at level info. Found
+  by the CHORUS integration's phase-2 live run.
+
 ## 0.4.1 (2026-10-01)
 
 - **Idempotent writes.** `remember` and `keep_note` take `key=`: the write ID is derived from the key

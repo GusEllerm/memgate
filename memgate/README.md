@@ -9,7 +9,7 @@ Hindsight 0.10.1).
 **Integrating it into a host application?** Read [INTEGRATION.md](INTEGRATION.md) first.
 
 ```sh
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.1#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.2#subdirectory=memgate"
 
 memgate check-world world.json          # is this world file usable?
 memgate serve --port 8889               # Hindsight with memgate's validator (MEMGATE_WORLD/REGISTRY/SECRET set)

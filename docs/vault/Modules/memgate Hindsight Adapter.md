@@ -45,7 +45,7 @@ Every request carries the gate secret plus the agent and location headers, from 
 
 ## Validator: the second lock, inside Hindsight
 
-Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` is loaded by Hindsight from HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION.
+Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` is loaded by Hindsight from HINDSIGHT_API_OPERATION_VALIDATOR_EXTENSION. On load it also installs `RedactQueries` (`install_log_redaction`, since 0.4.2) on the root logger's handlers: Hindsight logs the start of every recall query at info and the whole recall log at error when a recall fails, and the filter removes the query text from those lines at any level. `memgate serve` sets the level to warning as well; the filter covers the error path and a raised level.
 
 - **Fails closed:** an exception inside the validator fails the request. An unknown agent or location is refused (see `Policy` in [[memgate Core]]). The world file is re-read when it changes (`Gate.refresh`), with no restart.
 - **Identity:** trusts only the caller's identity. A request without the memgate secret is refused, and Hindsight's own background work (consolidation) passes as internal.
