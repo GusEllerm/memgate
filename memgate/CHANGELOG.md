@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.3 (2026-10-02)
+
+- `carry_out` takes `key=` like `remember` and `keep_note` (0.4.1): a retried carry-out replaces its earlier
+  self in the agent's personal memory instead of adding a copy. The write ID is bound to the personal label
+  set, which the validator's existing check already covers. Personal memory is one label set per agent, so a
+  key must be unique across everything that agent carries out. For CHORUS's phase-3 departures.
+
 ## 0.4.2 (2026-10-01)
 
 - **Security: Hindsight's log holds no recall queries.** Hindsight 0.10.1 logs the first 50 characters

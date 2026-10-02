@@ -265,16 +265,18 @@ class HindsightMemory(_Core):
                             "personal note", "note", key=key)
 
     def carry_out(self, ctx: Context, text: str, memory_type: str, *, source: LabelSet | Recalled | str | None = None,
-                  when: datetime | None = None, source_writes: list[str] = ()) -> str:
+                  when: datetime | None = None, source_writes: list[str] = (), key: str | None = None) -> str:
         """Copy something into the agent's personal memory, if every environment it came from allows.
 
         `source` is what the content was formed under: a recalled memory (its label set and write),
         a label set or its ID, or by default `ctx`'s conversation. It must be readable in `ctx`
         (Cedar checks). `memory_type` is the agent's own classification (fact, opinion, skill,
-        episode), audited. Raises PermissionError if refused."""
+        episode), audited. `key`, if given, makes the write idempotent as in `remember`; the agent's
+        personal memory is one label set, so a key must be unique across everything the agent carries
+        out. Raises PermissionError if refused."""
         writes = self._plan_carry_out(ctx, memory_type, source, source_writes)
         return self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
-                            f"carried out ({memory_type})", "carry_out", derived_from=writes)
+                            f"carried out ({memory_type})", "carry_out", derived_from=writes, key=key)
 
     def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
         """Record what `ctx.agent` said, to `ctx.participants`, and which recalls (their `recall_id`s)
@@ -380,11 +382,11 @@ class AsyncHindsightMemory(_Core):
 
     async def carry_out(self, ctx: Context, text: str, memory_type: str, *,
                         source: LabelSet | Recalled | str | None = None, when: datetime | None = None,
-                        source_writes: list[str] = ()) -> str:
+                        source_writes: list[str] = (), key: str | None = None) -> str:
         """See `HindsightMemory.carry_out`."""
         writes = self._plan_carry_out(ctx, memory_type, source, source_writes)
         return await self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
-                                  f"carried out ({memory_type})", "carry_out", derived_from=writes)
+                                  f"carried out ({memory_type})", "carry_out", derived_from=writes, key=key)
 
     async def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
         """See `HindsightMemory.say`."""

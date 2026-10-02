@@ -172,3 +172,19 @@ def test_a_key_makes_a_write_repeatable_within_its_label_set(world, registry, tm
     assert write_id_label_set(mem.remember(ctx, "x")) == ctx.conversation().id
     with sqlite3.connect(tmp_path / "provenance-shared.sqlite") as db:
         assert db.execute("SELECT text FROM entity WHERE id = ?", (first,)).fetchall() == [("final",)]
+
+
+def test_a_keyed_carry_out_replaces_itself_in_personal_memory(world, registry, tmp_path):
+    from memgate.derivation import personal_labels
+    from memgate.provenance import ProvenanceLog, write_id_label_set
+    gate = Gate(world, registry, "s")
+    log = ProvenanceLog(tmp_path, gate)
+    mem, rec = sync_client(gate, provenance=log)
+    src = conversation_labels("lab", ["ada", "bo"])
+    ctx = Context("ada", "lab")                                              # after leaving: the agent alone
+    first = mem.carry_out(ctx, "the kiln runs hot", "fact", source=src, source_writes=["w_s1"], key="carry:d1:0")
+    again = mem.carry_out(ctx, "the kiln runs hot", "fact", source=src, source_writes=["w_s1", "w_s2"], key="carry:d1:0")
+    assert first == again and write_id_label_set(first) == personal_labels("ada").id
+    assert mem.carry_out(ctx, "x", "fact", source=src, key="carry:d1:1") != first
+    assert log.sources_of(first, ["shared"]) == ["w_s1", "w_s2"]            # the retry's sources replace the first's
+    assert [b["items"][0]["document_id"] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")][:2] == [first, first]

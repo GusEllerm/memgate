@@ -70,9 +70,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.2#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.3#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.4.2#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.4.3#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
@@ -114,10 +114,10 @@ ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # buil
 | `mem.recall(ctx, query, k=20)` | The agent needs to remember something | Returns a `RecallBatch` of `Recalled` (text, label set, date, write id), best first, only what `ctx` may read. `.recall_id` is set when provenance is on |
 | `mem.remember(ctx, text, when=None, about=None, turns=(), key=None)` | Something was said or seen in a conversation | Stored under `ctx`'s location and participants. `turns` links it to what was said (provenance). Returns the write id |
 | `mem.keep_note(ctx, text, key=None)` | An agent's private note that should stay where it was written | Readable only by its author, only in that location |
-| `mem.carry_out(ctx, text, memory_type, source=None)` | An agent takes something with it into personal memory | `source` is what the content was formed under. Pass the `Recalled` item itself to carry out something recalled (its label set, and its write for provenance), or a label set or its ID. It defaults to `ctx`'s conversation. It must be readable in `ctx`. Raises `PermissionError` if the environment forbids it |
+| `mem.carry_out(ctx, text, memory_type, source=None, source_writes=(), key=None)` | An agent takes something with it into personal memory | `source` is what the content was formed under. Pass the `Recalled` item itself to carry out something recalled (its label set, and its write for provenance), or a label set or its ID. It defaults to `ctx`'s conversation. It must be readable in `ctx`. Raises `PermissionError` if the environment forbids it |
 | `mem.say(ctx, text, recalls=[recall_id, ...])` | An agent speaks | Records which recalls it drew on, so later memories trace back (needs a `ProvenanceLog`) |
 
-- **Idempotent writes:** pass `key=` (any string the host chooses, e.g. its own segment id) to `remember` or `keep_note`. The write id is derived from the key and the label set, so re-sending the same key under the same label set (same location, same participants; same author for a note) replaces the earlier write instead of storing it twice: Hindsight upserts by that id, and a byte-identical re-send extracts nothing new. A host that records at least once (an outbox drained after a crash) gets exactly-once storage this way. The id carries the label set, and the server refuses a write id minted under another label set, so a key can never reach another conversation's memory.
+- **Idempotent writes:** pass `key=` (any string the host chooses, e.g. its own segment id) to `remember`, `keep_note` or `carry_out`. The write id is derived from the key and the label set, so re-sending the same key under the same label set (same location, same participants; same author for a note) replaces the earlier write instead of storing it twice: Hindsight upserts by that id, and a byte-identical re-send extracts nothing new. A host that records at least once (an outbox drained after a crash) gets exactly-once storage this way. The id carries the label set, and the server refuses a write id minted under another label set, so a key can never reach another conversation's memory. An agent's personal memory (carry-outs) is one label set, so a carry-out key must be unique across everything that agent ever carries out, and a retry must re-send the same text under the same key (store the chosen items, then write them).
 - **Async hosts:** `AsyncHindsightMemory` (same arguments, `await` every call; use `async with`, or call `aclose()`) has the same API and the same decisions. Otherwise wrap the sync client in `asyncio.to_thread`; it is thread-safe.
 - **Carrying out what an agent recalled** (the usual pattern on leaving a place): `recall` there, let the agent pick items and classify each, then call `carry_out(ctx, text, type, source=item)` per item. The item's own label set is the source, because it may have been formed with different people present than now.
 - **Writes that break a rule** raise `PermissionError` before anything is stored. Store errors raise `HindsightError`. None of these calls ever returns an unchecked result.
@@ -149,7 +149,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.4.2)
+## Limits (0.4.3)
 
 - **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
 - **Identity and context verification are the host's** (see the contract).
