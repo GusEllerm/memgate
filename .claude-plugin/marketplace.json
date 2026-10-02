@@ -9,7 +9,7 @@
       "name": "memgate",
       "source": "./plugins/memgate",
       "description": "Integrate memgate (context-scoped permissions for agent memory) into a host application.",
-      "version": "0.4.3"
+      "version": "0.4.4"
     }
   ]
 }

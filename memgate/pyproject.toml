@@ -1,6 +1,6 @@
 [project]
 name = "memgate"
-version = "0.4.3"
+version = "0.4.4"
 description = "Permission layer for agent memory: context-scoped labels, Cedar policies, and adapters for memory systems."
 readme = "README.md"
 requires-python = ">=3.11"

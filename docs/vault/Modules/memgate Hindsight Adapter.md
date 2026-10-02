@@ -56,7 +56,7 @@ Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` 
   - reflect is refused, because its scope can't be enforced;
   - mental models are refused, because they blend a bank;
   - memory-reading bank operations (list, export, get document, entity graph, …) are refused for agents, via `validate_bank_read`;
-  - bank writes and bank creation are admin-only (`validate_bank_write`, `validate_create_bank`).
+  - bank writes and bank creation are admin-only (`validate_bank_write`, `validate_create_bank`), with one exception since 0.4.4: an authenticated agent-role caller may submit a consolidation (`SCHEDULE_ONLY`). Hindsight schedules one after every retain with the writer's context; refusing it only delayed consolidation to Hindsight's five-minute reconcile sweep and logged a warning per write (found by CHORUS's phase-3 run). The submit stores nothing, and the consolidation it schedules is validated by `validate_consolidate` when it runs.
 
 **Launch:** `memgate serve` ([[memgate Integration]]) runs Hindsight with the validator loaded:
 - its own database (pg0://memgate by default);

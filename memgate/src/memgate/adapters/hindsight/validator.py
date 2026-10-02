@@ -83,6 +83,11 @@ SAFE_READS = {
     BankReadOperation.GET_OPERATION_STATUS, BankReadOperation.LIST_OPERATIONS,
     BankReadOperation.GET_BANK_PROFILE, BankReadOperation.GET_BANK_STATS,
 }
+# Bank writes that store nothing themselves: they only schedule work that is validated when it runs.
+# Hindsight submits a consolidation right after every retain, with the writer's own request context, so
+# an agent-role caller must be allowed this one or consolidation waits for Hindsight's reconcile sweep
+# (every 5 minutes by default). The consolidation itself goes through validate_consolidate.
+SCHEDULE_ONLY = {BankWriteOperation.SUBMIT_ASYNC_CONSOLIDATION}
 
 
 def _headers(ctx) -> dict[str, str]:
@@ -224,4 +229,6 @@ class MemgateValidator(OperationValidatorExtension):
             role, _, _ = self._caller(ctx)
         except PermissionError as e:
             return ValidationResult.reject(str(e))
-        return ValidationResult.accept() if role in ("internal", "admin") else ValidationResult.reject("admin only")
+        if role in ("internal", "admin") or ctx.operation in SCHEDULE_ONLY:
+            return ValidationResult.accept()
+        return ValidationResult.reject("admin only")

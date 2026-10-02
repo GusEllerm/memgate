@@ -151,8 +151,10 @@ def test_reads_around_the_filter_are_refused(validator):
 
 
 def test_bank_administration_is_admin_only(validator):
+    from memgate.adapters.hindsight.validator import SCHEDULE_ONLY
     for op in BankWriteOperation:
-        assert not run(validator.validate_bank_write(BankWriteContext(BANK, op, rc("ada", "lab")))).allowed
+        agent_ok = run(validator.validate_bank_write(BankWriteContext(BANK, op, rc("ada", "lab")))).allowed
+        assert agent_ok is (op in SCHEDULE_ONLY)          # only scheduling a consolidation (see the test below)
         assert run(validator.validate_bank_write(BankWriteContext(BANK, op, rc(role="admin")))).allowed
     assert not run(validator.validate_create_bank(CreateBankContext(BANK, rc("ada", "lab")))).allowed
 
@@ -263,3 +265,16 @@ def test_redaction_is_installed_once_on_root_and_its_handlers(validator, monkeyp
         assert sum(isinstance(f, RedactQueries) for f in h.filters) == 1
     finally:
         root.removeHandler(h)
+
+
+def test_an_agent_may_schedule_consolidation_but_nothing_else(validator):
+    """Hindsight submits consolidation after every retain with the writer's context; that one bank write is
+    allowed to an authenticated agent (it stores nothing; the run is validated by validate_consolidate)."""
+    sched = lambda **who: run(validator.validate_bank_write(BankWriteContext(
+        bank_id=BANK, operation=BankWriteOperation.SUBMIT_ASYNC_CONSOLIDATION, request_context=rc(**who))))
+    assert sched(agent="ada", location="lab").allowed
+    assert sched(role="admin").allowed
+    assert not sched(agent="ada", location="lab", secret="wrong").allowed            # still needs the secret
+    for op in (BankWriteOperation.DELETE_BANK, BankWriteOperation.DELETE_DOCUMENT, BankWriteOperation.CLEAR_OBSERVATIONS):
+        ctx = BankWriteContext(bank_id=BANK, operation=op, request_context=rc("ada", "lab"))
+        assert not run(validator.validate_bank_write(ctx)).allowed                   # every other write: admin only

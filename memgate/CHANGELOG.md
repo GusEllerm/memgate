@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.4 (2026-10-02)
+
+- **Consolidation runs right after a write again.** Hindsight schedules its auto-consolidation after every
+  retain with the writer's own request context; the validator treated that as a bank write and refused it
+  ("admin only"), so consolidation only ran when Hindsight's reconcile sweep picked the bank up, up to five
+  minutes later, and every write logged a warning. The validator now accepts that one operation
+  (`SUBMIT_ASYNC_CONSOLIDATION`) from an authenticated agent-role caller: it stores nothing, and the
+  consolidation it schedules is still validated when it runs and stays within one label set. Every other
+  bank write remains admin-only. Reported by the CHORUS integration's phase-3 live run.
+
 ## 0.4.3 (2026-10-02)
 
 - `carry_out` takes `key=` like `remember` and `keep_note` (0.4.1): a retried carry-out replaces its earlier
