@@ -8,5 +8,6 @@ One note per module or package. Name the code in backticks; livedocs checks it.
 - [[memgate Core]]
 - [[memgate Hindsight Adapter]]
 - [[Selective Memory Benchmark]]
+- [[Speed Suite]]
 - [[memgate Proofs]]
 - [[memgate Integration]]

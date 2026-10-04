@@ -11,6 +11,6 @@ on both sides of it.
 | **Integrate memgate into a host application** | [`memgate/INTEGRATION.md`](memgate/INTEGRATION.md), or the `integrate-memgate` skill: `claude plugin marketplace add GusEllerm/memgate`, then `claude plugin install memgate@memgate` |
 | Use the library and CLI | [`memgate/`](memgate/) (`memgate serve`, `check-world`, `conformance`) |
 | Understand the design and the evidence | the Obsidian vault at [`docs/vault/`](docs/vault/Home.md) (open it with "Open folder as vault"), kept in sync with the code by [livedocs](https://github.com/GusEllerm/vault-drift) |
-| Run the benchmarks | [`benchmark/`](benchmark/): LoCoMo and the selective-memory benchmark (to be split out at publication) |
+| Run the benchmarks | [`benchmark/`](benchmark/): LoCoMo, the selective-memory benchmark (on Hindsight and Mem0) and the Cedar speed suite (to be split out at publication) |
 
 The repo was called agentic-memory until 2026-09-30.

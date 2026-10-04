@@ -416,6 +416,41 @@ target = "memgate/src/memgate/world.py#World"
 sig = "80d643aa4a33130d"
 
 [[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "benchmark/src/smbench/speed/cedar.py"
+sig = "a768e11a32d73994"
+
+[[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "benchmark/src/smbench/speed/cedar.py#build_world"
+sig = "c6b34a98ceadf50e"
+
+[[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "benchmark/src/smbench/speed/cedar.py#label_sets"
+sig = "a375092472a90893"
+
+[[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "benchmark/src/smbench/speed/cedar.py#measure"
+sig = "642e96b42cf0e59d"
+
+[[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "benchmark/src/smbench/speed/cedar.py#timed"
+sig = "92dae8af6c9d2832"
+
+[[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "memgate/src/memgate/policy.py#Policy"
+sig = "19923e112fc28845"
+
+[[bindings]]
+doc = "docs/vault/Modules/Speed Suite.md"
+target = "memgate/src/memgate/registry.py#Registry"
+sig = "caa2ed4cb276b1d9"
+
+[[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "benchmark/src/smbench/selective/leakcheck.py#lineage"
 sig = "002aa567b96c9022"
@@ -728,7 +763,7 @@ sig = "c161037c91c03766"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "plugins/memgate/skills/integrate-memgate/SKILL.md"
-sig = "1774437577a830b7"
+sig = "814c2a02bd84e5bc"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"
