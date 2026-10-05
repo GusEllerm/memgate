@@ -278,3 +278,13 @@ def test_an_agent_may_schedule_consolidation_but_nothing_else(validator):
     for op in (BankWriteOperation.DELETE_BANK, BankWriteOperation.DELETE_DOCUMENT, BankWriteOperation.CLEAR_OBSERVATIONS):
         ctx = BankWriteContext(bank_id=BANK, operation=op, request_context=rc("ada", "lab"))
         assert not run(validator.validate_bank_write(ctx)).allowed                   # every other write: admin only
+
+
+def test_a_class_set_is_written_like_the_plain_personal_set(validator):
+    """The validator needs no change for classes: a class set is a registered label set the owner may write
+    anywhere {self:A} may be written, and nobody else may."""
+    unnamed = personal_labels("ada", "unattributed")
+    assert retain(validator, BANK, unnamed, agent="ada", location="lab").allowed
+    assert not retain(validator, BANK, unnamed, agent="bo", location="lab").allowed
+    assert not retain(validator, VAULT_BANK, unnamed, agent="ada", location="vault").allowed      # the seal holds
+    assert not retain(validator, BANK, unnamed, agent="ada", location="vault").allowed

@@ -8,7 +8,13 @@ agents and locations from the world, plants canary strings (unique codes) in a t
 checks who can recall each from where, probes the validator directly, then deletes the bank. Checks
 that need something the world doesn't have (a second location, a high-assurance location, an
 environment that refuses a carry-out) are reported as skipped. Costs a few dozen LLM calls, for
-Hindsight's extraction of the canary memories.
+Hindsight's extraction and consolidation of the canary memories.
+
+The class checks (0.5.0) keep a named item in an agent's personal set and its nameless version in the
+"unattributed" class set, wait for consolidation, then list every stored unit (as admin): no observation
+may be built from a unit of another label set, and the planted name may appear in no unit of the class
+set. That is the separation the class exists for, which the memory system's per-tag consolidation keeps
+(outside the policies' proofs), so it is checked here rather than proved.
 
 Exit code 0 means every applicable check passed.
 """
@@ -22,7 +28,10 @@ from dataclasses import dataclass
 
 from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Context, Gate, partition_bank
 from memgate.derivation import personal_labels
+from memgate.labels import CLASSES
 from memgate.world import MEMORY_TYPES
+
+UNATTRIBUTED = CLASSES[0]
 
 
 @dataclass
@@ -40,6 +49,29 @@ def _raw(url: str, method: str, path: str, body: dict | None, headers: dict) -> 
     return status, raw.decode(errors="replace")
 
 
+def _apart(mem, bank: str, gate: Gate, class_set: str, name: str) -> tuple[bool | None, str]:
+    """(passed, detail) for class-apart, or (None, why) when consolidation formed nothing to check."""
+    units, offset = [], 0
+    while True:
+        r = mem._call("GET", f"/v1/default/banks/{bank}/memories/list?limit=500&offset={offset}", None, role="admin")
+        page = r.get("items", [])
+        units += page
+        offset += len(page)
+        if not page or offset >= r.get("total", 0):
+            break
+    tag = {u["id"]: tuple(sorted(u.get("tags") or [])) for u in units}
+    observations = [u for u in units if u.get("fact_type") == "observation"]
+    crossed = [u["id"] for u in observations
+               if any(s in tag and tag[s] != tag[u["id"]] for s in (u.get("source_memory_ids") or []))]
+    named = [u["id"] for u in units if tag[u["id"]] == (class_set,) and name.lower() in (u.get("text") or "").lower()]
+    in_class = sum(1 for u in observations if tag[u["id"]] == (class_set,))
+    if not observations:
+        return None, f"consolidation formed no observations within the wait ({len(units)} units)"
+    return (not crossed and not named,
+            f"{len(observations)} observations ({in_class} in the class set): {len(crossed)} built across label sets, "
+            f"{len(named)} class-set units with the name")
+
+
 def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = None) -> list[Check]:
     from memgate.adapters.hindsight.client import HindsightError, HindsightMemory
 
@@ -55,6 +87,10 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
         Check("write-rules", "The validator refuses a write under a label set the writer may not write"),
         Check("carry-out", "A permitted carry-out becomes personal memory: its owner recalls it elsewhere, no one else does"),
         Check("carry-refused", "A carry-out the environment forbids is refused and stores nothing"),
+        Check("class-carry-out", "A carry-out into a class set: its owner recalls it elsewhere, no one else does"),
+        Check("class-downgrade", "Content from a class set cannot be carried into a less strict personal set"),
+        Check("class-minimum", "An environment's minimum class refuses a carry-out without it"),
+        Check("class-apart", "Consolidation never builds on another label set: the class set never gets the named item's name"),
         Check("ha-inside", "A high-assurance conversation is recalled inside its location"),
         Check("ha-outside", "...and never outside it"),
         Check("ha-partition", "It is stored in the location's own partition, not the shared bank"),
@@ -90,13 +126,22 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
         a, b, c = agents[:3]
         l1 = ordinary[0]
         l2 = ordinary[1] if len(ordinary) > 1 else None
-        codes = {k: f"MGC-{k.upper()}-{uuid.uuid4().hex[:6]}" for k in ("conv", "carry", "refused", "ha")}
+        codes = {k: f"MGC-{k.upper()}-{uuid.uuid4().hex[:6]}" for k in ("conv", "carry", "refused", "ha", "class")}
         here = Context(a, l1, (a, b))
         mem.remember(here, f"{a} and {b} agreed the conformance canary for {l1} is {codes['conv']}.")
 
         carry_type = next((t for t in sorted(w.carry_out_types(frozenset({l1})))), None)
+        floor = w.min_class({l1})                          # meet the location's minimum, if its environment sets one
         if carry_type:
-            mem.carry_out(here, f"{a}'s own {carry_type}: the conformance keepsake code is {codes['carry']}.", carry_type)
+            mem.carry_out(here, f"{a}'s own {carry_type}: the conformance keepsake code is {codes['carry']}.", carry_type,
+                          cls=floor)
+            # The same fact twice, once with a name in the plain personal set and once without in the class set.
+            # A canary name, so that finding it in the class set can only mean the two sets were mixed.
+            canary_name = f"Zorvath{uuid.uuid4().hex[:4]}"
+            topic = f"the conformance buffer drifts above {codes['class']} degrees"
+            if floor is None:
+                mem.carry_out(here, f"{canary_name} says {topic}.", carry_type)
+            mem.carry_out(here, f"A colleague says {topic}.", carry_type, cls=UNATTRIBUTED)
         refusing = next(((l, t) for l in ordinary for t in sorted(MEMORY_TYPES - w.carry_out_types(frozenset({l})))), None)
         if ha:
             v = ha[0]
@@ -131,9 +176,39 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
 
         if carry_type and l2:
             ok("carry-out", sees(a, l2, codes["carry"], "conformance keepsake code") and
-               not sees(b, l2, codes["carry"], "conformance keepsake code"), f"type {carry_type}")
+               not sees(b, l2, codes["carry"], "conformance keepsake code"), f"type {carry_type}" + (f", class {floor}" if floor else ""))
+            ok("class-carry-out", sees(a, l2, codes["class"], "conformance buffer drift") and
+               not sees(b, l2, codes["class"], "conformance buffer drift"), f"type {carry_type}")
         else:
-            checks["carry-out"].detail = "no ordinary location lets any memory type out, or only one location"
+            for cid in ("carry-out", "class-carry-out"):
+                checks[cid].detail = "no ordinary location lets any memory type out, or only one location"
+        if carry_type:
+            try:
+                mem.carry_out(Context(a, l1), "downgraded", carry_type, source=personal_labels(a, UNATTRIBUTED), cls=None)
+                ok("class-downgrade", False, f"a {UNATTRIBUTED} item was carried into {a}'s plain personal set")
+            except PermissionError as e:
+                ok("class-downgrade", True, str(e))
+        else:
+            checks["class-downgrade"].detail = "no ordinary location lets any memory type out"
+        floored = next(((l, t) for l in ordinary if w.min_class({l}) for t in sorted(w.carry_out_types(frozenset({l})))), None)
+        if floored:
+            loc, t = floored
+            try:
+                mem.carry_out(Context(a, loc, (a, b)), "no class given", t)
+                ok("class-minimum", False, f"{t} out of {loc} without a class was allowed")
+            except PermissionError as e:
+                ok("class-minimum", True, str(e))
+        else:
+            checks["class-minimum"].detail = "no environment in the world sets a min_class"
+        if carry_type and floor is None:
+            ok_apart, detail = _apart(mem, bank, gate, personal_labels(a, UNATTRIBUTED).id, canary_name)
+            if ok_apart is None:
+                checks["class-apart"].detail = detail
+            else:
+                ok("class-apart", ok_apart, detail)
+        else:
+            checks["class-apart"].detail = ("no ordinary location lets any memory type out" if not carry_type else
+                                            f"{l1} sets a min_class, so the named item can't be kept there")
         if refusing:
             loc, t = refusing
             try:

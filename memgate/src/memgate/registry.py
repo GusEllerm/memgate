@@ -14,7 +14,13 @@ import sqlite3
 import threading
 from pathlib import Path
 
-from memgate.labels import LabelSet
+from memgate.labels import CLASSES, KINDS, LabelSet
+
+# Rows this version can read: every label of a known kind, and a class label of a known class. A label
+# set written by a newer memgate with a kind or class this one doesn't know is skipped (never readable,
+# never writable here) rather than failing every call that reads the registry.
+_KNOWN = (f"(u.kind IN ({','.join('?' * (len(KINDS) - 1))}) OR (u.kind = 'class' AND u.value IN ({','.join('?' * len(CLASSES))})))")
+_KNOWN_PARAMS = [k for k in KINDS if k != "class"] + list(CLASSES)
 
 
 class Registry:
@@ -55,7 +61,9 @@ class Registry:
         so callers can cache a result and later ask only about label sets registered since."""
         with self._lock:
             ids = {r[0] for r in self._db.execute(
-                f"SELECT ls.id FROM label_sets ls WHERE ls.rowid > ? AND ({where})", [after] + params)}
+                f"SELECT ls.id FROM label_sets ls WHERE ls.rowid > ? AND ({where}) "
+                f"AND NOT EXISTS (SELECT 1 FROM label u WHERE u.label_set = ls.id AND NOT {_KNOWN})",
+                [after] + params + _KNOWN_PARAMS)}
             newest = self._db.execute("SELECT COALESCE(MAX(rowid), 0) FROM label_sets").fetchone()[0]
         return ids, newest
 
@@ -67,9 +75,16 @@ class Registry:
         return LabelSet.of(json.loads(row[0]))
 
     def all(self) -> dict[str, LabelSet]:
+        """Every registered label set this version can read (see _KNOWN; unreadable rows are left out)."""
         with self._lock:
             rows = self._db.execute("SELECT id, labels FROM label_sets").fetchall()
-        return {id: LabelSet.of(json.loads(labels)) for id, labels in rows}
+        out = {}
+        for id, labels in rows:
+            try:
+                out[id] = LabelSet.of(json.loads(labels))
+            except ValueError:
+                continue                    # written by a newer memgate: fail closed for that set only
+        return out
 
     def __len__(self) -> int:
         with self._lock:

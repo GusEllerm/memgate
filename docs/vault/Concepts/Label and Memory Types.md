@@ -2,9 +2,9 @@
 type: design
 status: draft
 authority: describes
-summary: "Selective memory for a social simulation of agents: three label types (identity, location, participants); participants recall a discussion in its location; personal memory is always readable, and the environment decides what may enter it."
+summary: "Selective memory for a social simulation of agents: three label types (identity, location, participants), plus a class on personal memory since memgate 0.5.0; participants recall a discussion in its location; personal memory is always readable, and the environment decides what may enter it."
 created: 2026-09-25
-updated: 2026-09-30
+updated: 2026-10-05
 tags: [memgate, design, permissions, memory-types]
 ---
 
@@ -33,6 +33,15 @@ Across types, every type on an item must be satisfied. Within the participant ty
 - So the memory system never merges across label sets (accepted, [[Decision Log]]); merging within one label set is fine. It must never fold a new {A, B, C} memory into a similar {A, B} one. Cross-label-set merges may be allowed in some cases later. A merge would either leak {A, B} to C or take away C's own memory of the meeting. Similar content stays separate and is linked by provenance.
 
 **Example (Gus).** A, B and C discuss in L. The derived memory is tagged {loc:L, with:A, with:B, with:C}. Later, A alone in L can recall it. D in L cannot, because D wasn't there. A in another location cannot either, unless L let A carry it into personal memory.
+
+## Classes of personal memory (memgate 0.5.0)
+
+A fourth label kind, `class:C`, only on personal memory. {self:A, class:unattributed} is read exactly like {self:A}: the policies never see the class. It exists so the memory system keeps the two sets apart: Hindsight consolidates within one tag, merging and resolving references ("a colleague" → a name), so items kept without names must not share a set with the agent's named ones.
+
+- **Asked for** by CHORUS for the Knowledge Ranch's unattributed (Chatham House) trees, where content may leave but no one may be named (Rob's "mosaic": each class consolidates only with its own).
+- **Feasibility, 2026-10-02** (this repo's maintainer session, in reply to CHORUS; recorded here because the answer lived only in CHORUS's memory-phase3.md §9): a class label is about a day's work, needs no policy or proof change, and the host keeps the meet.
+- **Design ruled by Gus, 2026-10-05** (relayed by CHORUS's plan, memory-unattributed.md §4): one ordered list of classes (`unattributed` for now); `carry_out(cls=)`; the host decides the class, as the stricter of each stretch's recorded setting and the tree's current one; no class on conversation sets; no Cedar or proof change. memgate added, as its own calls: refusing a carry-out to a less strict class, an environment's `min_class` as a guard against a host bug, and failing closed per set on labels a version doesn't know.
+- **Outside the proofs:** the separation itself (checked live by conformance's `class-apart`) and the two carry-out rules (client-side, tested).
 
 ## The environment decides (accepted)
 

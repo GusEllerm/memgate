@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 
 from memgate.context import PARTITION_SEP       # reserved in ids: partition bank names use it
+from memgate.labels import CLASSES
 from memgate.world import MEMORY_TYPES
 
 
@@ -50,8 +51,10 @@ def check_world(spec) -> list[str]:
             elif set(co) - MEMORY_TYPES:
                 errors.append(f"environment {e.get('id')!r}: unknown memory types {sorted(set(co) - MEMORY_TYPES)} "
                               f"(known: {sorted(MEMORY_TYPES)})")
-        if isinstance(e, dict) and set(e) - {"id", "carry_out"}:
-            errors.append(f"environment {e.get('id')!r}: unknown keys {sorted(set(e) - {'id', 'carry_out'})}")
+        if isinstance(e, dict) and "min_class" in e and e["min_class"] not in CLASSES:
+            errors.append(f"environment {e.get('id')!r}: min_class must be one of {list(CLASSES)}, not {e['min_class']!r}")
+        if isinstance(e, dict) and set(e) - {"id", "carry_out", "min_class"}:
+            errors.append(f"environment {e.get('id')!r}: unknown keys {sorted(set(e) - {'id', 'carry_out', 'min_class'})}")
 
     ids("locations", spec.get("locations", []))
     for l in spec.get("locations", []) if isinstance(spec.get("locations"), list) else []:

@@ -78,7 +78,8 @@ def load_world(path: str | Path) -> World:
     spec = json.loads(Path(path).read_text())
     w = World()
     for e in spec["environments"]:
-        w.add_environment(e["id"], carry_out=e.get("carry_out", ("fact", "opinion", "skill", "episode")))
+        w.add_environment(e["id"], carry_out=e.get("carry_out", ("fact", "opinion", "skill", "episode")),
+                          min_class=e.get("min_class"))
     for l in spec["locations"]:
         w.add_location(l["id"], l["environment"], l.get("high_assurance", False))
     w.add_agents(*spec.get("agents", []))

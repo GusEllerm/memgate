@@ -188,3 +188,72 @@ def test_a_keyed_carry_out_replaces_itself_in_personal_memory(world, registry, t
     assert mem.carry_out(ctx, "x", "fact", source=src, key="carry:d1:1") != first
     assert log.sources_of(first, ["shared"]) == ["w_s1", "w_s2"]            # the retry's sources replace the first's
     assert [b["items"][0]["document_id"] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")][:2] == [first, first]
+
+
+# -- classes of personal memory (0.5.0) -----------------------------------------------------------------
+def classed_world():
+    from memgate.registry import Registry
+    from memgate.world import World
+    w = World()
+    w.add_environment("open")
+    w.add_environment("slick", carry_out={"fact", "opinion", "skill"}, min_class="unattributed")
+    w.add_environment("sealed", carry_out=())
+    for l, e in [("lab", "open"), ("cafe", "open"), ("shade", "slick"), ("pen", "sealed")]:
+        w.add_location(l, e)
+    w.add_agents("ada", "bo", "cy")
+    return Gate(w, Registry(), "s")
+
+
+def test_carry_out_with_a_class_goes_to_the_class_set():
+    from memgate.derivation import personal_labels
+    gate = classed_world()
+    mem, rec = sync_client(gate)
+    mem.carry_out(Context("ada", "shade", ("ada", "bo")), "a colleague says the buffer drifts", "fact", cls="unattributed")
+    mem.carry_out(Context("ada", "lab", ("ada", "bo")), "Bo says the buffer drifts", "fact")
+    tags = [b["items"][0]["tags"][0] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")]
+    assert tags == [personal_labels("ada", "unattributed").id, personal_labels("ada").id]
+
+
+def test_the_class_rules_refuse_before_anything_is_stored(tmp_path):
+    from memgate.derivation import personal_labels
+    from memgate.provenance import ProvenanceLog
+    gate = classed_world()
+    log = ProvenanceLog(tmp_path, gate)
+    mem, rec = sync_client(gate, provenance=log)
+    here = Context("ada", "lab", ("ada", "bo"))
+    unnamed = Recalled("a colleague says the buffer drifts", gate.registry.register(personal_labels("ada", "unattributed")), None, "w_x")
+    with pytest.raises(PermissionError, match="may not go to"):                     # never to a less strict class
+        mem.carry_out(here, "keep it", "fact", source=unnamed)
+    mem.carry_out(here, "keep it", "fact", source=unnamed, cls="unattributed")       # same class: fine
+    mem.carry_out(here, "tightened", "fact", cls="unattributed")                      # unclassed source into a class: fine
+    with pytest.raises(PermissionError, match="need class"):                         # the environment's minimum
+        mem.carry_out(Context("ada", "shade", ("ada", "bo")), "forgot the class", "fact")
+    with pytest.raises(PermissionError, match="may not be carried out"):             # a shade source is only readable
+        mem.carry_out(Context("ada", "lab"), "via the source", "fact", source=conversation_labels("shade", ["ada", "bo"]))
+    with pytest.raises(PermissionError):                                              # Cedar still decides first
+        mem.carry_out(Context("ada", "pen", ("ada", "bo")), "sealed", "fact", cls="unattributed")
+    with pytest.raises(ValueError):
+        mem.carry_out(here, "typo", "fact", cls="unatributed")
+    writes = [b for _, m, p, b, *_ in rec.calls if p.endswith("/memories")]
+    assert [w["items"][0]["content"] for w in writes] == ["keep it", "tightened"]
+    import json
+    import sqlite3
+    with sqlite3.connect(tmp_path / "provenance-shared.sqlite") as db:
+        audits = [json.loads(d) for (d,) in db.execute("SELECT detail FROM audit WHERE event = 'carry_out'")]
+    assert any(a.get("why") and "need class" in a["why"] and a["cls"] is None for a in audits)
+
+
+def test_the_async_client_applies_the_same_class_rules():
+    from memgate.derivation import personal_labels
+    gate = classed_world()
+
+    async def go():
+        mem, rec = async_client(gate)
+        await mem.carry_out(Context("ada", "shade", ("ada", "bo")), "unnamed", "fact", cls="unattributed")
+        with pytest.raises(PermissionError):
+            await mem.carry_out(Context("ada", "shade", ("ada", "bo")), "named", "fact")
+        await mem.aclose()
+        return rec
+    rec = asyncio.run(go())
+    assert [b["items"][0]["tags"][0] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")] == \
+        [personal_labels("ada", "unattributed").id]

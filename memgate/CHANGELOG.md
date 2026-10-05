@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.0 (2026-10-05)
+
+- **Classes of personal memory.** A fourth label kind, `class`, allowed only beside a `self` label and at
+  most one per set, from the ordered list `labels.CLASSES` (one value for now: `unattributed`).
+  `personal_labels(agent, cls=None)` gives {self:A} or {self:A, class:C}; `LabelSet.classes`;
+  `carry_out(..., cls=None)` on both clients files the item in the class set. A class set is read exactly
+  like {self:A}: the Cedar entity carries no class, so no policy, schema or proof changes, and the compiled
+  filter still equals exact Cedar (tested with class sets). It exists so the memory system never
+  consolidates the two sets together (Hindsight consolidates within one tag). `derived_labels` keeps the
+  strictest class of its sources.
+- **Two client-side class rules on carry-out** (the server never sees a carry-out): content from a classed
+  source never goes to a less strict class, whatever form the source takes; and an environment may set
+  `min_class` in the world file, which carry-outs from its locations must meet. memgate never chooses a
+  class; the host does. Refusals are audited with the reason.
+- **Conformance gains four checks:** `class-carry-out`, `class-downgrade`, `class-minimum` (skipped unless
+  the world sets a `min_class`) and `class-apart`, which lists every stored unit after consolidation and
+  fails if an observation was built from another label set or the class set holds a name planted only in
+  the plain set. Live: 18 passed, 0 failed, 1 skipped (split-scope).
+- **Unknown labels fail closed per set.** A label set with a kind or class value this version doesn't know
+  (written by a newer memgate) is left out of `Registry.all` and of every compiled read, instead of failing
+  every call. **Upgrade order:** servers first, then clients: a 0.4.x server fails every write once one
+  class row exists in the registry. The guide gives the rollback steps.
+- For CHORUS's unattributed (Chatham House) trees; design ruled by Gus 2026-10-05.
+
 ## 0.4.4 (2026-10-02)
 
 - **Consolidation runs right after a write again.** Hindsight schedules its auto-consolidation after every

@@ -35,7 +35,7 @@ from datetime import datetime
 from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, PARTITION_SEP, Context,
                              Gate, partition_bank)
 from memgate.derivation import personal_labels, personal_note_labels
-from memgate.labels import LabelSet
+from memgate.labels import LabelSet, class_rank, strictest
 from memgate.provenance import ProvenanceLog, write_id_for
 
 _BANK_IN_PATH = re.compile(r"^/v1/default/banks/([^/?]+)")
@@ -181,15 +181,31 @@ class _Core:
             return self.gate.registry.get(source), []
         return source, []
 
-    def _plan_carry_out(self, ctx: Context, memory_type: str, source, source_writes) -> list[str]:
-        """Check a carry-out; returns the writes it derives from. Raises PermissionError if refused."""
+    def _plan_carry_out(self, ctx: Context, memory_type: str, source, source_writes, cls: str | None = None) -> list[str]:
+        """Check a carry-out into the personal set of class `cls`; returns the writes it derives from.
+        Raises PermissionError if refused.
+
+        Cedar decides whether the content may leave (`Policy.may_carry_out`). Two class rules follow, both
+        here in the client, since the server never sees a carry-out, only the personal write it produces:
+        content from a classed source never goes to a less strict class, and the `min_class` of ctx.location's
+        environment must be met (a source Cedar lets out is always readable here, so its locations are this
+        one; they are included anyway). Neither rule chooses a class; the host does."""
+        class_rank(cls)                                     # an unknown class is a ValueError, not a refusal
         labels, writes = self._resolve_source(ctx, source)
-        allowed = self.gate.policy.may_carry_out(ctx.agent, ctx.location, labels, memory_type)
+        allowed, why = self.gate.policy.may_carry_out(ctx.agent, ctx.location, labels, memory_type), None
+        if not allowed:
+            why = f"{memory_type} may not be carried out of {labels}"
+        elif class_rank(strictest(labels.classes)) > class_rank(cls):
+            allowed, why = False, f"content of class {strictest(labels.classes)!r} may not go to {cls or 'unclassed'} personal memory"
+        else:
+            floor = self.gate.world.min_class(labels.locs | {ctx.location})
+            if class_rank(floor) > class_rank(cls):
+                allowed, why = False, f"carry-outs from {ctx.location} need class {floor!r} or stricter, not {cls or 'none'}"
         if self.provenance:
             self.provenance.audit(ctx.location, "carry_out", agent=ctx.agent, source=labels.id,
-                                  memory_type=memory_type, allowed=allowed)
+                                  memory_type=memory_type, cls=cls, allowed=allowed, **({"why": why} if why else {}))
         if not allowed:
-            raise PermissionError(f"{memory_type} may not be carried out of {labels}")
+            raise PermissionError(why)
         return list(source_writes) or writes
 
     def _plan_recall(self, ctx: Context, query: str, budget: str) -> tuple[set[str], list[str], dict]:
@@ -265,17 +281,20 @@ class HindsightMemory(_Core):
                             "personal note", "note", key=key)
 
     def carry_out(self, ctx: Context, text: str, memory_type: str, *, source: LabelSet | Recalled | str | None = None,
-                  when: datetime | None = None, source_writes: list[str] = (), key: str | None = None) -> str:
+                  when: datetime | None = None, source_writes: list[str] = (), key: str | None = None,
+                  cls: str | None = None) -> str:
         """Copy something into the agent's personal memory, if every environment it came from allows.
 
         `source` is what the content was formed under: a recalled memory (its label set and write),
         a label set or its ID, or by default `ctx`'s conversation. It must be readable in `ctx`
         (Cedar checks). `memory_type` is the agent's own classification (fact, opinion, skill,
-        episode), audited. `key`, if given, makes the write idempotent as in `remember`; the agent's
-        personal memory is one label set, so a key must be unique across everything the agent carries
-        out. Raises PermissionError if refused."""
-        writes = self._plan_carry_out(ctx, memory_type, source, source_writes)
-        return self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
+        episode), audited. `cls` (since 0.5.0) files it in the agent's personal set of that class
+        (`personal_labels(agent, cls)`), kept apart from its other personal memory; content from a
+        classed source must keep at least that class, and an environment's `min_class` must be met.
+        `key`, if given, makes the write idempotent as in `remember`; a key must be unique across
+        everything the agent carries out. Raises PermissionError if refused."""
+        writes = self._plan_carry_out(ctx, memory_type, source, source_writes, cls)
+        return self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent, cls), text, when,
                             f"carried out ({memory_type})", "carry_out", derived_from=writes, key=key)
 
     def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
@@ -382,10 +401,10 @@ class AsyncHindsightMemory(_Core):
 
     async def carry_out(self, ctx: Context, text: str, memory_type: str, *,
                         source: LabelSet | Recalled | str | None = None, when: datetime | None = None,
-                        source_writes: list[str] = (), key: str | None = None) -> str:
+                        source_writes: list[str] = (), key: str | None = None, cls: str | None = None) -> str:
         """See `HindsightMemory.carry_out`."""
-        writes = self._plan_carry_out(ctx, memory_type, source, source_writes)
-        return await self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent), text, when,
+        writes = self._plan_carry_out(ctx, memory_type, source, source_writes, cls)
+        return await self._retain(ctx.agent, ctx.location, personal_labels(ctx.agent, cls), text, when,
                                   f"carried out ({memory_type})", "carry_out", derived_from=writes, key=key)
 
     async def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:

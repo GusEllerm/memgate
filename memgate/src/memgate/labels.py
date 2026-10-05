@@ -1,9 +1,14 @@
 """Labels and label sets.
 
-Three label kinds (docs/vault/Concepts/Label and Memory Types.md):
+Four label kinds (docs/vault/Concepts/Label and Memory Types.md):
 - self:A   identity, the owner of a personal memory; all must be held
 - loc:L    the conceptual location a memory was formed in; all must be held
 - with:X   a participant present when the memory was formed; the reader must be one of them
+- class:C  (since 0.5.0) a class of personal memory, e.g. "unattributed": items kept under a rule
+           (no one named) that must never be consolidated with the agent's other personal memory.
+           Only alongside a self label, at most one per set, from the ordered list CLASSES. It decides
+           nothing about who may read: the policies never see it. It only makes a separate label set,
+           so the memory system keeps the class apart.
 
 A label set is the full set of labels on a memory. Its ID is content-addressed, so every store
 and process agrees on it without coordination, and a memory system only ever sees the opaque ID.
@@ -15,8 +20,26 @@ import hashlib
 from dataclasses import dataclass
 from typing import Iterable, Literal
 
-Kind = Literal["self", "loc", "with"]
-KINDS: tuple[Kind, ...] = ("self", "loc", "with")
+Kind = Literal["self", "loc", "with", "class"]
+KINDS: tuple[Kind, ...] = ("self", "loc", "with", "class")
+
+# Classes of personal memory, least strict first. A memory never moves to a less strict class
+# (the client refuses that carry-out), and an environment may set a minimum (World.min_class).
+CLASSES: tuple[str, ...] = ("unattributed",)
+
+
+def class_rank(cls: str | None) -> int:
+    """0 for no class, then 1, 2, … along CLASSES. Raises ValueError for an unknown class."""
+    if cls is None:
+        return 0
+    if cls not in CLASSES:
+        raise ValueError(f"unknown memory class {cls!r} (known: {list(CLASSES)})")
+    return CLASSES.index(cls) + 1
+
+
+def strictest(classes) -> str | None:
+    """The strictest of some classes (None for none)."""
+    return max(classes, key=class_rank, default=None)
 
 # A participant label no agent can hold. It marks a derived memory whose sources share no
 # participant, so the participant check fails for every reader instead of being skipped.
@@ -33,6 +56,8 @@ class Label:
             raise ValueError(f"unknown label kind {self.kind!r}")
         if not self.value or "|" in self.value:
             raise ValueError(f"label value must be non-empty and contain no '|': {self.value!r}")
+        if self.kind == "class":
+            class_rank(self.value)                     # raises for a class this version doesn't know
 
     def __str__(self) -> str:
         return f"{self.kind}:{self.value}"
@@ -47,13 +72,22 @@ class Label:
 class LabelSet:
     labels: frozenset[Label]
 
+    def __post_init__(self) -> None:
+        classes = [l for l in self.labels if l.kind == "class"]
+        if classes and not any(l.kind == "self" for l in self.labels):
+            raise ValueError(f"a class label needs a self label beside it: {sorted(str(l) for l in self.labels)}")
+        if len(classes) > 1:
+            raise ValueError(f"at most one class per label set: {sorted(str(l) for l in classes)}")
+
     @classmethod
     def of(cls, labels: Iterable[Label | str]) -> "LabelSet":
         return cls(frozenset(l if isinstance(l, Label) else Label.parse(l) for l in labels))
 
     @classmethod
-    def build(cls, *, selfs: Iterable[str] = (), locs: Iterable[str] = (), withs: Iterable[str] = ()) -> "LabelSet":
-        return cls.of([Label("self", v) for v in selfs] + [Label("loc", v) for v in locs] + [Label("with", v) for v in withs])
+    def build(cls, *, selfs: Iterable[str] = (), locs: Iterable[str] = (), withs: Iterable[str] = (),
+              classes: Iterable[str] = ()) -> "LabelSet":
+        return cls.of([Label("self", v) for v in selfs] + [Label("loc", v) for v in locs] + [Label("with", v) for v in withs]
+                      + [Label("class", v) for v in classes])
 
     def values(self, kind: Kind) -> frozenset[str]:
         return frozenset(l.value for l in self.labels if l.kind == kind)
@@ -69,6 +103,10 @@ class LabelSet:
     @property
     def withs(self) -> frozenset[str]:
         return self.values("with")
+
+    @property
+    def classes(self) -> frozenset[str]:
+        return self.values("class")
 
     @property
     def key(self) -> str:

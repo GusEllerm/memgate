@@ -16,7 +16,7 @@ tags: [module, memgate, permissions]
 ## Pieces
 
 - **Labels** (`memgate/src/memgate/labels.py`).
-  - `Label` has three kinds: self, loc and with.
+  - `Label` has four kinds: self, loc, with and (since 0.5.0) class. A class label is allowed only beside a self label, at most one per `LabelSet`, with a value from the ordered list `CLASSES` (`class_rank`, `strictest`); `LabelSet.classes` reads it. The policies never see it: it only makes a separate personal label set, so the memory system keeps classed personal memory apart.
   - A `LabelSet`'s `id` is a content-addressed hash, so every store and process agrees on it without coordination.
   - `NOBODY` is a participant no agent holds. It marks a derived memory whose sources share no participant.
 - **World** (`memgate/src/memgate/world.py`).
@@ -24,7 +24,8 @@ tags: [module, memgate, permissions]
   - `Environment` lists the memory types that may be carried out: all (open), some (selective) or none (*Severance*).
   - `Location` can be high-assurance.
   - `carry_out_types` gives the types every location in a set allows.
-- **Registry** (`memgate/src/memgate/registry.py`): `Registry` is a SQLite table of every label set in use, and `register` is idempotent. It also keeps one indexed row per label (a `label` table, backfilled for older registries). `select_ids` runs a compiled filter, optionally only over label sets registered after a given row: the registry is append-only.
+  - An `Environment` may set `min_class` (since 0.5.0); `World.min_class` gives the strictest among some locations' environments. The client refuses a carry-out below it; it never chooses a class.
+- **Registry** (`memgate/src/memgate/registry.py`): `Registry` is a SQLite table of every label set in use, and `register` is idempotent. It also keeps one indexed row per label (a `label` table, backfilled for older registries). `select_ids` runs a compiled filter, optionally only over label sets registered after a given row: the registry is append-only. Since 0.5.0, a label set holding a kind or class this version doesn't know (written by a newer memgate) is left out of `select_ids` and of `Registry.all`, so it is never readable or writable here and the rest keeps working; 0.4.x instead raised on such a row in `Registry.all`, which its validator calls on every write.
 - **Policies** (`memgate/src/memgate/policies/memgate.cedar` and `memgate.cedarschema`):
   - read: identity and location labels held, and the reader among the participants;
   - the high-assurance seal;
@@ -43,8 +44,8 @@ tags: [module, memgate, permissions]
   - `Policy.may_carry_out` checks a carry-out into personal memory, from the carrier's current location.
   - `Policy.validate` checks the policies against the schema.
 - **Derivation** (`memgate/src/memgate/derivation.py`):
-  - `conversation_labels` gives the location plus everyone present; `personal_labels` and `personal_note_labels` cover personal memory.
-  - `derived_labels` combines identity and location labels and intersects participants.
+  - `conversation_labels` gives the location plus everyone present; `personal_labels` and `personal_note_labels` cover personal memory; `personal_labels(agent, cls)` gives the class set {self:A, class:C}.
+  - `derived_labels` combines identity and location labels, intersects participants, and keeps the strictest class.
   - `check_merge` raises `CrossLabelSetMerge` if a merge would cross label sets.
 
 - **Provenance and audit** (`memgate/src/memgate/provenance.py`), following the W3C PROV data model:

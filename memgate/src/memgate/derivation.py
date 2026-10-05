@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Iterable
 
-from memgate.labels import NOBODY, LabelSet
+from memgate.labels import NOBODY, LabelSet, strictest
 
 
 class CrossLabelSetMerge(ValueError):
@@ -28,9 +28,11 @@ def conversation_labels(location: str, participants: Iterable[str]) -> LabelSet:
     return LabelSet.build(locs=[location], withs=people)
 
 
-def personal_labels(agent: str) -> LabelSet:
-    """Labels for an agent's personal memory: readable by the agent everywhere."""
-    return LabelSet.build(selfs=[agent])
+def personal_labels(agent: str, cls: str | None = None) -> LabelSet:
+    """Labels for an agent's personal memory: readable by the agent everywhere. With a class (one of
+    `labels.CLASSES`), a separate personal set, {self:A, class:C}: read exactly like {self:A}, but a
+    different label set, so the memory system never consolidates the two together."""
+    return LabelSet.build(selfs=[agent], classes=[cls] if cls else [])
 
 
 def personal_note_labels(agent: str, location: str) -> LabelSet:
@@ -48,7 +50,10 @@ def derived_labels(sources: Iterable[LabelSet]) -> LabelSet:
     withs: set[str] = set.intersection(*(set(w) for w in constrained)) if constrained else set()
     if constrained and not withs:
         withs = {NOBODY}
-    return LabelSet.build(selfs=selfs, locs=locs, withs=withs)
+    # A derived memory is at least as strict as its strictest source (a class needs a self, which the
+    # union above keeps, since a classed source always has one).
+    cls = strictest(set().union(*(s.classes for s in sources)))
+    return LabelSet.build(selfs=selfs, locs=locs, withs=withs, classes=[cls] if cls else [])
 
 
 def check_merge(label_set_ids: Iterable[str]) -> str:

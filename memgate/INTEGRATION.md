@@ -45,7 +45,8 @@ A world file is JSON. Check it with `memgate check-world world.json`.
   "environments": [
     {"id": "campus"},
     {"id": "studio", "carry_out": ["opinion", "skill"]},
-    {"id": "severed-floor", "carry_out": []}
+    {"id": "severed-floor", "carry_out": []},
+    {"id": "chatham", "carry_out": ["fact", "opinion", "skill"], "min_class": "unattributed"}
   ],
   "locations": [
     {"id": "lab", "environment": "campus"},
@@ -58,7 +59,7 @@ A world file is JSON. Check it with `memgate check-world world.json`.
 
 | Concept | Meaning | Host decision |
 | --- | --- | --- |
-| Environment | A set of locations sharing one carry-out rule | Which memory types may leave: `carry_out` lists them. Omitted means all four; `[]` means nothing leaves |
+| Environment | A set of locations sharing one carry-out rule | Which memory types may leave: `carry_out` lists them. Omitted means all four; `[]` means nothing leaves. Optionally `min_class` (0.5.0): carry-outs from its locations must name at least that class (see "Classes of personal memory") |
 | Location | Where conversations happen; every memory formed there is bound to it | Which locations exist, and which are high assurance |
 | High assurance | Outbound only: nothing leaves, anything inside stays inside; personal memory may still be recalled there | Which locations need it (secrets, sensitive work) |
 | Agent | An identity with its own personal memory | Every agent id the host will ever pass |
@@ -70,9 +71,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.4.4#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.5.0#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.4.4#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.5.0#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
@@ -115,10 +116,17 @@ ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # buil
 | `mem.recall(ctx, query, k=20)` | The agent needs to remember something | Returns a `RecallBatch` of `Recalled` (text, label set, date, write id), best first, only what `ctx` may read. `.recall_id` is set when provenance is on |
 | `mem.remember(ctx, text, when=None, about=None, turns=(), key=None)` | Something was said or seen in a conversation | Stored under `ctx`'s location and participants. `turns` links it to what was said (provenance). Returns the write id |
 | `mem.keep_note(ctx, text, key=None)` | An agent's private note that should stay where it was written | Readable only by its author, only in that location |
-| `mem.carry_out(ctx, text, memory_type, source=None, source_writes=(), key=None)` | An agent takes something with it into personal memory | `source` is what the content was formed under. Pass the `Recalled` item itself to carry out something recalled (its label set, and its write for provenance), or a label set or its ID. It defaults to `ctx`'s conversation. It must be readable in `ctx`. Raises `PermissionError` if the environment forbids it |
+| `mem.carry_out(ctx, text, memory_type, source=None, source_writes=(), key=None, cls=None)` | An agent takes something with it into personal memory | `source` is what the content was formed under. Pass the `Recalled` item itself to carry out something recalled (its label set, and its write for provenance), or a label set or its ID. It defaults to `ctx`'s conversation. It must be readable in `ctx`. Raises `PermissionError` if the environment forbids it |
 | `mem.say(ctx, text, recalls=[recall_id, ...])` | An agent speaks | Records which recalls it drew on, so later memories trace back (needs a `ProvenanceLog`) |
 
 - **Idempotent writes:** pass `key=` (any string the host chooses, e.g. its own segment id) to `remember`, `keep_note` or `carry_out`. The write id is derived from the key and the label set, so re-sending the same key under the same label set (same location, same participants; same author for a note) replaces the earlier write instead of storing it twice: Hindsight upserts by that id, and a byte-identical re-send extracts nothing new. A host that records at least once (an outbox drained after a crash) gets exactly-once storage this way. The id carries the label set, and the server refuses a write id minted under another label set, so a key can never reach another conversation's memory. An agent's personal memory (carry-outs) is one label set, so a carry-out key must be unique across everything that agent ever carries out, and a retry must re-send the same text under the same key (store the chosen items, then write them).
+- **Classes of personal memory (0.5.0).** `carry_out(..., cls="unattributed")` files the item in the agent's class set, `personal_labels(agent, "unattributed")` = {self:A, class:unattributed}, instead of {self:A}. Use it for items that must never be consolidated with the agent's other personal memory, for example items kept without names from a place where no one may be named: the memory system's consolidation merges and resolves references within a label set, and would put a name back if both lived in one set.
+  - **Reading** is exactly as for {self:A}: the owner recalls it everywhere, nobody else does. The policies never see the class, so nothing about who may read changes. `Recalled.label_set` tells the host which set an item came from (compare it with `personal_labels(agent, cls).id`, or read `gate.registry.get(id).classes`).
+  - **The host chooses the class.** memgate never derives it. Two rules guard it, both in the client, since the server never sees a carry-out (only the personal write it produces): content whose source carries a class may not go to a less strict class (any source form: a `Recalled` item, a label set or its id), and an environment's `min_class` must be met. Neither can catch a host that declares a classless source for content that came from a class set.
+  - **What keeps the sets apart** is the memory system's consolidation scope: Hindsight consolidates within one tag, and a class set is a different tag. That is outside the policies' proofs. `memgate conformance` checks it on the live deployment (`class-apart`).
+  - **One class for now** (`labels.CLASSES`), on one ordered scale, so each agent has at most one set per class. A class is allowed only beside a self label (personal memory), never on conversations.
+  - **Upgrading:** move every `memgate serve` to 0.5.0 before any client writes a class, then the clients, restarting every worker together. A 0.4.x server reads the whole registry on every write and fails every write, not only classed ones, once one class row exists; a 0.4.x client fails on any class set it looks up. Add `min_class` to the world file only once the server is on 0.5.0 (older `serve` and `check-world` reject unknown keys).
+  - **Rolling back to 0.4.x** after a class row exists needs those rows removed from the registry, with every memgate process stopped: `DELETE FROM label WHERE label_set IN (SELECT label_set FROM label WHERE kind = 'class'); DELETE FROM label_sets WHERE labels LIKE '%"class:%';` (run the first statement first). The class sets' memories stay in the store, unreachable (failing closed, not leaking); upgrading again and writing to a class set re-registers it, and its memories come back, since ids are content-addressed. From 0.5.0 on, a label set with a kind or class the running version doesn't know is skipped (never readable or writable there) instead of failing every call.
 - **Async hosts:** `AsyncHindsightMemory` (same arguments, `await` every call; use `async with`, or call `aclose()`) has the same API and the same decisions. Otherwise wrap the sync client in `asyncio.to_thread`; it is thread-safe.
 - **Carrying out what an agent recalled** (the usual pattern on leaving a place): `recall` there, let the agent pick items and classify each, then call `carry_out(ctx, text, type, source=item)` per item. The item's own label set is the source, because it may have been formed with different people present than now.
 - **Writes that break a rule** raise `PermissionError` before anything is stored. Store errors raise `HindsightError`. None of these calls ever returns an unchecked result.
@@ -150,7 +158,7 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.4.4)
+## Limits (0.5.0)
 
 - **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
 - **Identity and context verification are the host's** (see the contract).
