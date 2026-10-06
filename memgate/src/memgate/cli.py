@@ -176,9 +176,9 @@ def cmd_serve(args) -> int:
         print("memgate: --embeddings-provider onnx with --reranker local still needs torch (the local reranker is a "
               "sentence-transformers cross-encoder); use --reranker flashrank or rrf for a torch-free server", file=sys.stderr)
     if args.min_client_version:
-        from memgate.adapters.hindsight.validator import _release
         from memgate import __version__
-        if _release(args.min_client_version) is None or _release(args.min_client_version) > _release(__version__):
+        from memgate.context import release
+        if release(args.min_client_version) is None or release(args.min_client_version) > release(__version__):
             print(f"--min-client-version must be a release no newer than this server ({__version__}), "
                   f"not {args.min_client_version!r}", file=sys.stderr)
             return 2

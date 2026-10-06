@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -26,6 +27,18 @@ HEADER_SECRET = "x-memgate-secret"
 HEADER_ROLE = "x-memgate-role"          # "agent" (default) or "admin"
 HEADER_VERSION = "x-memgate-version"    # the client's memgate release (the version handshake, 0.6.0)
 HEADERS = (HEADER_AGENT, HEADER_LOCATION, HEADER_SECRET, HEADER_ROLE, HEADER_VERSION)
+
+
+def release(v: str | None) -> tuple[int, int, int] | None:
+    """A memgate release string as (major, minor, patch), padded; None for anything that is not one. A
+    pre-release suffix (0.6.0rc1, 0.6.0-dev) is dropped, so it compares as its release. Used by the
+    validator's version handshake and by `memgate serve --min-client-version`."""
+    if not v:
+        return None
+    m = re.fullmatch(r"\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:[-.+]?[A-Za-z].*)?\s*", v)
+    if not m:
+        return None
+    return int(m.group(1)), int(m.group(2) or 0), int(m.group(3) or 0)
 
 @dataclass(frozen=True)
 class Context:

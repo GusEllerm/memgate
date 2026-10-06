@@ -44,6 +44,7 @@ import os
 from memgate import __version__
 from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, HEADER_VERSION, Gate,
                              partition_location, serve_fingerprint)
+from memgate.context import release as _release   # the handshake's version parsing; shared with memgate serve
 from memgate.provenance import write_id_label_set
 
 VERSION_REFUSED = "memgate version:"        # a version refusal: status 426, and the reason starts with this
@@ -84,15 +85,6 @@ def install_event_log() -> None:
         log.propagate = False
 
 
-def _release(v: str | None) -> tuple[int, int, int] | None:
-    """A release string as (major, minor, patch), padded; None for anything that is not one. A pre-release
-    suffix (0.6.0rc1, 0.6.0-dev) is dropped, so it compares as its release."""
-    if not v:
-        return None
-    m = re.fullmatch(r"\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:[-.+]?[A-Za-z].*)?\s*", v)
-    if not m:
-        return None
-    return int(m.group(1)), int(m.group(2) or 0), int(m.group(3) or 0)
 
 NO_MATCH = "ls_none"  # a tag no item carries: recall returns nothing
 
