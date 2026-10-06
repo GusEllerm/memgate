@@ -20,6 +20,7 @@ its owner is) and, inside a high-assurance location, that location's partition.
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import logging
 import re
@@ -317,7 +318,7 @@ class AsyncMemory:
     def __init__(self, gate: Gate, store, shared: str, provenance: ProvenanceLog | None = None):
         self.core, self.store = Core(gate, shared, provenance), store
         self.gate = gate
-        self._async = asyncio.iscoroutinefunction(getattr(store, "search", None))
+        self._async = inspect.iscoroutinefunction(getattr(store, "search", None))   # asyncio's is deprecated on 3.14
 
     @property
     def capabilities(self) -> Capabilities:

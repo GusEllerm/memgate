@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1 (2026-10-06)
+
+- `VersionMismatch` is exported from `memgate.adapters.hindsight` beside `HindsightError`; the async client no
+  longer uses `asyncio.iscoroutinefunction`, which Python 3.14 deprecates (a warning per construction).
+  Reported by CHORUS on adopting 0.6.0.
+
 ## 0.6.0 (2026-10-06)
 
 Ruled by Gus on 2026-10-06 after CHORUS's stocktake (vault: Decision Log, 2026-10-06 rows).

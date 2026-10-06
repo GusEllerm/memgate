@@ -28,7 +28,7 @@ sig = "aa8025ade3648e48"
 [[bindings]]
 doc = "docs/vault/Concepts/Label and Memory Types.md"
 target = "memgate/src/memgate/core.py#AsyncMemory"
-sig = "5420be617777ba8e"
+sig = "75f05a7d7c7e1db0"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Label and Memory Types.md"
@@ -163,7 +163,7 @@ sig = "aa8025ade3648e48"
 [[bindings]]
 doc = "docs/vault/Concepts/Store Protocol.md"
 target = "memgate/src/memgate/core.py#AsyncMemory"
-sig = "5420be617777ba8e"
+sig = "75f05a7d7c7e1db0"
 
 [[bindings]]
 doc = "docs/vault/Concepts/Store Protocol.md"
@@ -778,7 +778,7 @@ sig = "aa8025ade3648e48"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
 target = "memgate/src/memgate/core.py#AsyncMemory"
-sig = "5420be617777ba8e"
+sig = "75f05a7d7c7e1db0"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Core.md"
@@ -1058,7 +1058,7 @@ sig = "bab0ab132abab9ae"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
 target = "memgate/src/memgate/core.py#AsyncMemory"
-sig = "5420be617777ba8e"
+sig = "75f05a7d7c7e1db0"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Hindsight Adapter.md"
@@ -1153,12 +1153,12 @@ sig = "18a8a4e569f43b73"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/CHANGELOG.md"
-sig = "b25b4712d21ab5fe"
+sig = "514f2961ed90b71d"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/INTEGRATION.md"
-sig = "f3236e7ee5bef103"
+sig = "f984cf7e543b4392"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -1218,7 +1218,7 @@ sig = "b888fa980b85dc3e"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "memgate/src/memgate/core.py#AsyncMemory"
-sig = "5420be617777ba8e"
+sig = "75f05a7d7c7e1db0"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
@@ -1243,7 +1243,7 @@ sig = "b2e6f0fdca09a168"
 [[bindings]]
 doc = "docs/vault/Modules/memgate Integration.md"
 target = "plugins/memgate/skills/integrate-memgate/SKILL.md"
-sig = "97163ac5e7b18b96"
+sig = "a3871e4365fe9018"
 
 [[bindings]]
 doc = "docs/vault/Modules/memgate Proofs.md"

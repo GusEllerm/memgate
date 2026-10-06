@@ -260,3 +260,8 @@ def test_the_async_client_applies_the_same_class_rules():
     rec = asyncio.run(go())
     assert [b["items"][0]["tags"][0] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")] == \
         [personal_labels("ada", "unattributed").id]
+
+
+def test_version_mismatch_is_exported_beside_hindsight_error():
+    import memgate.adapters.hindsight as h
+    assert issubclass(h.VersionMismatch, h.HindsightError)

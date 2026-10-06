@@ -71,9 +71,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.6.0#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.6.1#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.6.0#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.6.1#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry, shared by both sides: a SQLite path, or postgresql://... (0.6.0)
@@ -182,7 +182,7 @@ memgate's decisions live in `memgate.core` and know nothing about the store; a s
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.6.0)
+## Limits (0.6.1)
 
 - **Two memory systems:** Hindsight 0.10.1 (pinned; the only store with a second lock) and Mem0 2.2 (client-side enforcement only). Another store is a `Store` implementation.
 - **Python:** 3.11 to 3.14 for the client (tested on 3.12 and 3.14 in CI); the server runs on 3.12, which Hindsight's stack is tested with.
