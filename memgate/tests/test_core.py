@@ -157,3 +157,30 @@ def test_class_items_kept_before_the_flag_flip_are_listed_and_forgotten(mem):
     assert [i.text for i in mem.personal("ada")] == ["kept after"]
     assert mem.core.partitions_of_write(new) == ["b--class--unattributed", "b"]
     assert mem.core.partitions_of_write(mem.carry_out(Context("ada", "lab", ("ada", "bo")), "plain", "fact")) == ["b"]
+
+
+def test_the_owner_sees_every_unit_of_a_write_but_not_a_partitions_repeat(mem):
+    """Hindsight extracts one write into several units sharing its write id: all of them are lines of the
+    owner's view (0.6.3; 0.6.2 collapsed them). Only a later partition repeating an earlier one is dropped."""
+    from memgate.store import Listed
+
+    class Extracting(FakeStore):
+        def list(self, partition, label_set):
+            items = super().list(partition, label_set)
+            return [Listed(i.write_id, i.label_set, f"{i.text} ({n})") for i in items for n in (1, 2)]   # two units per write
+    mem.store = Extracting()
+    ada = Context("ada", "lab", ("ada", "bo"))
+    kept = mem.carry_out(ada, "kept", "fact")
+    unnamed = mem.carry_out(ada, "unnamed", "fact", cls="unattributed")
+    lines = mem.personal("ada")
+    assert sorted(i.text for i in lines) == ["kept (1)", "kept (2)", "unnamed (1)", "unnamed (2)"]
+    assert {i.write_id for i in lines} == {kept, unnamed}
+
+    class Flat(Extracting):
+        def list(self, partition, label_set):            # a store without partitions: the same answer for each
+            return [Listed(i.write_id, i.label_set, f"{i.text} ({n})") for i in self.items.values() if i.label_set == label_set for n in (1, 2)]
+    mem.store = Flat()
+    mem.store.items = dict(Extracting().items) or mem.store.items
+    mem.carry_out(ada, "nameless", "fact", cls="unattributed")
+    lines = mem.personal("ada")
+    assert sorted(i.text for i in lines) == ["nameless (1)", "nameless (2)"]           # listed once, with both units

@@ -305,12 +305,11 @@ class Memory:
         if not self.store.capabilities.list_by_label_set:
             raise NotImplementedError("this store cannot list by label set")
         out: list[Listed] = []
-        seen: set[str] = set()
+        seen: set[str] = set()                           # write ids listed by an earlier partition
         for ls, partition in self.core.personal_sets(agent):
-            for i in self.store.list(partition, ls):
-                if i.write_id not in seen:              # a store without partitions answers the same for each
-                    seen.add(i.write_id)
-                    out.append(i)
+            listed = [i for i in self.store.list(partition, ls) if i.write_id not in seen]
+            out += listed                                # every unit of a write stays: one write may be several lines
+            seen |= {i.write_id for i in listed}         # a store without partitions answers the same for each
         _event("personal_listed", agent=agent, items=len(out))
         return out
 
@@ -417,10 +416,9 @@ class AsyncMemory:
         out: list[Listed] = []
         seen: set[str] = set()
         for ls, partition in self.core.personal_sets(agent):
-            for i in await self._s("list", partition, ls):
-                if i.write_id not in seen:
-                    seen.add(i.write_id)
-                    out.append(i)
+            listed = [i for i in await self._s("list", partition, ls) if i.write_id not in seen]
+            out += listed
+            seen |= {i.write_id for i in listed}
         return out
 
     async def stats(self, agent: str | None = None) -> dict:

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.3 (2026-10-06)
+
+- The owner's view keeps every unit of a write again. 0.6.2 de-duplicated listed items by write id to cope
+  with a store that answers the same for every partition, which also collapsed Hindsight's several units per
+  write (one document extracts into N units sharing its document id) to one line. The de-duplication now
+  drops only a later partition's repeat of an earlier one. Found by CHORUS's owner-view test.
+
 ## 0.6.2 (2026-10-06)
 
 - `personal` and `forget` look in every partition a class set may live in: a class marked
