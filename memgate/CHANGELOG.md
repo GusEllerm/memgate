@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.2 (2026-10-06)
+
+- `personal` and `forget` look in every partition a class set may live in: a class marked
+  `consolidate: false` gets its own partition for new writes, but items carried in before the flag was set
+  (or by a 0.5.x client) stay in the shared partition, where recall already found them while the owner's
+  view said "missing" and forget said "did not exist". Conformance gains `class-legacy`, which writes such an
+  item and sees it listed and forgotten. No migration on a flag flip. Asked by CHORUS, ruled by Gus.
+
 ## 0.6.1 (2026-10-06)
 
 - `VersionMismatch` is exported from `memgate.adapters.hindsight` beside `HindsightError`; the async client no

@@ -14,6 +14,7 @@ from test_core import FakeStore
 def world_for_conformance(world):
     world.add_environment("slick", carry_out={"fact", "opinion", "skill"}, min_class="unattributed")
     world.add_location("shade", "slick")
+    world.add_class("unattributed", consolidate=False)
     return world
 
 
@@ -32,7 +33,7 @@ def test_everything_applicable_passes_on_a_correct_fake_store(world, registry):
         assert checks[cid].status == "skip"
         assert "second lock" in checks[cid].detail or (cid == "ha-partition-search" and "no partitions" in checks[cid].detail)
     for cid in ("witness", "non-witness", "elsewhere", "carry-out", "carry-refused", "class-carry-out", "class-downgrade",
-                "class-minimum", "owner-view", "ha-inside", "ha-outside", "ha-seal"):
+                "class-minimum", "owner-view", "class-legacy", "ha-inside", "ha-outside", "ha-seal"):
         assert checks[cid].status == "pass", (cid, checks[cid].detail)
     assert checks["ha-partition"].status == "skip" and "no partitions" in checks["ha-partition"].detail
     assert checks["class-apart"].status == "skip" and "derived nothing" in checks["class-apart"].detail
@@ -45,7 +46,7 @@ def test_a_store_without_the_owner_capabilities_skips_those_checks(world, regist
         capabilities = Capabilities()
     gate = Gate(world_for_conformance(world), registry, "s")
     checks = by_id(run(gate, memory=Memory(gate, Plain(), shared="x")))
-    assert checks["owner-view"].status == "skip" and checks["class-apart"].status == "skip"
+    assert checks["owner-view"].status == "skip" and checks["class-apart"].status == "skip" and checks["class-legacy"].status == "skip"
     assert checks["witness"].status == "pass" and checks["class-downgrade"].status == "pass"
 
 
@@ -60,12 +61,12 @@ def test_owner_view_fails_when_forget_removes_more_than_the_one_item(world, regi
     assert checks["owner-view"].status == "fail" and "did not remove exactly it" in checks["owner-view"].detail
 
 
-def test_owner_view_fails_when_the_listing_shows_another_sets_items(world, registry):
+def test_owner_view_fails_when_the_listing_ignores_the_label_set_filter(world, registry):
     from memgate.store import Listed
 
     class Leaky(FakeStore):
         def list(self, partition, label_set):
-            return [Listed(i.write_id, label_set, i.text) for i in self.items.values()]   # every item, relabelled
+            return [Listed(i.write_id, i.label_set, i.text) for i in self.items.values()]   # every item, whatever was asked
     gate = Gate(world_for_conformance(world), registry, "s")
     checks = by_id(run(gate, memory=Memory(gate, Leaky(), shared="x")))
     assert checks["owner-view"].status == "fail"

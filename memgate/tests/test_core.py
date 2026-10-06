@@ -38,10 +38,15 @@ class FakeStore:
         return 0
 
     def delete(self, partition, write_id):
-        return self.items.pop(write_id, None) is not None
+        i = self.items.get(write_id)
+        if i is None or i.partition != partition:       # partition-aware, like Hindsight's banks
+            return False
+        del self.items[write_id]
+        return True
 
     def list(self, partition, label_set):
-        return [Listed(i.write_id, i.label_set, i.text) for i in self.items.values() if i.label_set == label_set]
+        return [Listed(i.write_id, i.label_set, i.text) for i in self.items.values()
+                if i.label_set == label_set and i.partition == partition]
 
     def stats(self, partition, label_sets=None):
         return {"exists": True, "items": sum(i.partition == partition for i in self.items.values())}
@@ -135,3 +140,20 @@ def test_a_store_without_a_capability_is_refused_not_guessed(world, registry):
         m.personal("ada")
     with pytest.raises(NotImplementedError):
         m.stats()
+
+
+def test_class_items_kept_before_the_flag_flip_are_listed_and_forgotten(mem):
+    """Items carried into a class set while the class still consolidated live in the shared partition; recall
+    finds them there, so the owner's view and forget must too (0.6.2)."""
+    from memgate.derivation import personal_labels
+    ls = mem.gate.registry.register(personal_labels("ada", "unattributed"))
+    legacy = Item(text="kept before the flip", label_set=ls, write_id=f"w_{ls}_{'c' * 16}", partition="b")
+    mem.store.put(legacy, agent="ada", location="lab")                                   # as a 0.5.x client did
+    new = mem.carry_out(Context("ada", "lab", ("ada", "bo")), "kept after", "fact", cls="unattributed")
+    assert mem.store.items[new].partition == "b--class--unattributed"
+    assert sorted(i.text for i in mem.personal("ada")) == ["kept after", "kept before the flip"]
+    assert [r.text for r in mem.recall(Context("ada", "cafe"), "kept")] == ["kept before the flip", "kept after"]
+    assert mem.forget("ada", legacy.write_id) is True and mem.forget("ada", legacy.write_id) is False
+    assert [i.text for i in mem.personal("ada")] == ["kept after"]
+    assert mem.core.partitions_of_write(new) == ["b--class--unattributed", "b"]
+    assert mem.core.partitions_of_write(mem.carry_out(Context("ada", "lab", ("ada", "bo")), "plain", "fact")) == ["b"]

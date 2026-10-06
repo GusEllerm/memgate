@@ -55,6 +55,7 @@ CLAIMS = [
     ("class-minimum", "An environment's minimum class refuses a carry-out without it"),
     ("class-apart", "Consolidation never builds on another label set: the class set never gets the named item's name"),
     ("owner-view", "An agent's personal items can be listed, and only its own; forget removes one and nothing else"),
+    ("class-legacy", "A class item kept in the shared partition before the class stopped consolidating is still listed and forgotten"),
     ("ha-inside", "A high-assurance conversation is recalled inside its location"),
     ("ha-outside", "...and never outside it"),
     ("ha-partition", "It is stored in the location's own partition, not the shared one"),
@@ -166,7 +167,7 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         a, b, c = agents[:3]
         l1 = ordinary[0]
         l2 = ordinary[1] if len(ordinary) > 1 else None
-        codes = {k: f"MGC-{k.upper()}-{uuid.uuid4().hex[:6]}" for k in ("conv", "carry", "refused", "ha", "class")}
+        codes = {k: f"MGC-{k.upper()}-{uuid.uuid4().hex[:6]}" for k in ("conv", "carry", "refused", "ha", "class", "legacy")}
         here = Context(a, l1, (a, b))
         keep(mem.remember(here, f"{a} and {b} agreed the conformance canary for {l1} is {codes['conv']}."))
         written = [here.conversation().id]
@@ -290,6 +291,31 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         else:
             skip("owner-view", "no ordinary location lets any memory type out")
 
+        legacy_class = next((c for c in CLASSES if not w.consolidates(c)), None)
+        if not (caps.list_by_label_set and caps.delete):
+            skip("class-legacy", "the store cannot list by label set or delete")
+        elif legacy_class is None:
+            skip("class-legacy", "no class in the world is marked consolidate: false")
+        elif not carry_type:
+            skip("class-legacy", "no ordinary location lets any memory type out")
+        else:
+            # What a 0.5.x client, or a client before the class was marked, did: the class set's item in the shared
+            # partition. Written straight into the store under memgate's own labels and write id.
+            from memgate.store import Item
+            legacy_ls = gate.registry.register(personal_labels(a, legacy_class))
+            legacy_id = keep(f"w_{legacy_ls}_{uuid.uuid4().hex[:16]}")
+            mem.store.ensure(bank)
+            mem.store.put(Item(text=f"Kept before the flag flipped: the legacy code is {codes['legacy']}.", label_set=legacy_ls,
+                               write_id=legacy_id, partition=bank), agent=a, location=l1)
+            deadline2 = time.time() + wait_s
+            while mem.pending_operations() and time.time() < deadline2:
+                time.sleep(5)
+            listed = any(i.write_id == legacy_id for i in mem.personal(a))
+            recalled = sees(a, l2 or l1, codes["legacy"], "legacy code")
+            gone = mem.forget(a, legacy_id)
+            still = any(i.write_id == legacy_id for i in mem.personal(a))
+            ok("class-legacy", listed and gone and not still,
+               f"listed {listed}, recalled {recalled}, forgotten {gone}, still listed {still}")
         if ha:
             ok("ha-inside", sees(a, v, codes["ha"], "conformance dial"))
             ok("ha-outside", not sees(a, l1, codes["ha"], "conformance dial"))
@@ -340,7 +366,8 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         elif caps.delete:
             for wid in created:                               # exactly this run's writes, nothing else
                 try:
-                    mem.store.delete(mem.core.partition_of_write(wid), wid)
+                    for part in mem.core.partitions_of_write(wid):
+                        mem.store.delete(part, wid)
                 except Exception:                             # cleanup is best effort
                     pass
     return list(checks.values())

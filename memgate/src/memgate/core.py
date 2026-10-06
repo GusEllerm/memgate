@@ -191,17 +191,25 @@ class Core:
             raise PermissionError(f"{write_id} is not in {agent}'s personal memory")
         return ls
 
+    def partitions_holding(self, labels: LabelSet) -> list[str]:
+        """Every partition that may hold items of this label set: where new writes go (`partition_for`), and,
+        for a class the world keeps out of consolidation, the shared partition too, since items carried in
+        before the class was marked `consolidate: false` (or by a 0.5.x client) live there and recall still
+        finds them. The owner's view and forget must see what recall sees."""
+        first = self.partition_for(labels)
+        return [first, self.shared] if first not in (self.shared,) and strictest(labels.classes) else [first]
+
     def personal_sets(self, agent: str) -> list[tuple[str, str]]:
-        """An agent's personal sets that exist in the registry, as (label-set ID, partition): plain first,
-        then by class."""
+        """An agent's personal sets that exist in the registry, as (label-set ID, partition) pairs: plain
+        first, then by class, a pair per partition that may hold the set (`partitions_holding`)."""
         known = self.gate.registry.all()
         sets = [personal_labels(agent)] + [personal_labels(agent, c) for c in CLASSES]
-        return [(ls.id, self.partition_for(ls)) for ls in sets if ls.id in known]
+        return [(ls.id, part) for ls in sets if ls.id in known for part in self.partitions_holding(ls)]
 
-    def partition_of_write(self, write_id: str) -> str:
-        """The partition a write ID's label set lives in (its label set is in the ID)."""
+    def partitions_of_write(self, write_id: str) -> list[str]:
+        """The partitions a write ID's item may live in (its label set is in the ID), the likeliest first."""
         ls = write_id_label_set(write_id)
-        return self.partition_for(self.gate.registry.get(ls)) if ls in self.gate.registry.all() else self.shared
+        return self.partitions_holding(self.gate.registry.get(ls)) if ls in self.gate.registry.all() else [self.shared]
 
 
 class Memory:
@@ -285,7 +293,7 @@ class Memory:
         if not self.store.capabilities.delete:
             raise NotImplementedError("this store cannot delete")
         self.core.owned_by(agent, write_id)
-        existed = self.store.delete(self.core.partition_of_write(write_id), write_id)
+        existed = any([self.store.delete(p, write_id) for p in self.core.partitions_of_write(write_id)])   # every partition it may be in
         _event("forget", agent=agent, write_id=write_id, existed=existed)
         if self.core.provenance:
             self.core.provenance.audit(None, "forget", agent=agent, write_id=write_id, existed=existed)
@@ -297,8 +305,12 @@ class Memory:
         if not self.store.capabilities.list_by_label_set:
             raise NotImplementedError("this store cannot list by label set")
         out: list[Listed] = []
+        seen: set[str] = set()
         for ls, partition in self.core.personal_sets(agent):
-            out += self.store.list(partition, ls)
+            for i in self.store.list(partition, ls):
+                if i.write_id not in seen:              # a store without partitions answers the same for each
+                    seen.add(i.write_id)
+                    out.append(i)
         _event("personal_listed", agent=agent, items=len(out))
         return out
 
@@ -390,7 +402,9 @@ class AsyncMemory:
         if not self.store.capabilities.delete:
             raise NotImplementedError("this store cannot delete")
         self.core.owned_by(agent, write_id)
-        existed = await self._s("delete", self.core.partition_of_write(write_id), write_id)
+        existed = False
+        for p in self.core.partitions_of_write(write_id):                        # every partition it may be in
+            existed = await self._s("delete", p, write_id) or existed
         _event("forget", agent=agent, write_id=write_id, existed=existed)
         if self.core.provenance:
             self.core.provenance.audit(None, "forget", agent=agent, write_id=write_id, existed=existed)
@@ -401,8 +415,12 @@ class AsyncMemory:
         if not self.store.capabilities.list_by_label_set:
             raise NotImplementedError("this store cannot list by label set")
         out: list[Listed] = []
+        seen: set[str] = set()
         for ls, partition in self.core.personal_sets(agent):
-            out += await self._s("list", partition, ls)
+            for i in await self._s("list", partition, ls):
+                if i.write_id not in seen:
+                    seen.add(i.write_id)
+                    out.append(i)
         return out
 
     async def stats(self, agent: str | None = None) -> dict:

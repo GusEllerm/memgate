@@ -71,9 +71,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.6.1#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.6.2#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.6.1#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.6.2#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry, shared by both sides: a SQLite path, or postgresql://... (0.6.0)
@@ -133,7 +133,7 @@ ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # buil
   - **One class for now** (`labels.CLASSES`), on one ordered scale, so each agent has at most one set per class. A class is allowed only beside a self label (personal memory), never on conversations.
   - **Upgrading:** servers first, always (the version handshake refuses a client newer than its server): move every `memgate serve` to 0.5.0 before any client writes a class, then the clients, restarting every worker together. A 0.4.x server reads the whole registry on every write and fails every write, not only classed ones, once one class row exists; a 0.4.x client fails on any class set it looks up. Add `min_class` to the world file only once the server is on 0.5.0 (older `serve` and `check-world` reject unknown keys).
   - **Rolling back to 0.4.x** after a class row exists needs those rows removed from the registry, with every memgate process stopped: `DELETE FROM label WHERE label_set IN (SELECT label_set FROM label WHERE kind = 'class'); DELETE FROM label_sets WHERE labels LIKE '%"class:%';` (run the first statement first). The class sets' memories stay in the store, unreachable (failing closed, not leaking); upgrading again and writing to a class set re-registers it, and its memories come back, since ids are content-addressed. From 0.5.0 on, a label set with a kind or class the running version doesn't know is skipped (never readable or writable there) instead of failing every call.
-- **Classes and consolidation (0.6.0):** the world file may set, per class, whether the store consolidates that class's sets: `"classes": [{"id": "unattributed", "consolidate": false}]`. With `false`, Hindsight builds no observations over those sets (set per partition, so the class's items are kept in a partition of their own by the store). The default is to consolidate, as before.
+- **Classes and consolidation (0.6.0):** the world file may set, per class, whether the store consolidates that class's sets: `"classes": [{"id": "unattributed", "consolidate": false}]`. With `false`, Hindsight builds no observations over those sets (set per partition, so the class's items are kept in a partition of their own by the store). The default is to consolidate, as before. Items carried into the class set before the flag was set (or by a 0.5.x client) stay in the shared partition; recall finds them there, and since 0.6.2 so do `personal` and `forget`, which look in every partition the set may live in. No migration is needed when the flag flips.
 - **The owner's view and forget** are host-trusted operations: memgate checks that a write id belongs to the agent's personal memory (plain or any class), nothing more; who may ask on that agent's behalf is the host's decision, like every Context. Forget is a hard delete (database backups keep the text until they age out). A host that re-sends keyed writes on retry must tombstone its own record of a forgotten item, or the next replay brings it back. `memgate inspect <agent> --bank <name>` and `memgate forget <agent> <write-id> --bank <name> --yes` do the same from a terminal, with the server's `MEMGATE_*` settings and `MEMGATE_URL`.
 - **Async hosts:** `AsyncHindsightMemory` (same arguments, `await` every call; use `async with`, or call `aclose()`) has the same API and the same decisions. Otherwise wrap the sync client in `asyncio.to_thread`; it is thread-safe.
 - **Carrying out what an agent recalled** (the usual pattern on leaving a place): `recall` there, let the agent pick items and classify each, then call `carry_out(ctx, text, type, source=item)` per item. The item's own label set is the source, because it may have been formed with different people present than now.
@@ -182,7 +182,7 @@ memgate's decisions live in `memgate.core` and know nothing about the store; a s
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.6.1)
+## Limits (0.6.2)
 
 - **Two memory systems:** Hindsight 0.10.1 (pinned; the only store with a second lock) and Mem0 2.2 (client-side enforcement only). Another store is a `Store` implementation.
 - **Python:** 3.11 to 3.14 for the client (tested on 3.12 and 3.14 in CI); the server runs on 3.12, which Hindsight's stack is tested with.
