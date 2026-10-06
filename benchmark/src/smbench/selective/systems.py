@@ -65,8 +65,10 @@ class RawHindsight:
             raw = r.read()
             return json.loads(raw) if raw else {}
 
-    def bank(self, bank: str) -> None:
+    def bank(self, bank: str, config: dict | None = None) -> None:
         self.call("PUT", f"/v1/default/banks/{bank}", {"name": bank})
+        if config:
+            self.call("PATCH", f"/v1/default/banks/{bank}/config", {"updates": config})
 
     def retain(self, bank: str, text: str, ts: datetime, doc: str) -> None:
         self.call("POST", f"/v1/default/banks/{bank}/memories",
@@ -91,15 +93,15 @@ class RawHindsight:
 class NoFilter:
     name = "nofilter"
 
-    def __init__(self, url: str, run: str):
-        self.h, self.run = RawHindsight(url), run
+    def __init__(self, url: str, run: str, bank_config: dict | None = None):
+        self.h, self.run, self.bank_config = RawHindsight(url), run, bank_config
 
     def _bank(self, world: World) -> str:
         return f"{self.run}-nofilter-w{world.seed}"
 
     def ingest_jobs(self, world: World) -> list:
         """Create the banks, then return one zero-argument job per store (run in parallel by the runner)."""
-        self.h.bank(self._bank(world))
+        self.h.bank(self._bank(world), self.bank_config)
         jobs = [lambda c=c: self.h.retain(self._bank(world), transcript(world, c), when(world, c), c.id)
                 for c in world.conversations]
         # No permission check: every carry-out attempt and note is simply stored.
@@ -127,7 +129,7 @@ class PerAgent(NoFilter):
 
     def ingest_jobs(self, world: World) -> list:
         for a in world.agents:
-            self.h.bank(self._agent_bank(world, a))
+            self.h.bank(self._agent_bank(world, a), self.bank_config)
         jobs = [lambda c=c, a=a: self.h.retain(self._agent_bank(world, a), transcript(world, c), when(world, c), f"{c.id}-{a}")
                 for c in world.conversations for a in c.participants]
         # No permission check: carry-outs and notes go into the agent's own bank.
@@ -144,10 +146,11 @@ class PerAgent(NoFilter):
 class Memgate:
     name = "memgate"
 
-    def __init__(self, url: str, run: str, gate):
+    def __init__(self, url: str, run: str, gate, bank_config: dict | None = None):
         from memgate.adapters.hindsight.client import HindsightMemory
         self.gate, self.run, self.url, self._mem = gate, run, url, {}
         self._cls = HindsightMemory
+        self.bank_config = bank_config          # Hindsight per-bank settings applied after creation (e.g. observations off)
 
     def _m(self, world: World):
         if world.seed not in self._mem:
@@ -158,6 +161,10 @@ class Memgate:
         from memgate import Context
         m = self._m(world)
         m.create_bank()
+        if self.bank_config:
+            for bank in m.partitions():
+                m._ensure(bank)
+                m._call("PATCH", f"/v1/default/banks/{bank}/config", {"updates": self.bank_config}, role="admin")
         jobs = [lambda c=c: m.remember(Context(c.participants[0], c.location, tuple(c.participants)), transcript(world, c),
                                        when=when(world, c))
                 for c in world.conversations]

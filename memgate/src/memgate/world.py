@@ -28,11 +28,21 @@ class Location:
     high_assurance: bool = False
 
 
+@dataclass(frozen=True)
+class ClassPolicy:
+    """What a class of personal memory asks of the store (since 0.6.0). `consolidate` False gives that
+    class's personal sets a partition of their own (`memgate.context.class_bank`) in which the store is
+    told not to build derived memories (Hindsight's observations). The rest of the deployment is untouched."""
+    id: str
+    consolidate: bool = True
+
+
 @dataclass
 class World:
     environments: dict[str, Environment] = field(default_factory=dict)
     locations: dict[str, Location] = field(default_factory=dict)
     agents: set[str] = field(default_factory=set)
+    classes: dict[str, ClassPolicy] = field(default_factory=dict)
 
     def add_environment(self, id: str, carry_out=MEMORY_TYPES, min_class: str | None = None) -> Environment:
         class_rank(min_class)                          # raises for an unknown class
@@ -50,11 +60,22 @@ class World:
     def add_agents(self, *ids: str) -> None:
         self.agents.update(ids)
 
+    def add_class(self, id: str, consolidate: bool = True) -> ClassPolicy:
+        class_rank(id)                                  # raises for a class this version doesn't know
+        pol = ClassPolicy(id, consolidate)
+        self.classes[id] = pol
+        return pol
+
+    def consolidates(self, cls: str | None) -> bool:
+        """Whether the store may consolidate the personal sets of this class (always, for no class)."""
+        return cls is None or self.classes.get(cls, ClassPolicy(cls)).consolidate
+
     def fingerprint(self) -> tuple:
         """Changes whenever anything the policies read changes (for caching decisions)."""
         return (tuple(sorted((e.id, tuple(sorted(e.carry_out)), e.min_class or "") for e in self.environments.values())),
                 tuple(sorted((l.id, l.environment, l.high_assurance) for l in self.locations.values())),
-                tuple(sorted(self.agents)))
+                tuple(sorted(self.agents)),
+                tuple(sorted((c.id, c.consolidate) for c in self.classes.values())))
 
     def high_assurance(self, loc: str) -> bool:
         return self.locations[loc].high_assurance

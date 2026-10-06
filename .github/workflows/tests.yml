@@ -1,0 +1,31 @@
+# memgate's offline tests on the Python versions it supports for the client (3.12 and 3.14; 3.11 and 3.13
+# are declared but not run here). The validator, conformance-over-a-socket and live-Hindsight tests need
+# hindsight-api and a reachable LLM, so they skip or are deselected; they run locally (memgate/README.md).
+# livedocs verify (the vault's freshness gate) also runs locally: its tools are not published.
+name: tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  memgate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install the client and the test runner
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "memgate[async]" pytest
+      - name: Offline tests
+        working-directory: memgate
+        run: |
+          python -m pytest tests -q -p no:cacheprovider \
+            --deselect tests/test_hindsight_integration.py \
+            --deselect tests/test_serve_logs.py

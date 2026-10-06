@@ -1,6 +1,6 @@
 [project]
 name = "memgate"
-version = "0.5.0"
+version = "0.6.0"
 description = "Permission layer for agent memory: context-scoped labels, Cedar policies, and adapters for memory systems."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -11,6 +11,8 @@ dependencies = ["cedarpy==4.12.1"]
 hindsight = ["hindsight-api==0.10.1", "hindsight-client==0.10.1"]
 # The async client (AsyncHindsightMemory).
 async = ["httpx>=0.27"]
+postgres = ["psycopg[binary]>=3.1"]
+mem0 = ["mem0ai>=2.2"]
 
 [project.scripts]
 memgate = "memgate.cli:main"

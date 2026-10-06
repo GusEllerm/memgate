@@ -19,7 +19,10 @@ class Recording:
     def answer(self, client, method, path, body, agent, location, role):
         self.calls.append((client._base_for(path), method, path, body, agent, location, role))
         if path.endswith("/memories/recall"):
-            return {"results": [{"text": f"from {path.split('/')[4]}", "tags": ["ls_x"],
+            # Answer with the first label set the client asked for, as a real server (and its validator)
+            # would; the client drops anything outside what it allowed.
+            tag = (body or {}).get("tags", ["ls_x"])[0]
+            return {"results": [{"text": f"from {path.split('/')[4]}", "tags": [tag],
                                  "scores": {"final": 0.9 if "--ha--" in path else 0.5}}]}
         return {}
 

@@ -17,7 +17,7 @@ tags: [module, memgate, hindsight]
 
 Code: `memgate/src/memgate/adapters/hindsight/client.py`.
 
-`HindsightMemory` (synchronous, urllib) and `AsyncHindsightMemory` (asyncio, httpx; since 0.3.0) are the only way agents' memory reaches Hindsight. They have the same API. Both are built on `_Core`, which makes every decision (labels, permission checks, routing, provenance) and does no I/O. So the two cannot decide differently; only the transport differs. Their operations are below.
+`HindsightMemory` (synchronous, urllib) and `AsyncHindsightMemory` (asyncio, httpx; since 0.3.0) are the only way agents' memory reaches Hindsight. Since 0.6.0 they are `Memory` and `AsyncMemory` (`memgate/src/memgate/core.py`) over `HindsightStore` / `AsyncHindsightStore` (`memgate/src/memgate/adapters/hindsight/store.py`): the decisions live in `Core`, which does no I/O and knows nothing of Hindsight; the store binds banks to partitions, tags to label sets and document IDs to write IDs, and claims every capability (second lock, idempotent replace, partitions, delete, list by label set, stats, consolidation control). `check_version` makes one gated request per server (the version handshake, refused with 426 as `VersionMismatch`). Their operations are below.
 
 **Partitions (since 2026-09-30).** A world has one shared bank, for ordinary locations and personal memory, plus one bank per high-assurance location, named by `partition_bank` in `memgate/src/memgate/context.py`. `_Core.bank_for` sends each write to the partition of the high-assurance location it is labelled with, if any. A recall in a high-assurance location searches its partition and the shared bank (where personal memory lives) and merges the two by Hindsight's final score. A recall anywhere else never touches a partition. So a vault's memories never share ranking statistics, caches or consolidation with anything outside it. `_Core.partitions` lists the banks, and `HindsightMemory.pending_operations` counts across all of them.
 
@@ -56,6 +56,7 @@ Code: `memgate/src/memgate/adapters/hindsight/validator.py`. `MemgateValidator` 
   - reflect is refused, because its scope can't be enforced;
   - mental models are refused, because they blend a bank;
   - memory-reading bank operations (list, export, get document, entity graph, …) are refused for agents, via `validate_bank_read`;
+  - the bank list is empty for anyone but an admin with the secret (`filter_bank_list`, since 0.6.0; Hindsight does not gate that route, and bank names embed high-assurance locations); a role other than agent or admin is refused, and a client newer than the server, or older than `--min-client-version`, is refused with status 426 (`_caller`, since 0.6.0);
   - bank writes and bank creation are admin-only (`validate_bank_write`, `validate_create_bank`), with one exception since 0.4.4: an authenticated agent-role caller may submit a consolidation (`SCHEDULE_ONLY`). Hindsight schedules one after every retain with the writer's context; refusing it only delayed consolidation to Hindsight's five-minute reconcile sweep and logged a warning per write (found by CHORUS's phase-3 run). The submit stores nothing, and the consolidation it schedules is validated by `validate_consolidate` when it runs.
 
 **Launch:** `memgate serve` ([[memgate Integration]]) runs Hindsight with the validator loaded:

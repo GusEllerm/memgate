@@ -71,12 +71,12 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.5.0#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.6.0#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.5.0#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.6.0#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
-export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry (SQLite), shared by both sides
+export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry, shared by both sides: a SQLite path, or postgresql://... (0.6.0)
 export MEMGATE_SECRET=$(memgate secret)                        # store it where only the host can read it
 export MEMGATE_LLM_BASE_URL=https://your-llm/v1 MEMGATE_LLM_MODEL=your-model MEMGATE_LLM_API_KEY=...
 
@@ -92,10 +92,13 @@ memgate serve --socket /srv/host/memgate-run/memgate.sock      # recommended: a 
 - **Consolidation timing:** Hindsight derives observations from stored facts in a background consolidation it schedules right after each write. Facts are recallable at once; observations follow within seconds (0.4.4 and later; before 0.4.4 the validator refused that schedule request and Hindsight's reconcile sweep ran consolidation up to five minutes later, logging "Failed to submit consolidation task ... admin only" each time). Consolidation stays within one label set.
 - **Readiness:** don't detect startup from the server's log (at the default warning level uvicorn prints no "running on" line). Probe `GET /health` over the socket or port until it answers 200, or retry the client's `create_bank()` until it stops raising; the first request after start can take a while because the embedder loads.
 - **The LLM** is used by Hindsight to extract and consolidate memories (any OpenAI-compatible endpoint). **Embeddings** are local (BAAI/bge-small-en-v1.5 by default).
+- **A slimmer server image (0.6.0):** torch is only there for Hindsight's local embedder and cross-encoder reranker. `memgate serve --embeddings-provider onnx --reranker rrf` runs the embedder on onnxruntime (`--embedder` then names a Hugging Face repo with an `onnx/model.onnx` export) and skips reranking, so the server environment can be `pip install 'memgate[hindsight-slim]'`-sized rather than carrying torch; Prefer `--reranker flashrank`, a small ONNX reranker: on the benchmark it holds within two points of the local cross-encoder, where no reranker at all (`rrf`) halves recall on indirect questions (see the changelog).
+- **Version handshake (0.6.0):** the client sends its release with every request. The server refuses a client newer than itself (upgrade the server first) and, with `memgate serve --min-client-version X.Y.Z`, any client older than that or sending no version (a stale worker). `HindsightMemory(..., check_version=True)` makes one gated request per server at construction, so a mismatched worker fails at boot with `VersionMismatch` rather than on its first write. The handshake protects from 0.6.0 onward: a 0.5.x server does not read the header, and a 0.5.x client sends none (it is refused only when the server sets a minimum).
+- **Logging (0.6.0):** memgate logs one JSON line per write, recall, refusal and forget, with ids, counts, label-set ids and reasons, never memory or query text. The server writes them to stdout itself (independent of Hindsight's log level); the client logs to the Python logger `memgate`, which the host enables like any other library logger.
 - **The host process and the server must see the same three settings:** `MEMGATE_WORLD`, `MEMGATE_REGISTRY` and `MEMGATE_SECRET`.
 - **The database:** `pg0://name` is an embedded Postgres. For your own server, use a `postgresql://` URL in `MEMGATE_DB`, not the `--db` flag, so the password stays out of the process list. Put the password in the user part (`postgresql://user:password@host/db`): memgate and Hindsight both mask it in their output. `memgate serve` refuses a password in the query (`?password=`), because Hindsight 0.10.1 logs the query in clear. Give memgate its own database role, with access to its database only, so the server can't reach the host's other data. The database needs the `vector` (pgvector) and `pg_trgm` extensions; pre-create them if Hindsight's role may not.
 - **World changes:** both sides re-read the world file when it changes, checked at most every `MEMGATE_WORLD_CHECK_S` seconds (default 1; `memgate serve --world-check-interval`). In the host, call `gate.refresh(force=True)` right after writing the file. A memory call to something created within that interval may be refused by the server; retry once.
-- **The registry** is a SQLite file (WAL). Any number of host processes may write it (for example several web workers), and the server only reads it. That works across processes and containers on one host. Never put it on NFS or EFS, or on a macOS Docker Desktop bind mount shared with a host process.
+- **The registry** is a SQLite file (WAL) or, since 0.6.0, a PostgreSQL database (`MEMGATE_REGISTRY=postgresql://user:password@host/db`, with `memgate[postgres]` installed on both sides; tables go in a `memgate` schema, so it can share Hindsight's database). Any number of host processes may write it (for example several web workers), and the server only reads it. SQLite works across processes and containers on one host; never put it on NFS or EFS, or on a macOS Docker Desktop bind mount shared with a host process. Use PostgreSQL when API workers run on more than one host; `PostgresRegistry.copy_from(Registry(path))` migrates a SQLite registry (ids are content-addressed, so it is a re-registration).
 - **A separate server for high-assurance partitions** (optional, for isolation): run a second `memgate serve --scope partitions` with its own port and database, and the first with `--scope shared`. Both use the same world, registry and secret. Pass `partition_url=` to the client. Each server refuses the other's banks. Both can use the same LLM (Hindsight 0.10.1 cannot give one bank its own LLM, so a different LLM for high assurance needs this split anyway).
 
 ## The API
@@ -118,6 +121,9 @@ ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # buil
 | `mem.keep_note(ctx, text, key=None)` | An agent's private note that should stay where it was written | Readable only by its author, only in that location |
 | `mem.carry_out(ctx, text, memory_type, source=None, source_writes=(), key=None, cls=None)` | An agent takes something with it into personal memory | `source` is what the content was formed under. Pass the `Recalled` item itself to carry out something recalled (its label set, and its write for provenance), or a label set or its ID. It defaults to `ctx`'s conversation. It must be readable in `ctx`. Raises `PermissionError` if the environment forbids it |
 | `mem.say(ctx, text, recalls=[recall_id, ...])` | An agent speaks | Records which recalls it drew on, so later memories trace back (needs a `ProvenanceLog`) |
+| `mem.personal(agent)` | The owner wants to see what the agent kept | Every item in the agent's personal sets (plain and by class), text as kept, month, kind. Admin, host-trusted: the host verifies the owner (0.6.0) |
+| `mem.forget(agent, write_id)` | The owner wants one kept item gone | A hard delete of that item and what the store derived from it; refused unless the write id is in that agent's personal memory. The host must also stop re-sending it (0.6.0) |
+| `mem.stats(agent=None)` | An operator or owner wants counts | Per partition: pending work, last consolidation; per personal set of `agent`: memories, derived items, writes, last write (0.6.0) |
 
 - **Idempotent writes:** pass `key=` (any string the host chooses, e.g. its own segment id) to `remember`, `keep_note` or `carry_out`. The write id is derived from the key and the label set, so re-sending the same key under the same label set (same location, same participants; same author for a note) replaces the earlier write instead of storing it twice: Hindsight upserts by that id, and a byte-identical re-send extracts nothing new. A host that records at least once (an outbox drained after a crash) gets exactly-once storage this way. The id carries the label set, and the server refuses a write id minted under another label set, so a key can never reach another conversation's memory. An agent's personal memory (carry-outs) is one label set, so a carry-out key must be unique across everything that agent ever carries out, and a retry must re-send the same text under the same key (store the chosen items, then write them).
 - **Classes of personal memory (0.5.0).** `carry_out(..., cls="unattributed")` files the item in the agent's class set, `personal_labels(agent, "unattributed")` = {self:A, class:unattributed}, instead of {self:A}. Use it for items that must never be consolidated with the agent's other personal memory, for example items kept without names from a place where no one may be named: the memory system's consolidation merges and resolves references within a label set, and would put a name back if both lived in one set.
@@ -125,11 +131,13 @@ ctx = Context(agent="ada", location="lab", participants=("ada", "bo"))    # buil
   - **The host chooses the class.** memgate never derives it. Two rules guard it, both in the client, since the server never sees a carry-out (only the personal write it produces): content whose source carries a class may not go to a less strict class (any source form: a `Recalled` item, a label set or its id), and an environment's `min_class` must be met. Neither can catch a host that declares a classless source for content that came from a class set.
   - **What keeps the sets apart** is the memory system's consolidation scope: Hindsight consolidates within one tag, and a class set is a different tag. That is outside the policies' proofs. `memgate conformance` checks it on the live deployment (`class-apart`).
   - **One class for now** (`labels.CLASSES`), on one ordered scale, so each agent has at most one set per class. A class is allowed only beside a self label (personal memory), never on conversations.
-  - **Upgrading:** move every `memgate serve` to 0.5.0 before any client writes a class, then the clients, restarting every worker together. A 0.4.x server reads the whole registry on every write and fails every write, not only classed ones, once one class row exists; a 0.4.x client fails on any class set it looks up. Add `min_class` to the world file only once the server is on 0.5.0 (older `serve` and `check-world` reject unknown keys).
+  - **Upgrading:** servers first, always (the version handshake refuses a client newer than its server): move every `memgate serve` to 0.5.0 before any client writes a class, then the clients, restarting every worker together. A 0.4.x server reads the whole registry on every write and fails every write, not only classed ones, once one class row exists; a 0.4.x client fails on any class set it looks up. Add `min_class` to the world file only once the server is on 0.5.0 (older `serve` and `check-world` reject unknown keys).
   - **Rolling back to 0.4.x** after a class row exists needs those rows removed from the registry, with every memgate process stopped: `DELETE FROM label WHERE label_set IN (SELECT label_set FROM label WHERE kind = 'class'); DELETE FROM label_sets WHERE labels LIKE '%"class:%';` (run the first statement first). The class sets' memories stay in the store, unreachable (failing closed, not leaking); upgrading again and writing to a class set re-registers it, and its memories come back, since ids are content-addressed. From 0.5.0 on, a label set with a kind or class the running version doesn't know is skipped (never readable or writable there) instead of failing every call.
+- **Classes and consolidation (0.6.0):** the world file may set, per class, whether the store consolidates that class's sets: `"classes": [{"id": "unattributed", "consolidate": false}]`. With `false`, Hindsight builds no observations over those sets (set per partition, so the class's items are kept in a partition of their own by the store). The default is to consolidate, as before.
+- **The owner's view and forget** are host-trusted operations: memgate checks that a write id belongs to the agent's personal memory (plain or any class), nothing more; who may ask on that agent's behalf is the host's decision, like every Context. Forget is a hard delete (database backups keep the text until they age out). A host that re-sends keyed writes on retry must tombstone its own record of a forgotten item, or the next replay brings it back. `memgate inspect <agent> --bank <name>` and `memgate forget <agent> <write-id> --bank <name> --yes` do the same from a terminal, with the server's `MEMGATE_*` settings and `MEMGATE_URL`.
 - **Async hosts:** `AsyncHindsightMemory` (same arguments, `await` every call; use `async with`, or call `aclose()`) has the same API and the same decisions. Otherwise wrap the sync client in `asyncio.to_thread`; it is thread-safe.
 - **Carrying out what an agent recalled** (the usual pattern on leaving a place): `recall` there, let the agent pick items and classify each, then call `carry_out(ctx, text, type, source=item)` per item. The item's own label set is the source, because it may have been formed with different people present than now.
-- **Writes that break a rule** raise `PermissionError` before anything is stored. Store errors raise `HindsightError`. None of these calls ever returns an unchecked result.
+- **Writes that break a rule** raise `PermissionError` before anything is stored. Store errors raise `HindsightError`. None of these calls ever returns an unchecked result. Recall also applies memgate's own filter to whatever the store returns: an item whose label set the context may not read is dropped and counted in the recall's log line, even if a store without a second lock returned it.
 - **Provenance** (optional; recommended where audit matters): `HindsightMemory(..., provenance=ProvenanceLog(root, gate))` from `memgate.provenance`. It keeps a W3C PROV-style record of every write, recall and turn, with one SQLite file per high-assurance location.
 
 A turn, in order:
@@ -139,6 +147,22 @@ A turn, in order:
 4. `remember(ctx, what was said, turns=[turn])`.
 
 When the agent leaves, the host may call `carry_out` for whatever the agent chooses to take, then drops the agent's working context.
+
+## Stores and capabilities (0.6.0)
+
+memgate's decisions live in `memgate.core` and know nothing about the store; a store implements `memgate.store.Store` (`ensure`, `put`, `search`, `pending`) and declares `Capabilities`. `HindsightMemory` is `Memory` over the Hindsight store; `Memory(gate, Mem0Store(...), shared="ranch")` runs the same decisions over Mem0 (`memgate[mem0]`). What memgate guarantees with every store rests on its client-side decisions; the rest depends on the store:
+
+| Capability | Hindsight | Mem0 | What it gives you |
+| --- | --- | --- | --- |
+| Second lock | yes (the validator inside the server) | no | Writes and recalls are checked again inside the store, whatever the client sent. Without it, a compromised host process could read anything |
+| Idempotent replace | yes | emulated | `key=` makes a retried write replace its earlier self |
+| Partitions | yes (a bank per high-assurance location) | no | High-assurance memories never share storage, ranking or consolidation with the rest; without it they are kept apart by label only |
+| Delete | yes, with derived items | yes | `forget` |
+| List by label set | yes | yes | `personal`, conformance's `class-apart` |
+| Stats | yes | partial | `stats`, `memgate inspect` |
+| Consolidation control | yes (per partition) | nothing to control | a class's `consolidate: false` |
+
+`memgate conformance` checks only what the store claims; the rest is reported as skipped with the reason. The proofs cover the decisions ([[memgate Proofs]] in the vault); the second lock and per-label-set consolidation are properties of Hindsight.
 
 ## Verify
 
@@ -158,9 +182,10 @@ When the agent leaves, the host may call `carry_out` for whatever the agent choo
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.5.0)
+## Limits (0.6.0)
 
-- **One memory system:** Hindsight 0.10.1, pinned. Other stores need an adapter.
+- **Two memory systems:** Hindsight 0.10.1 (pinned; the only store with a second lock) and Mem0 2.2 (client-side enforcement only). Another store is a `Store` implementation.
+- **Python:** 3.11 to 3.14 for the client (tested on 3.12 and 3.14 in CI); the server runs on 3.12, which Hindsight's stack is tested with.
 - **Identity and context verification are the host's** (see the contract).
 - **Not tested against adversarial agents.** The evidence covers cooperative agents.
 - **Reflect and mental models are disabled** under memgate.

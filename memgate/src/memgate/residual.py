@@ -5,7 +5,7 @@ remains of each policy (its residual) is a condition on the unknown label set's 
 module turns those residuals into one SQL WHERE clause, so the database picks the readable label
 sets instead of Cedar checking every one.
 
-Only the constructs our policies produce are compiled: && || ! true/false, containsAll, contains,
+Truth literals are TRUE/FALSE, which SQLite (3.23+) and PostgreSQL both accept. Only the constructs our policies produce are compiled: && || ! true/false, containsAll, contains,
 containsAny and isEmpty over the label set's attributes and literal sets of entities. Anything else
 raises Unsupported, and the caller falls back to checking each label set with Cedar, so an
 unfamiliar policy makes recall slower but never wrong. tests/test_residual.py checks the compiled
@@ -37,7 +37,7 @@ class AttrSet:
         if self.only is not None:
             if not self.only:
                 # Matches nothing, but keeps `extra` so its placeholders still line up with the caller's params.
-                return "SELECT 1 FROM label l WHERE 0" + extra, []
+                return "SELECT 1 FROM label l WHERE FALSE" + extra, []
             sql += f" AND l.value IN ({','.join('?' * len(self.only))})"
             params += list(self.only)
         return sql + extra, params
@@ -84,7 +84,7 @@ class Compiler:
             raise Unsupported(str(node)[:80])
         (op, body), = node.items()
         if op == "Value" and isinstance(body, bool):
-            return ("1" if body else "0"), []
+            return ("TRUE" if body else "FALSE"), []
         if op in ("&&", "||"):
             a, pa = self.expr(body["left"])
             b, pb = self.expr(body["right"])
@@ -114,14 +114,14 @@ class Compiler:
                     rows, p = la.rows(" AND l.value = ?")
                     parts.append(f"EXISTS ({rows})")
                     params += p + [v]
-                return ("(" + " AND ".join(parts) + ")" if parts else "1"), params
+                return ("(" + " AND ".join(parts) + ")" if parts else "TRUE"), params
             if op == "contains" and la is not None and rl is not None and len(rl) == 1:
                 rows, p = la.rows(" AND l.value = ?")
                 return f"(EXISTS ({rows}))", p + rl
             if op == "containsAny" and ((la is not None and rl is not None) or (ra is not None and ll is not None)):
                 attr, lit = (la, rl) if la is not None else (ra, ll)
                 if not lit:
-                    return "0", []
+                    return "FALSE", []
                 rows, p = attr.rows(f" AND l.value IN ({','.join('?' * len(lit))})")
                 return f"(EXISTS ({rows}))", p + lit
             raise Unsupported(f"{op} with these operands")
@@ -137,7 +137,7 @@ class Compiler:
             sql, p = self.expr(cond["body"])
             clauses.append(sql if cond["kind"] == "when" else f"(NOT {sql})")
             params += p
-        return ("(" + " AND ".join(clauses) + ")" if clauses else "1"), params
+        return ("(" + " AND ".join(clauses) + ")" if clauses else "TRUE"), params
 
     def where(self, residuals: dict[str, dict]) -> tuple[str, list]:
         """One WHERE clause for the label sets allowed by a set of residual policies."""
@@ -151,7 +151,7 @@ class Compiler:
                 forbids.append(sql)
                 params_f += p
         if not permits:
-            return "0", []
+            return "FALSE", []
         where = "(" + " OR ".join(permits) + ")"
         if forbids:
             where += " AND NOT (" + " OR ".join(forbids) + ")"

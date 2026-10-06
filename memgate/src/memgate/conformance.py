@@ -4,17 +4,21 @@
     memgate conformance --url http://127.0.0.1:8889 --partition-url http://127.0.0.1:8890   # split deployment
 
 Run it against the deployment's own server and world, after any change to the deployment. It picks
-agents and locations from the world, plants canary strings (unique codes) in a throwaway bank,
-checks who can recall each from where, probes the validator directly, then deletes the bank. Checks
-that need something the world doesn't have (a second location, a high-assurance location, an
-environment that refuses a carry-out) are reported as skipped. Costs a few dozen LLM calls, for
-Hindsight's extraction and consolidation of the canary memories.
+agents and locations from the world, plants canary strings (unique codes) in a throwaway partition,
+checks who can recall each from where, probes the store's second lock directly where it has one, then
+deletes the partition. Checks that need something the world doesn't have (a second location, a
+high-assurance location, an environment that refuses a carry-out) are reported as skipped, and so are
+checks that need a capability the store doesn't claim (memgate.store.Capabilities): a store without a
+second lock skips the validator probes, one without partitions skips the partition checks. Costs a few
+dozen LLM calls, for the store's extraction and consolidation of the canary memories. On a store without
+partitions the canaries share the one collection with real data (label-set ids are content-addressed),
+so cleanup deletes exactly the writes the run made; a store's own history may still hold their text.
 
-The class checks (0.5.0) keep a named item in an agent's personal set and its nameless version in the
-"unattributed" class set, wait for consolidation, then list every stored unit (as admin): no observation
-may be built from a unit of another label set, and the planted name may appear in no unit of the class
-set. That is the separation the class exists for, which the memory system's per-tag consolidation keeps
-(outside the policies' proofs), so it is checked here rather than proved.
+The class checks keep a named item in an agent's personal set and its nameless version in the
+"unattributed" class set, wait for consolidation, then list what the store holds: no derived item may
+be built from another label set, and the planted name may appear in no item of the class set. That is
+the separation the class exists for, which the store's per-label-set consolidation keeps (outside the
+policies' proofs), so it is checked here rather than proved.
 
 Exit code 0 means every applicable check passed.
 """
@@ -26,12 +30,39 @@ import time
 import uuid
 from dataclasses import dataclass
 
-from memgate.context import HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, Context, Gate, partition_bank
+from memgate.context import (HEADER_AGENT, HEADER_LOCATION, HEADER_ROLE, HEADER_SECRET, HEADER_VERSION, Context, Gate,
+                             partition_bank)
+from memgate.core import Memory
 from memgate.derivation import personal_labels
 from memgate.labels import CLASSES
+from memgate.provenance import write_id_label_set
 from memgate.world import MEMORY_TYPES
 
 UNATTRIBUTED = CLASSES[0]
+
+CLAIMS = [
+    ("secret", "A request without memgate's secret is refused (the validator is loaded and keyed)"),
+    ("side-doors", "Reflect, memory listing and document reads are refused to agents"),
+    ("witness", "A participant recalls a conversation in its location"),
+    ("non-witness", "An agent who wasn't there cannot recall it, even in the same location"),
+    ("elsewhere", "A participant cannot recall it from another location"),
+    ("forged-tags", "A recall asking for a label set the caller may not read gets nothing from it"),
+    ("write-rules", "The validator refuses a write under a label set the writer may not write"),
+    ("carry-out", "A permitted carry-out becomes personal memory: its owner recalls it elsewhere, no one else does"),
+    ("carry-refused", "A carry-out the environment forbids is refused and stores nothing"),
+    ("class-carry-out", "A carry-out into a class set: its owner recalls it elsewhere, no one else does"),
+    ("class-downgrade", "Content from a class set cannot be carried into a less strict personal set"),
+    ("class-minimum", "An environment's minimum class refuses a carry-out without it"),
+    ("class-apart", "Consolidation never builds on another label set: the class set never gets the named item's name"),
+    ("owner-view", "An agent's personal items can be listed, and only its own; forget removes one and nothing else"),
+    ("ha-inside", "A high-assurance conversation is recalled inside its location"),
+    ("ha-outside", "...and never outside it"),
+    ("ha-partition", "It is stored in the location's own partition, not the shared one"),
+    ("ha-partition-search", "The partition cannot be searched from outside"),
+    ("ha-seal", "Personal memory cannot be written inside a high-assurance location"),
+    ("split-scope", "In a split deployment, each server refuses the other's banks"),
+]
+SECOND_LOCK_CHECKS = ("secret", "side-doors", "forged-tags", "write-rules", "ha-partition-search")
 
 
 @dataclass
@@ -43,83 +74,92 @@ class Check:
 
 
 def _raw(url: str, method: str, path: str, body: dict | None, headers: dict) -> tuple[int, str]:
-    from memgate.adapters.hindsight.client import send      # http or unix, never via a proxy
+    """A request straight at the server, as a probe of the second lock; it carries this release's version
+    like the client does, so a server with a minimum client version judges the probe on its merits."""
+    from memgate import __version__
+    from memgate.adapters.hindsight.store import send      # http or unix, never via a proxy
     status, raw = send(url, method, path, json.dumps(body).encode() if body is not None else None,
-                       {"Content-Type": "application/json", **headers}, 300)
+                       {"Content-Type": "application/json", HEADER_VERSION: __version__, **headers}, 300)
     return status, raw.decode(errors="replace")
 
 
-def _apart(mem, bank: str, gate: Gate, class_set: str, name: str) -> tuple[bool | None, str]:
-    """(passed, detail) for class-apart, or (None, why) when consolidation formed nothing to check."""
-    units, offset = [], 0
-    while True:
-        r = mem._call("GET", f"/v1/default/banks/{bank}/memories/list?limit=500&offset={offset}", None, role="admin")
-        page = r.get("items", [])
-        units += page
-        offset += len(page)
-        if not page or offset >= r.get("total", 0):
-            break
-    tag = {u["id"]: tuple(sorted(u.get("tags") or [])) for u in units}
-    observations = [u for u in units if u.get("fact_type") == "observation"]
-    crossed = [u["id"] for u in observations
-               if any(s in tag and tag[s] != tag[u["id"]] for s in (u.get("source_memory_ids") or []))]
-    named = [u["id"] for u in units if tag[u["id"]] == (class_set,) and name.lower() in (u.get("text") or "").lower()]
-    in_class = sum(1 for u in observations if tag[u["id"]] == (class_set,))
-    if not observations:
-        return None, f"consolidation formed no observations within the wait ({len(units)} units)"
-    return (not crossed and not named,
-            f"{len(observations)} observations ({in_class} in the class set): {len(crossed)} built across label sets, "
-            f"{len(named)} class-set units with the name")
+def _apart(mem: Memory, partition: str, label_sets: list[str], class_set: str, name: str) -> tuple[bool | None, str]:
+    """(passed, detail) for class-apart, or (None, why) when the store derived nothing to check. Lists every
+    label set conformance wrote to; a derived item's sources are write IDs, whose label set is in the ID."""
+    items = []
+    for ls in label_sets:
+        items += mem.store.list(mem.core.partition_for(mem.gate.registry.get(ls)), ls)
+    derived = [i for i in items if i.kind == "derived"]
+    # A source the listing could not resolve to a write of the same label set was built from another set
+    # (or from something since deleted): counted as crossed, never excused.
+    crossed = [i for i in derived if any(write_id_label_set(s) != i.label_set for s in i.sources)]
+    named = [i for i in items if i.label_set == class_set and name.lower() in i.text.lower()]
+    if named:
+        return False, f"{len(named)} class-set item(s) hold the name planted only in the plain set"
+    if not derived:
+        return None, f"the store derived nothing within the wait ({len(items)} items; the name appears nowhere in the class set)"
+    in_class = sum(1 for i in derived if i.label_set == class_set)
+    return (not crossed,
+            f"{len(derived)} derived items ({in_class} in the class set): {len(crossed)} built across label sets or from "
+            f"unresolved sources, 0 class-set items with the name")
 
 
-def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = None) -> list[Check]:
+def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: str | None = None,
+        memory: Memory | None = None) -> list[Check]:
+    """Check a deployment. Give `url` (a memgate serve address) for Hindsight, or any `memory` (a `Memory`
+    over some store); with a store that has no second lock, the validator probes are skipped."""
     from memgate.adapters.hindsight.client import HindsightError, HindsightMemory
 
-    url = url.rstrip("/")
+    if memory is None and not url:
+        raise ValueError("give url (a memgate serve address) or memory (a Memory over some store)")
     w = gate.world
-    checks: dict[str, Check] = {c.id: c for c in [
-        Check("secret", "A request without memgate's secret is refused (the validator is loaded and keyed)"),
-        Check("side-doors", "Reflect, memory listing and document reads are refused to agents"),
-        Check("witness", "A participant recalls a conversation in its location"),
-        Check("non-witness", "An agent who wasn't there cannot recall it, even in the same location"),
-        Check("elsewhere", "A participant cannot recall it from another location"),
-        Check("forged-tags", "A recall asking for a label set the caller may not read gets nothing from it"),
-        Check("write-rules", "The validator refuses a write under a label set the writer may not write"),
-        Check("carry-out", "A permitted carry-out becomes personal memory: its owner recalls it elsewhere, no one else does"),
-        Check("carry-refused", "A carry-out the environment forbids is refused and stores nothing"),
-        Check("class-carry-out", "A carry-out into a class set: its owner recalls it elsewhere, no one else does"),
-        Check("class-downgrade", "Content from a class set cannot be carried into a less strict personal set"),
-        Check("class-minimum", "An environment's minimum class refuses a carry-out without it"),
-        Check("class-apart", "Consolidation never builds on another label set: the class set never gets the named item's name"),
-        Check("ha-inside", "A high-assurance conversation is recalled inside its location"),
-        Check("ha-outside", "...and never outside it"),
-        Check("ha-partition", "It is stored in the location's own partition, not the shared bank"),
-        Check("ha-partition-search", "The partition cannot be searched from outside"),
-        Check("ha-seal", "Personal memory cannot be written inside a high-assurance location"),
-        Check("split-scope", "In a split deployment, each server refuses the other's banks"),
-    ]}
+    checks: dict[str, Check] = {cid: Check(cid, claim) for cid, claim in CLAIMS}
 
     def ok(cid, cond, detail=""):
         checks[cid].status, checks[cid].detail = ("pass" if cond else "fail"), detail
+
+    def skip(cid, why):
+        checks[cid].detail = why
 
     ordinary = sorted(l for l in w.locations if not w.high_assurance(l))
     ha = sorted(l for l in w.locations if w.high_assurance(l))
     agents = sorted(w.agents)
     bank = f"memgate-conformance-{uuid.uuid4().hex[:8]}"
-    mem = HindsightMemory(gate, bank=bank, base_url=url, partition_url=partition_url)
-    purl = (partition_url or url).rstrip("/")
+    if memory is None:
+        url = (url or "").rstrip("/")
+        mem = HindsightMemory(gate, bank=bank, base_url=url, partition_url=partition_url)
+    else:
+        # The caller's Memory is left alone: a fresh one over the same store, with the throwaway partition
+        # name and no provenance, so the canaries record nothing in the host's provenance log.
+        mem = Memory(memory.gate, memory.store, bank)
+    caps = mem.capabilities
+    hindsight = isinstance(mem, HindsightMemory)
+    purl = (partition_url or url or "").rstrip("/")
     admin = {HEADER_SECRET: gate.secret, HEADER_ROLE: "admin"}
+    created: list[str] = []              # every write id this run makes, for a cleanup that touches nothing else
 
     def as_(agent, loc):
         return {HEADER_SECRET: gate.secret, HEADER_AGENT: agent, HEADER_LOCATION: loc}
 
+    probes = caps.second_lock and hindsight
+    if not caps.second_lock:
+        for cid in SECOND_LOCK_CHECKS:
+            skip(cid, "the store has no second lock (memgate's client is the only enforcement)")
+    elif not hindsight:
+        for cid in SECOND_LOCK_CHECKS:
+            skip(cid, "conformance can only probe Hindsight's validator directly")
+    def keep(write_id: str) -> str:
+        created.append(write_id)
+        return write_id
+
     try:
         mem.create_bank()
-        status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall", {"query": "x"}, {})
-        ok("secret", status == 403, f"status {status}")
+        if probes:
+            status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall", {"query": "x"}, {})
+            ok("secret", status == 403, f"status {status}")
         if len(agents) < 3 or not ordinary:
             for c in checks.values():
-                if c.status == "skip":
+                if c.status == "skip" and not c.detail:
                     c.detail = "the world needs at least three agents and one ordinary location"
             return list(checks.values())
 
@@ -128,24 +168,27 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
         l2 = ordinary[1] if len(ordinary) > 1 else None
         codes = {k: f"MGC-{k.upper()}-{uuid.uuid4().hex[:6]}" for k in ("conv", "carry", "refused", "ha", "class")}
         here = Context(a, l1, (a, b))
-        mem.remember(here, f"{a} and {b} agreed the conformance canary for {l1} is {codes['conv']}.")
+        keep(mem.remember(here, f"{a} and {b} agreed the conformance canary for {l1} is {codes['conv']}."))
+        written = [here.conversation().id]
 
         carry_type = next((t for t in sorted(w.carry_out_types(frozenset({l1})))), None)
         floor = w.min_class({l1})                          # meet the location's minimum, if its environment sets one
+        canary_name = f"Zorvath{uuid.uuid4().hex[:4]}"
+        kept_id = None
         if carry_type:
-            mem.carry_out(here, f"{a}'s own {carry_type}: the conformance keepsake code is {codes['carry']}.", carry_type,
-                          cls=floor)
+            kept_id = keep(mem.carry_out(here, f"{a}'s own {carry_type}: the conformance keepsake code is {codes['carry']}.", carry_type, cls=floor))
+            written.append(personal_labels(a, floor).id)
             # The same fact twice, once with a name in the plain personal set and once without in the class set.
             # A canary name, so that finding it in the class set can only mean the two sets were mixed.
-            canary_name = f"Zorvath{uuid.uuid4().hex[:4]}"
             topic = f"the conformance buffer drifts above {codes['class']} degrees"
             if floor is None:
-                mem.carry_out(here, f"{canary_name} says {topic}.", carry_type)
-            mem.carry_out(here, f"A colleague says {topic}.", carry_type, cls=UNATTRIBUTED)
+                keep(mem.carry_out(here, f"{canary_name} says {topic}.", carry_type))
+            keep(mem.carry_out(here, f"A colleague says {topic}.", carry_type, cls=UNATTRIBUTED))
+            written.append(personal_labels(a, UNATTRIBUTED).id)
         refusing = next(((l, t) for l in ordinary for t in sorted(MEMORY_TYPES - w.carry_out_types(frozenset({l})))), None)
         if ha:
             v = ha[0]
-            mem.remember(Context(a, v, (a, b)), f"Inside {v}, {a} and {b} set the conformance dial to {codes['ha']}.")
+            keep(mem.remember(Context(a, v, (a, b)), f"Inside {v}, {a} and {b} set the conformance dial to {codes['ha']}."))
 
         deadline = time.time() + wait_s
         while mem.pending_operations() and time.time() < deadline:
@@ -154,25 +197,27 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
         def sees(agent, loc, code, query="conformance canary code"):
             return any(code in r.text for r in mem.recall(Context(agent, loc), query, k=20))
 
-        s1, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/reflect", {"query": "anything"}, as_(a, l1))
-        s2, _ = _raw(url, "GET", f"/v1/default/banks/{bank}/memories/list", None, as_(a, l1))
-        s3, _ = _raw(url, "GET", f"/v1/default/banks/{bank}/documents", None, as_(a, l1))
-        ok("side-doors", {s1, s2, s3} == {403}, f"reflect {s1}, list {s2}, documents {s3}")
+        if probes:
+            s1, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/reflect", {"query": "anything"}, as_(a, l1))
+            s2, _ = _raw(url, "GET", f"/v1/default/banks/{bank}/memories/list", None, as_(a, l1))
+            s3, _ = _raw(url, "GET", f"/v1/default/banks/{bank}/documents", None, as_(a, l1))
+            ok("side-doors", {s1, s2, s3} == {403}, f"reflect {s1}, list {s2}, documents {s3}")
 
         ok("witness", sees(a, l1, codes["conv"]))
         ok("non-witness", not sees(c, l1, codes["conv"]))
         if l2:
             ok("elsewhere", not sees(a, l2, codes["conv"]))
         else:
-            checks["elsewhere"].detail = "the world has only one ordinary location"
+            skip("elsewhere", "the world has only one ordinary location")
 
         conv_ls = gate.registry.register(here.conversation())
-        status, body = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall",
-                            {"query": "conformance canary code", "tags": [conv_ls], "tags_match": "any"}, as_(c, l1))
-        ok("forged-tags", status == 200 and codes["conv"] not in body, f"status {status}")
-        status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories",
-                         {"items": [{"content": "misplaced", "tags": [conv_ls]}]}, as_(c, l1))
-        ok("write-rules", status == 403, f"status {status}")
+        if probes:
+            status, body = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall",
+                                {"query": "conformance canary code", "tags": [conv_ls], "tags_match": "any"}, as_(c, l1))
+            ok("forged-tags", status == 200 and codes["conv"] not in body, f"status {status}")
+            status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories",
+                             {"items": [{"content": "misplaced", "tags": [conv_ls]}]}, as_(c, l1))
+            ok("write-rules", status == 403, f"status {status}")
 
         if carry_type and l2:
             ok("carry-out", sees(a, l2, codes["carry"], "conformance keepsake code") and
@@ -181,7 +226,7 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
                not sees(b, l2, codes["class"], "conformance buffer drift"), f"type {carry_type}")
         else:
             for cid in ("carry-out", "class-carry-out"):
-                checks[cid].detail = "no ordinary location lets any memory type out, or only one location"
+                skip(cid, "no ordinary location lets any memory type out, or only one location")
         if carry_type:
             try:
                 mem.carry_out(Context(a, l1), "downgraded", carry_type, source=personal_labels(a, UNATTRIBUTED), cls=None)
@@ -189,7 +234,7 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
             except PermissionError as e:
                 ok("class-downgrade", True, str(e))
         else:
-            checks["class-downgrade"].detail = "no ordinary location lets any memory type out"
+            skip("class-downgrade", "no ordinary location lets any memory type out")
         floored = next(((l, t) for l in ordinary if w.min_class({l}) for t in sorted(w.carry_out_types(frozenset({l})))), None)
         if floored:
             loc, t = floored
@@ -199,16 +244,18 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
             except PermissionError as e:
                 ok("class-minimum", True, str(e))
         else:
-            checks["class-minimum"].detail = "no environment in the world sets a min_class"
-        if carry_type and floor is None:
-            ok_apart, detail = _apart(mem, bank, gate, personal_labels(a, UNATTRIBUTED).id, canary_name)
-            if ok_apart is None:
-                checks["class-apart"].detail = detail
+            skip("class-minimum", "no environment in the world sets a min_class")
+        if not caps.list_by_label_set:
+            skip("class-apart", "the store cannot list by label set")
+        elif carry_type and floor is None:
+            passed, detail = _apart(mem, bank, written, personal_labels(a, UNATTRIBUTED).id, canary_name)
+            if passed is None:
+                skip("class-apart", detail)
             else:
-                ok("class-apart", ok_apart, detail)
+                ok("class-apart", passed, detail)
         else:
-            checks["class-apart"].detail = ("no ordinary location lets any memory type out" if not carry_type else
-                                            f"{l1} sets a min_class, so the named item can't be kept there")
+            skip("class-apart", "no ordinary location lets any memory type out" if not carry_type else
+                 f"{l1} sets a min_class, so the named item can't be kept there")
         if refusing:
             loc, t = refusing
             try:
@@ -217,43 +264,85 @@ def run(gate: Gate, url: str, wait_s: float = 900, partition_url: str | None = N
             except PermissionError:
                 ok("carry-refused", True, f"{t} out of {loc}")
         else:
-            checks["carry-refused"].detail = "every ordinary location lets every memory type out"
+            skip("carry-refused", "every ordinary location lets every memory type out")
+
+        if not caps.list_by_label_set:
+            skip("owner-view", "the store cannot list by label set")
+        elif carry_type and kept_id:
+            mine = mem.personal(a)
+            theirs = mem.personal(b)
+            own_sets = {personal_labels(a, x).id for x in (None, *CLASSES)}
+            own_ok = any(i.write_id == kept_id for i in mine) and all(i.label_set in own_sets for i in mine)
+            if caps.delete:
+                before = sum(i.kind == "memory" for i in mine)
+                try:
+                    mem.forget(b, kept_id)
+                    stranger = "allowed"
+                except PermissionError:
+                    stranger = "refused"
+                gone = mem.forget(a, kept_id)
+                after = [i for i in mem.personal(a) if i.kind == "memory"]
+                removed = gone and all(i.write_id != kept_id for i in after) and len(after) == before - 1
+                ok("owner-view", own_ok and not theirs and stranger == "refused" and removed,
+                   f"{before} items listed, {b}'s forget {stranger}, {a}'s forget {'removed exactly it' if removed else 'did not remove exactly it'}, {len(after)} left")
+            else:
+                ok("owner-view", own_ok and not theirs, f"{len(mine)} items listed; the store cannot delete")
+        else:
+            skip("owner-view", "no ordinary location lets any memory type out")
 
         if ha:
             ok("ha-inside", sees(a, v, codes["ha"], "conformance dial"))
             ok("ha-outside", not sees(a, l1, codes["ha"], "conformance dial"))
             vault_bank = partition_bank(bank, v)
-            docs = lambda bk: json.loads(_raw(purl if bk == vault_bank else url, "GET",
-                                              f"/v1/default/banks/{bk}/documents?limit=500", None, admin)[1] or "{}").get("items", [])
-            reg = gate.registry.all()
-            in_v = lambda d: v in reg[d["tags"][0]].locs
-            ok("ha-partition", any(in_v(d) for d in docs(vault_bank)) and not any(in_v(d) for d in docs(bank)))
-            status, _ = _raw(purl, "POST", f"/v1/default/banks/{vault_bank}/memories/recall", {"query": "x"}, as_(a, l1))
-            ok("ha-partition-search", status == 403, f"status {status}")
-            mine = gate.registry.register(personal_labels(a))
-            status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories",
-                             {"items": [{"content": "sealed", "tags": [mine]}]}, as_(a, v))
+            if caps.partitions and hindsight:
+                docs = lambda bk: json.loads(_raw(purl if bk == vault_bank else url, "GET",
+                                                  f"/v1/default/banks/{bk}/documents?limit=500", None, admin)[1] or "{}").get("items", [])
+                reg = gate.registry.all()
+                in_v = lambda d: v in reg[d["tags"][0]].locs
+                ok("ha-partition", any(in_v(d) for d in docs(vault_bank)) and not any(in_v(d) for d in docs(bank)))
+                if probes:
+                    status, _ = _raw(purl, "POST", f"/v1/default/banks/{vault_bank}/memories/recall", {"query": "x"}, as_(a, l1))
+                    ok("ha-partition-search", status == 403, f"status {status}")
+            elif not caps.partitions:
+                skip("ha-partition", "the store has no partitions: a high-assurance location is kept apart by its label set only")
+                skip("ha-partition-search", "the store has no partitions")
+            else:
+                skip("ha-partition", "conformance can only read Hindsight's partitions directly")
+                skip("ha-partition-search", "conformance can only probe Hindsight's validator directly")
+            mine_ls = gate.registry.register(personal_labels(a))
+            validator_status = None
+            if probes:
+                validator_status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories",
+                                           {"items": [{"content": "sealed", "tags": [mine_ls]}]}, as_(a, v))
             try:
                 mem.carry_out(Context(a, v), "sealed", "opinion", source=personal_labels(a))
                 client_refused = False
             except PermissionError:
                 client_refused = True
-            ok("ha-seal", status == 403 and client_refused, f"validator {status}, client refused {client_refused}")
-            if partition_url:
+            ok("ha-seal", client_refused and validator_status in (None, 403),
+               f"client refused {client_refused}" + (f", validator {validator_status}" if validator_status is not None else ""))
+            if partition_url and probes:
                 s1, _ = _raw(url, "POST", f"/v1/default/banks/{vault_bank}/memories/recall", {"query": "x"}, as_(a, v))
                 s2, _ = _raw(purl, "POST", f"/v1/default/banks/{bank}/memories/recall", {"query": "x"}, as_(a, l1))
                 ok("split-scope", s1 == 403 and s2 == 403, f"shared server on a partition {s1}, partition server on shared {s2}")
             else:
-                checks["split-scope"].detail = "not a split deployment (no --partition-url)"
+                skip("split-scope", "not a split deployment (no --partition-url)")
         else:
             for cid in ("ha-inside", "ha-outside", "ha-partition", "ha-partition-search", "ha-seal", "split-scope"):
-                checks[cid].detail = "the world has no high-assurance location"
+                skip(cid, "the world has no high-assurance location")
     finally:
-        for bk in mem.partitions():
-            try:
-                mem._call("DELETE", f"/v1/default/banks/{bk}", None, role="admin")
-            except (HindsightError, OSError):
-                pass
+        if hindsight:
+            for bk in mem.partitions():
+                try:
+                    mem._call("DELETE", f"/v1/default/banks/{bk}", None, role="admin")
+                except (HindsightError, OSError):
+                    pass
+        elif caps.delete:
+            for wid in created:                               # exactly this run's writes, nothing else
+                try:
+                    mem.store.delete(mem.core.partition_of_write(wid), wid)
+                except Exception:                             # cleanup is best effort
+                    pass
     return list(checks.values())
 
 

@@ -24,7 +24,8 @@ HEADER_AGENT = "x-memgate-agent"
 HEADER_LOCATION = "x-memgate-location"
 HEADER_SECRET = "x-memgate-secret"
 HEADER_ROLE = "x-memgate-role"          # "agent" (default) or "admin"
-HEADERS = (HEADER_AGENT, HEADER_LOCATION, HEADER_SECRET, HEADER_ROLE)
+HEADER_VERSION = "x-memgate-version"    # the client's memgate release (the version handshake, 0.6.0)
+HEADERS = (HEADER_AGENT, HEADER_LOCATION, HEADER_SECRET, HEADER_ROLE, HEADER_VERSION)
 
 @dataclass(frozen=True)
 class Context:
@@ -59,11 +60,19 @@ def serve_fingerprint(env: dict[str, str], keys: list[str]) -> str:
 # Each high-assurance location gets its own partition (a separate bank in the memory system), so its
 # memories never share ranking statistics, caches or consolidation with anything outside it.
 PARTITION_SEP = "--ha--"
+CLASS_SEP = "--class--"       # a class of personal memory kept out of consolidation gets a partition too (0.6.0)
 
 
 def partition_bank(bank: str, location: str) -> str:
     """The partition (bank) holding high-assurance location `location`'s memories."""
     return f"{bank}{PARTITION_SEP}{location}"
+
+
+def class_bank(bank: str, cls: str) -> str:
+    """The partition holding the personal sets of class `cls` when the world says that class does not
+    consolidate. Not a high-assurance partition: it lives on the shared server and is readable everywhere
+    its owner is (`partition_location` returns None for it)."""
+    return f"{bank}{CLASS_SEP}{cls}"
 
 
 def partition_location(bank: str, world: World) -> str | None:
@@ -83,6 +92,8 @@ def load_world(path: str | Path) -> World:
     for l in spec["locations"]:
         w.add_location(l["id"], l["environment"], l.get("high_assurance", False))
     w.add_agents(*spec.get("agents", []))
+    for c in spec.get("classes", []):
+        w.add_class(c["id"], consolidate=c.get("consolidate", True))
     return w
 
 

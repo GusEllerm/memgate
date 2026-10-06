@@ -1,5 +1,54 @@
 # Changelog
 
+## 0.6.0 (2026-10-06)
+
+Ruled by Gus on 2026-10-06 after CHORUS's stocktake (vault: Decision Log, 2026-10-06 rows).
+
+- **The decisions no longer live inside the Hindsight adapter.** `memgate.core.Core` makes every decision
+  (labels, write IDs, partitions, carry-out rules, the allowed label sets, provenance) with no I/O;
+  `memgate.store.Store` is what a memory system must do (`ensure`, `put`, `search`, `pending`) and may
+  offer (`Capabilities`: second lock, idempotent replace, partitions, delete, list by label set, stats,
+  consolidation control); `Memory` and `AsyncMemory` are the API over any store. `HindsightMemory` and
+  `AsyncHindsightMemory` keep their names and constructors. Recall now also applies memgate's own filter
+  to whatever a store returns. `memgate conformance` checks only what a store claims and skips the rest
+  with the reason.
+- **Mem0 is the second store** (`memgate.adapters.mem0.Mem0Store`, `memgate[mem0]`): label set as Mem0's
+  scope, one search with an OR over the readable sets, emulated idempotent replace, delete and listing;
+  no second lock, no partitions. The benchmark's Mem0 systems now wrap it.
+- **Forget and the owner's view** (`Memory.forget`, `Memory.personal`, `Memory.stats`; `memgate inspect`,
+  `memgate forget`): host-trusted operations with the admin role. Forget is a hard delete of one item of
+  an agent's personal memory by write id (the write id's label set proves ownership), taking the store's
+  derived items with it; the host must tombstone its own record so a replayed keyed write never brings
+  the item back. `inspect` shows text only with `--text`.
+- **Classes and consolidation:** the world file may mark a class `consolidate: false`
+  (`"classes": [{"id": "unattributed", "consolidate": false}]`); that class's personal sets then get a
+  partition of their own (`<bank>--class--<cls>`) in which Hindsight builds no observations. Measured
+  first, as ruled: on the env worlds, observations off matched or beat a same-day observations-on
+  control under every question style (indirect at 5: 96% against 85%).
+- **Version handshake:** every request carries `x-memgate-version` (added to the passthrough allowlist);
+  the validator refuses a client newer than the server, and with `memgate serve --min-client-version`
+  any client older than that or unversioned, both with status 426 (`VersionMismatch`).
+  `HindsightMemory(..., check_version=True)` makes one gated request per server at construction.
+- **Security (validator):** the bank list (`GET /v1/default/banks`), which Hindsight does not gate, is now
+  empty for anyone but an admin with the secret (it named every high-assurance partition); a role other
+  than agent or admin is refused (the internal role comes only from Hindsight itself); the secret is
+  checked before the scope message on every hook; an agent may schedule consolidation only on the
+  partition of the location it is in. Write ids in request paths are quoted and their shape checked.
+- **Observability:** one JSON line per write, recall, refusal and forget (ids, counts, label sets,
+  reasons; never memory or query text) from the validator (stdout, independent of Hindsight's level) and
+  the client (logger `memgate`).
+- **Registry on PostgreSQL:** `MEMGATE_REGISTRY=postgresql://...` (`memgate[postgres]`), schema `memgate`,
+  registrations serialised by an advisory lock so sequence numbers commit in order; `copy_from` migrates
+  a SQLite registry. The compiler now emits TRUE/FALSE literals, which both databases accept.
+- **A torch-free server:** `memgate serve --embeddings-provider onnx --reranker flashrank|rrf`, with
+  pooling and prefixes set for the bge family. Measured first: without any reranker (rrf) recall on
+  indirect questions halves (50% at 20 against 95%), while flashrank holds within two points of the local
+  cross-encoder on every style, so `--reranker flashrank` is the slim configuration and rrf is for
+  latency-bound deployments only (vault: Review Ablations consolidation and reranker 2026-10-06).
+- **Python 3.11 to 3.14** declared; the offline tests run on 3.12 and 3.14 in GitHub Actions.
+- Also: `Registry` skips a label set whose kind or class this version does not know (fail closed per
+  set); `derived_labels` keeps the strictest class; `when` may be a date or a string.
+
 ## 0.5.0 (2026-10-05)
 
 - **Classes of personal memory.** A fourth label kind, `class`, allowed only beside a `self` label and at

@@ -139,3 +139,88 @@ def test_serve_keeps_hindsight_quiet_about_memory_text(tmp_path, monkeypatch, ca
     _, seen = _serve(tmp_path, monkeypatch, ("--hindsight-log-level", "info"))
     assert seen["env"]["HINDSIGHT_API_LOG_LEVEL"] == "info"
     assert "labelled data" in capsys.readouterr().err                   # asked for, and said out loud
+
+
+# -- inspect and forget (the operator commands) -------------------------------------------------------------
+class _FakeMemory:
+    """Stands in for HindsightMemory in the operator commands."""
+    calls: list = []
+
+    def __init__(self, gate, bank, base_url, partition_url=None, check_version=False):
+        from memgate.store import Capabilities, Listed
+        self.gate, self.bank, self.capabilities = gate, bank, Capabilities(delete=True, list_by_label_set=True, stats=True)
+        self._items = [Listed("w_ls_x_0123456789abcdef", "ls_x", "the kiln code is EMBER-4471", "2026-10")]
+        _FakeMemory.calls.append("init")
+
+    def check_version(self):
+        return {"client": "0.6.0", "servers": 1}
+
+    def stats(self, agent=None):
+        return {"b": {"exists": True, "pending": 0, "last_consolidation": None}}
+
+    def personal(self, agent):
+        _FakeMemory.calls.append("personal")
+        return self._items
+
+    def forget(self, agent, write_id):
+        if agent != "ada":
+            raise PermissionError("not yours")
+        return write_id == self._items[0].write_id
+
+
+@pytest.fixture
+def operator_env(tmp_path, monkeypatch):
+    world = tmp_path / "world.json"
+    world.write_text('{"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["ada"]}')
+    monkeypatch.setenv("MEMGATE_WORLD", str(world))
+    monkeypatch.setenv("MEMGATE_REGISTRY", str(tmp_path / "r.sqlite"))
+    monkeypatch.setenv("MEMGATE_SECRET", "s")
+    import memgate.adapters.hindsight as h
+    monkeypatch.setattr(h, "HindsightMemory", _FakeMemory)
+    _FakeMemory.calls.clear()
+
+
+def test_inspect_hides_text_unless_asked_and_lists_once(operator_env, capsys):
+    assert cli.main(["inspect", "ada", "--bank", "b"]) == 0
+    out = capsys.readouterr().out
+    assert "EMBER" not in out and "chars" in out and "w_ls_x_0123456789abcdef" in out
+    assert _FakeMemory.calls.count("personal") == 1
+    assert cli.main(["inspect", "ada", "--bank", "b", "--text"]) == 0
+    assert "EMBER-4471" in capsys.readouterr().out
+    assert cli.main(["inspect", "--bank", "b", "--json"]) == 0
+    assert '"handshake"' in capsys.readouterr().out
+    assert cli.main(["inspect", "ada"]) == 2                               # no bank named
+    assert "--bank" in capsys.readouterr().err
+
+
+def test_forget_needs_confirmation_and_reports_refusals(operator_env, capsys):
+    assert cli.main(["forget", "ada", "w_ls_x_0123456789abcdef", "--bank", "b"]) == 2
+    assert "--yes" in capsys.readouterr().err
+    assert cli.main(["forget", "bo", "w_ls_x_0123456789abcdef", "--bank", "b", "--yes"]) == 1
+    assert "refused" in capsys.readouterr().err
+    assert cli.main(["forget", "ada", "w_ls_x_0123456789abcdef", "--bank", "b", "--yes"]) == 0
+    assert "forgotten" in capsys.readouterr().out
+    assert cli.main(["forget", "ada", "w_ls_x_ffffffffffffffff", "--bank", "b", "--yes"]) == 0
+    assert "not found" in capsys.readouterr().out
+
+
+def test_serve_validates_the_minimum_client_version(tmp_path, monkeypatch, capsys):
+    rc, _ = _serve(tmp_path, monkeypatch, ("--min-client-version", "99.0.0"))
+    assert rc == 2 and "no newer than this server" in capsys.readouterr().err
+    import memgate
+    _, seen = _serve(tmp_path, monkeypatch, ("--min-client-version", memgate.__version__))
+    assert seen["env"]["MEMGATE_SERVE_MIN_CLIENT"] == memgate.__version__
+    assert "MEMGATE_SERVE_MIN_CLIENT" in seen["env"]["MEMGATE_SERVE_KEYS"].split(",")
+
+
+def test_serve_accepts_a_postgres_registry_url(tmp_path, monkeypatch):
+    _, seen = _serve(tmp_path, monkeypatch, ("--registry", "postgresql://u:p@db/memgate", "--workdir", str(tmp_path / "wd")))
+    assert seen["env"]["MEMGATE_REGISTRY"] == "postgresql://u:p@db/memgate"
+
+
+def test_serve_sets_onnx_pooling_for_bge_and_warns_about_torch(tmp_path, monkeypatch, capsys):
+    _, seen = _serve(tmp_path, monkeypatch, ("--embeddings-provider", "onnx", "--reranker", "rrf"))
+    assert seen["env"]["HINDSIGHT_API_EMBEDDINGS_ONNX_POOLING"] == "cls" and seen["env"]["HINDSIGHT_API_EMBEDDINGS_ONNX_QUERY_PREFIX"] == ""
+    assert seen["env"]["HINDSIGHT_API_RERANKER_PROVIDER"] == "rrf"
+    _serve(tmp_path, monkeypatch, ("--embeddings-provider", "onnx", "--reranker", "local"))
+    assert "still needs torch" in capsys.readouterr().err

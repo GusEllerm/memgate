@@ -122,10 +122,12 @@ def cmd_serve(args) -> int:
               file=sys.stderr)
         return 2
     binary = str(Path(binary).resolve())            # before the chdir below, so a relative path still works
-    Path(registry).parent.mkdir(parents=True, exist_ok=True)
+    registry_is_url = registry.startswith(("postgresql://", "postgres://"))
+    if not registry_is_url:
+        Path(registry).parent.mkdir(parents=True, exist_ok=True)
     # Hindsight applies the first .env it finds walking up from its working directory, over the
     # environment. Start it in a private directory whose own .env is empty, so nothing is found.
-    workdir = Path(args.workdir or Path(registry).resolve().parent / ".memgate-serve")
+    workdir = Path(args.workdir or (Path.cwd() / ".memgate-serve" if registry_is_url else Path(registry).resolve().parent / ".memgate-serve"))
     workdir.mkdir(parents=True, exist_ok=True)
     workdir.chmod(0o700)
     dotenv = workdir / ".env"
@@ -138,7 +140,7 @@ def cmd_serve(args) -> int:
     env = dict(os.environ)
     forced = {
         "MEMGATE_WORLD": str(Path(world).resolve()),
-        "MEMGATE_REGISTRY": str(Path(registry).resolve()),
+        "MEMGATE_REGISTRY": registry if registry_is_url else str(Path(registry).resolve()),
         "MEMGATE_SECRET": secret,
         "MEMGATE_SERVE_SCOPE": args.scope,
         "MEMGATE_WORLD_CHECK_S": str(args.world_check_interval),
@@ -153,15 +155,33 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_LLM_MODEL": args.llm_model,
         "HINDSIGHT_API_LLM_MAX_CONCURRENT": str(args.llm_max_concurrent),
         "HINDSIGHT_API_LLM_TIMEOUT": "300",
-        "HINDSIGHT_API_EMBEDDINGS_PROVIDER": "local",
+        "HINDSIGHT_API_EMBEDDINGS_PROVIDER": args.embeddings_provider,
         "HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL": args.embedder,
+        "HINDSIGHT_API_EMBEDDINGS_ONNX_MODEL_ID": args.embedder,
+        # Hindsight's onnx defaults (mean pooling, E5 prefixes) suit intfloat/e5; the bge family wants CLS
+        # pooling and no prefixes, so the onnx provider gives the same vectors as the local one for bge.
+        "HINDSIGHT_API_EMBEDDINGS_ONNX_POOLING": "cls" if "bge" in args.embedder.lower() else "mean",
+        "HINDSIGHT_API_EMBEDDINGS_ONNX_QUERY_PREFIX": "" if "bge" in args.embedder.lower() else "query: ",
+        "HINDSIGHT_API_EMBEDDINGS_ONNX_PASSAGE_PREFIX": "" if "bge" in args.embedder.lower() else "passage: ",
+        "HINDSIGHT_API_RERANKER_PROVIDER": args.reranker,
         "HINDSIGHT_API_LLM_TRACE_ENABLED": "false",     # traces would hold memory content outside the partitions
         "HINDSIGHT_API_AUDIT_LOG_ENABLED": "false",
         "HINDSIGHT_API_OTEL_TRACES_ENABLED": "false",
         # Hindsight logs the start of every recall query at INFO: conversation text in the server's log.
         # The validator also redacts queries from whatever is logged (RedactQueries), at any level.
         "HINDSIGHT_API_LOG_LEVEL": args.hindsight_log_level,
+        "MEMGATE_SERVE_MIN_CLIENT": args.min_client_version or "",
     }
+    if args.embeddings_provider == "onnx" and args.reranker == "local":
+        print("memgate: --embeddings-provider onnx with --reranker local still needs torch (the local reranker is a "
+              "sentence-transformers cross-encoder); use --reranker flashrank or rrf for a torch-free server", file=sys.stderr)
+    if args.min_client_version:
+        from memgate.adapters.hindsight.validator import _release
+        from memgate import __version__
+        if _release(args.min_client_version) is None or _release(args.min_client_version) > _release(__version__):
+            print(f"--min-client-version must be a release no newer than this server ({__version__}), "
+                  f"not {args.min_client_version!r}", file=sys.stderr)
+            return 2
     if args.hindsight_log_level in ("info", "debug", "trace"):
         print(f"memgate: Hindsight log level {args.hindsight_log_level}: its log will hold memory and query text "
               "(queries redacted); treat it as labelled data", file=sys.stderr)
@@ -204,6 +224,71 @@ def cmd_secret(args) -> int:
     return 0
 
 
+def _memory(args):
+    """A HindsightMemory for the operator commands, from the same settings the host uses."""
+    from memgate.adapters.hindsight import HindsightMemory
+    from memgate.context import Gate
+    for name in ("MEMGATE_WORLD", "MEMGATE_REGISTRY", "MEMGATE_SECRET"):
+        if not _env(name):
+            print(f"this command needs {name} (the same values the server was started with)", file=sys.stderr)
+            return None
+    if not args.bank:
+        print("this command needs --bank (or MEMGATE_BANK): the host's shared partition name", file=sys.stderr)
+        return None
+    return HindsightMemory(Gate.from_env(), bank=args.bank, base_url=args.url, partition_url=args.partition_url, check_version=True)
+
+
+def cmd_inspect(args) -> int:
+    """What memgate holds for an agent (or the deployment): counts, timestamps, and the agent's personal items."""
+    import json
+    mem = _memory(args)
+    if mem is None:
+        return 2
+    out = {"handshake": mem.check_version(), "capabilities": mem.capabilities.__dict__, "stats": mem.stats(args.agent)}
+    personal = mem.personal(args.agent) if args.agent else []
+    if args.agent:
+        out["personal"] = [{**i.__dict__, **({} if args.text else {"text": f"({len(i.text)} chars; --text shows it)"})} for i in personal]
+    if args.json:
+        print(json.dumps(out, indent=1, default=str))
+        return 0
+    for part, st in out["stats"].items():
+        if not st.get("exists", True):
+            print(f"{part}: (no such partition yet)")
+            continue
+        print(f"{part}: pending {st.get('pending', 0)}, last consolidation {st.get('last_consolidation') or '-'}")
+        for ls, c in (st.get("label_sets") or {}).items():
+            print(f"  {ls}: {c['memories']} memories, {c['observations']} observations, {c['documents']} writes, last {c['last_write'] or '-'}")
+    if args.agent:
+        print(f"{args.agent}'s personal memory ({len(personal)} items" + ("" if args.text else "; --text shows the text") + "):")
+        known = mem.gate.registry.all()
+        for i in personal:
+            cls = known[i.label_set].classes if i.label_set in known else set()
+            tag = f" [{', '.join(sorted(cls))}]" if cls else ""
+            body = i.text[:160] if args.text else f"({len(i.text)} chars)"
+            print(f"  {i.write_id}  {i.when or '-'}{tag}  {i.kind}: {body}")
+    return 0
+
+
+def cmd_forget(args) -> int:
+    """Delete one item of an agent's personal memory by write ID (the owner's request, relayed by the host)."""
+    mem = _memory(args)
+    if mem is None:
+        return 2
+    if not args.yes:
+        print("forget is a hard delete; add --yes to confirm", file=sys.stderr)
+        return 2
+    try:
+        existed = mem.forget(args.agent, args.write_id)
+    except PermissionError as e:
+        print(f"refused: {e}", file=sys.stderr)
+        return 1
+    except (OSError, RuntimeError) as e:                   # HindsightError, VersionMismatch, connection errors
+        print(f"failed: {e}", file=sys.stderr)
+        return 1
+    print(f"{'forgotten' if existed else 'not found'}: {args.write_id}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="memgate", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -228,7 +313,14 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--llm-base-url", default=_env("MEMGATE_LLM_BASE_URL", "http://127.0.0.1:8411/v1"))
     s.add_argument("--llm-model", default=_env("MEMGATE_LLM_MODEL", "openai/gpt-oss-120b"))
     s.add_argument("--llm-max-concurrent", type=int, default=int(_env("MEMGATE_LLM_MAX_CONCURRENT", "6")))
-    s.add_argument("--embedder", default=_env("MEMGATE_EMBEDDER", "BAAI/bge-small-en-v1.5"))
+    s.add_argument("--embedder", default=_env("MEMGATE_EMBEDDER", "BAAI/bge-small-en-v1.5"),
+                   help="the embedding model (a sentence-transformers model for the local provider, a Hugging Face "
+                        "repo with an onnx/model.onnx export for onnx)")
+    s.add_argument("--embeddings-provider", choices=["local", "onnx"], default=_env("MEMGATE_EMBEDDINGS_PROVIDER", "local"),
+                   help="local (sentence-transformers, needs torch) or onnx (onnxruntime, no torch; the slim image)")
+    s.add_argument("--reranker", choices=["local", "rrf", "flashrank"], default=_env("MEMGATE_RERANKER", "local"),
+                   help="Hindsight's reranker: local (a cross-encoder, needs torch), rrf (no reranking: retrieval "
+                        "order as is) or flashrank (a small ONNX reranker, no torch)")
     s.add_argument("--scope", choices=["all", "shared", "partitions"], default=_env("MEMGATE_SERVE_SCOPE", "all"),
                    help="which banks this server holds: all (default), shared (no high-assurance partitions), or "
                         "partitions (only them, for a separate high-assurance server)")
@@ -241,6 +333,9 @@ def main(argv: list[str] | None = None) -> int:
                    default=_env("MEMGATE_HINDSIGHT_LOG_LEVEL", "warning"),
                    help="Hindsight's log level (default warning: at info and below Hindsight logs memory and "
                         "query text, which is labelled data)")
+    s.add_argument("--min-client-version", default=_env("MEMGATE_SERVE_MIN_CLIENT"),
+                   help="refuse clients older than this memgate release, or sending no version (catches stale "
+                        "workers); clients newer than the server are always refused")
     s.add_argument("--hindsight-bin")
     s.set_defaults(func=cmd_serve)
 
@@ -253,6 +348,21 @@ def main(argv: list[str] | None = None) -> int:
 
     g = sub.add_parser("secret", help="print a new random shared secret")
     g.set_defaults(func=cmd_secret)
+
+    for name, fn, help_ in (("inspect", cmd_inspect, "counts, timestamps and an agent's personal items (admin; never agents)"),
+                            ("forget", cmd_forget, "delete one item of an agent's personal memory by write id (hard delete)")):
+        o = sub.add_parser(name, help=help_)
+        o.add_argument("agent", nargs="?" if name == "inspect" else None)
+        if name == "forget":
+            o.add_argument("write_id")
+            o.add_argument("--yes", action="store_true", help="confirm the hard delete")
+        else:
+            o.add_argument("--json", action="store_true")
+            o.add_argument("--text", action="store_true", help="show the items' text (memory text is labelled data: off by default)")
+        o.add_argument("--url", default=_env("MEMGATE_URL", f"http://127.0.0.1:{_env('MEMGATE_PORT', '8889')}"))
+        o.add_argument("--partition-url", help="the high-assurance partition server, in a split deployment")
+        o.add_argument("--bank", default=_env("MEMGATE_BANK"), help="the host's shared partition name")
+        o.set_defaults(func=fn)
 
     args = p.parse_args(argv)
     return args.func(args)

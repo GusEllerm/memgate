@@ -26,6 +26,15 @@ VAULT_BANK = partition_bank(BANK, "vault")
 
 
 @pytest.fixture
+def gate_offline(tmp_path):
+    from memgate.context import Gate, load_world
+    from memgate.registry import Registry
+    (tmp_path / "w.json").write_text(json.dumps({"environments": [{"id": "campus"}], "locations": [{"id": "lab", "environment": "campus"}],
+                                                 "agents": ["ada"]}))
+    return Gate(load_world(tmp_path / "w.json"), Registry(), SECRET)
+
+
+@pytest.fixture
 def validator(tmp_path, monkeypatch):
     world = {"environments": [{"id": "campus"}],
              "locations": [{"id": "lab", "environment": "campus"}, {"id": "cafe", "environment": "campus"},
@@ -288,3 +297,133 @@ def test_a_class_set_is_written_like_the_plain_personal_set(validator):
     assert not retain(validator, BANK, unnamed, agent="bo", location="lab").allowed
     assert not retain(validator, VAULT_BANK, unnamed, agent="ada", location="vault").allowed      # the seal holds
     assert not retain(validator, BANK, unnamed, agent="ada", location="vault").allowed
+
+
+# -- the version handshake --------------------------------------------------------------------------
+def test_a_client_newer_than_the_server_is_refused(validator, monkeypatch):
+    from memgate.adapters.hindsight import validator as v
+    import memgate
+    rcx = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin", "x-memgate-version": "99.0.0"})
+    r = run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, rcx)))
+    assert not r.allowed and v.VERSION_REFUSED in r.reason and "upgrade the server" in r.reason
+    same = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin", "x-memgate-version": memgate.__version__})
+    assert run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, same))).allowed
+    unversioned = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin"})
+    assert run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, unversioned))).allowed
+
+
+def test_a_minimum_client_version_refuses_old_and_unversioned_clients(validator):
+    import memgate
+    validator.min_client = memgate.__version__
+    old = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin", "x-memgate-version": "0.5.0"})
+    assert "stale worker" in run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, old))).reason
+    unversioned = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin"})
+    assert not run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, unversioned))).allowed
+    ok = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin", "x-memgate-version": memgate.__version__})
+    assert run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, ok))).allowed
+
+
+def test_the_client_turns_a_426_into_version_mismatch():
+    from memgate.adapters.hindsight.store import HindsightError, VersionMismatch, _Routing
+    with pytest.raises(VersionMismatch):
+        _Routing.raise_for(426, '{"detail": "memgate version: client 9.9.9 is newer than this server (0.6.0)"}')
+    with pytest.raises(HindsightError) as e:
+        _Routing.raise_for(403, '{"detail": "memgate version: looks like one but is a plain refusal"}')
+    assert not isinstance(e.value, VersionMismatch)
+
+
+def test_version_refusals_carry_status_426_and_the_version_header_is_forwarded(validator):
+    from memgate.context import HEADERS, HEADER_VERSION
+    assert HEADER_VERSION in HEADERS                                      # on memgate serve's passthrough allowlist
+    from hindsight_api.api import passthrough_headers as ph
+    raw = [(b"x-memgate-secret", b"s"), (b"X-Memgate-Version", b"0.6.0"), (b"x-other", b"no")]
+    kept = ph.collect_passthrough_headers(raw, list(HEADERS))             # what Hindsight hands the validator
+    assert set(kept) == {"x-memgate-secret", HEADER_VERSION}
+    newer = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": "admin", "x-memgate-version": "99.0.0"})
+    r = run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, newer)))
+    assert not r.allowed and r.status_code == 426
+    wrong = RequestContext(extra_headers={"x-memgate-secret": "wrong", "x-memgate-version": "99.0.0"})
+    r = run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, wrong)))
+    assert not r.allowed and r.status_code == 403 and "version" not in r.reason    # the secret is checked first
+
+
+@pytest.mark.parametrize("text, release", [
+    ("0.6.0", (0, 6, 0)), ("0.6", (0, 6, 0)), ("1", (1, 0, 0)), ("0.6.0rc1", (0, 6, 0)), ("0.6.0-dev3", (0, 6, 0)),
+    ("1.2.3.4", None), ("abc", None), ("", None), (None, None), ("-1.0.0", None), (" 0.7.1 ", (0, 7, 1)),
+])
+def test_release_parsing(text, release):
+    from memgate.adapters.hindsight.validator import _release
+    assert _release(text) == release
+
+
+def test_a_minimum_above_the_server_or_unparseable_is_refused_at_load(tmp_path, monkeypatch, validator):
+    import memgate
+    from memgate.adapters.hindsight.validator import MemgateValidator
+    for bad in ("99.0.0", "abc"):
+        monkeypatch.setenv("MEMGATE_SERVE_MIN_CLIENT", bad)
+        with pytest.raises(ValueError):
+            MemgateValidator()
+    monkeypatch.setenv("MEMGATE_SERVE_MIN_CLIENT", memgate.__version__)
+    assert MemgateValidator().min_client == memgate.__version__
+
+
+def test_unknown_roles_are_refused(validator):
+    for role in ("internal", "root", "Admin"):
+        ctx = RequestContext(extra_headers={"x-memgate-secret": SECRET, "x-memgate-role": role})
+        assert not run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, ctx))).allowed
+    internal = RequestContext(extra_headers={}, internal=True)                 # Hindsight's own work: no header needed
+    assert run(validator.validate_bank_read(BankReadContext(BANK, BankReadOperation.GET_BANK_STATS, internal))).allowed
+
+
+def test_the_bank_list_is_empty_for_everyone_but_an_admin(validator):
+    from hindsight_api.extensions.operation_validator import BankListContext
+    banks = [{"bank_id": "w"}, {"bank_id": VAULT_BANK}]
+    assert run(validator.filter_bank_list(BankListContext(banks, rc(role="admin")))).banks == banks
+    assert run(validator.filter_bank_list(BankListContext(banks, rc("ada", "lab")))).banks == []
+    assert run(validator.filter_bank_list(BankListContext(banks, RequestContext(extra_headers={})))).banks == []
+    assert run(validator.filter_bank_list(BankListContext(banks, rc(secret="wrong", role="admin")))).banks == []
+
+
+def test_an_agent_schedules_consolidation_only_where_it_is(validator):
+    sched = lambda bank, **who: run(validator.validate_bank_write(BankWriteContext(
+        bank_id=bank, operation=BankWriteOperation.SUBMIT_ASYNC_CONSOLIDATION, request_context=rc(**who))))
+    assert sched(BANK, agent="ada", location="lab").allowed
+    assert sched(VAULT_BANK, agent="ada", location="vault").allowed                   # inside the vault
+    assert not sched(VAULT_BANK, agent="ada", location="lab").allowed                 # a partition from outside
+    assert sched(VAULT_BANK, role="admin").allowed
+
+
+def test_check_version_is_a_gated_request_that_tolerates_a_missing_bank(gate_offline):
+    from memgate.adapters.hindsight.client import HindsightMemory, VersionMismatch
+    calls = []
+
+    def answer(status):
+        def fake(method, path, body, *, agent=None, location=None, role="agent"):
+            calls.append((method, path, role))
+            from memgate.adapters.hindsight.store import _Routing
+            _Routing.raise_for(status, '{"detail": "x"}')
+            return {}
+        return fake
+    mem = HindsightMemory(gate_offline, bank="ranch", base_url="http://shared")
+    mem._call = answer(404)
+    assert mem.check_version() == {"client": __import__("memgate").__version__, "servers": 1}
+    assert calls == [("GET", "/v1/default/banks/ranch/stats", "admin")]            # a validated read, as admin
+    mem._call = answer(426)
+    with pytest.raises(VersionMismatch):
+        mem.check_version()
+    with pytest.raises(VersionMismatch):
+        m2 = HindsightMemory.__new__(HindsightMemory)
+        HindsightMemory.__init__(m2, gate_offline, bank="ranch", base_url="http://shared")
+        m2._call = answer(426)
+        m2.check_version()
+
+
+def test_events_are_json_without_text(validator, capsys):
+    ls = validator.gate.registry.register(personal_labels("ada"))
+    ctx = RetainContext(bank_id=BANK, contents=[{"content": "the kiln code is EMBER-4471", "tags": [ls]}], request_context=rc("ada", "lab"))
+    assert run(validator.validate_retain(ctx)).allowed
+    run(validator.validate_recall(RecallContext(bank_id=BANK, query="what is the kiln code?", request_context=rc("ada", "lab"))))
+    out = capsys.readouterr().out
+    events = [json.loads(l) for l in out.splitlines() if l.startswith("{")]
+    assert [e["event"] for e in events][-2:] == ["write", "recall"]
+    assert "EMBER" not in out and "kiln" not in out

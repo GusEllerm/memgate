@@ -121,3 +121,22 @@ def test_min_class_in_the_world_file():
 
 def test_notes_are_untouched():
     assert personal_note_labels("ada", "lab").classes == frozenset()
+
+
+# -- a class's consolidation setting, in the world file (0.6.0) -------------------------------------
+def test_classes_in_the_world_file(tmp_path):
+    import json
+    from memgate.context import load_world
+    spec = {"environments": [{"id": "open"}], "locations": [{"id": "lab", "environment": "open"}], "agents": ["ada"],
+            "classes": [{"id": U, "consolidate": False}]}
+    assert check_world(spec) == []
+    (tmp_path / "w.json").write_text(json.dumps(spec))
+    w = load_world(tmp_path / "w.json")
+    assert w.consolidates(None) and not w.consolidates(U)
+    assert World().consolidates(U)                                   # unset: consolidate, as before 0.6.0
+    for bad in [{"id": "secret"}, {"id": U, "consolidate": "no"}, {"id": U, "mission": "x"}]:
+        assert check_world({**spec, "classes": [bad]}), bad
+    assert check_world({**spec, "classes": {}})
+    a, b = World(), World()
+    a.add_class(U, consolidate=False)
+    assert a.fingerprint() != b.fingerprint()                        # the policy cache notices

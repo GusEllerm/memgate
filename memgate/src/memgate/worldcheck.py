@@ -20,7 +20,7 @@ def check_world(spec) -> list[str]:
     errors: list[str] = []
     if not isinstance(spec, dict):
         return ["the world must be a JSON object with environments, locations and agents"]
-    unknown = set(spec) - {"environments", "locations", "agents"}
+    unknown = set(spec) - {"environments", "locations", "agents", "classes"}
     if unknown:
         errors.append(f"unknown top-level keys: {sorted(unknown)}")
 
@@ -72,6 +72,15 @@ def check_world(spec) -> list[str]:
         errors.append("agents must be a list of agent id strings")
     else:
         ids("agents", agents)
+    for c in spec.get("classes", []) if isinstance(spec.get("classes"), list) else []:
+        if not isinstance(c, dict) or c.get("id") not in CLASSES:
+            errors.append(f"classes: each entry needs an id from {list(CLASSES)}: {c!r}")
+        elif "consolidate" in c and not isinstance(c["consolidate"], bool):
+            errors.append(f"class {c['id']!r}: consolidate must be true or false")
+        elif set(c) - {"id", "consolidate"}:
+            errors.append(f"class {c['id']!r}: unknown keys {sorted(set(c) - {'id', 'consolidate'})}")
+    if "classes" in spec and not isinstance(spec["classes"], list):
+        errors.append("classes must be a list")
     if not spec.get("locations"):
         errors.append("the world has no locations")
     if not spec.get("agents"):

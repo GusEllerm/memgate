@@ -30,43 +30,34 @@ from pathlib import Path
 
 os.environ.setdefault("MEM0_TELEMETRY", "false")
 
-from smbench.adapters import EMBEDDER, EMBEDDING_DIMS  # noqa: E402
+from smbench.adapters import EMBEDDER  # noqa: E402
 from smbench.selective.systems import note_text, personal_text, transcript, when  # noqa: E402
 from smbench.selective.world import World  # noqa: E402
 
 GATEWAY = "http://127.0.0.1:8411/v1"
 MODEL = "openai/gpt-oss-120b"
-TAG = "smbench"      # a constant agent_id on every write: Mem0's search needs a top-level scope key before it
-                     # accepts an OR over user_ids, so the OR is ANDed with this always-true condition
+from memgate.adapters.mem0 import filters_for  # noqa: E402,F401  (memgate's Mem0 store; re-exported for the tests)
+from memgate.adapters.mem0.store import TAG, Mem0Store as _MemgateMem0Store  # noqa: E402,F401
 
-
-def filters_for(scopes: list[str]) -> dict | None:
-    """Mem0 search filters for the label sets (scopes) a recall may read: None for none, one `user_id`
-    for one, else an OR over them ANDed with the constant tag Mem0 needs as a top-level scope key."""
-    if not scopes:
-        return None
-    if len(scopes) == 1:
-        return {"user_id": scopes[0]}
-    return {"agent_id": TAG, "OR": [{"user_id": s} for s in scopes]}
+GATEWAY = "http://127.0.0.1:8411/v1"
+MODEL = "openai/gpt-oss-120b"
 
 
 class Mem0Store:
-    """One Mem0 `Memory` per (run, system): its own Qdrant collection on disk. Calls are serialised: the local
-    Qdrant client and Mem0's history database are not safe to share across threads."""
+    """The benchmark's thin wrapper over memgate's Mem0 store: one Mem0 `Memory` per (run, system) on disk,
+    the gateway as its LLM. `add`/`search` keep the benchmark's older call shape."""
 
     def __init__(self, run: str, name: str, root: Path = Path("results/mem0")):
-        from mem0 import Memory
-        store = root / run / name
-        store.mkdir(parents=True, exist_ok=True)
-        self.memory = Memory.from_config({
-            "llm": {"provider": "openai", "config": {"model": MODEL, "openai_base_url": GATEWAY, "api_key": "gateway",
-                                                     "temperature": 0.0, "max_tokens": 8000}},
-            "embedder": {"provider": "fastembed", "config": {"model": EMBEDDER}},
-            "vector_store": {"provider": "qdrant", "config": {"collection_name": name.replace("-", "_"),
-                                                              "path": str(store / "qdrant"), "embedding_model_dims": EMBEDDING_DIMS}},
-            "history_db_path": str(store / "history.db"),
-        })
-        self._lock = threading.Lock()
+        from memgate.context import Gate
+        from memgate.registry import Registry
+        from memgate.world import World
+        gate = Gate(World(), Registry(), "benchmark")                 # the store itself makes no decisions
+        self.inner = _MemgateMem0Store(gate, root / run / name, collection=name.replace("-", "_"),
+                                       llm={"provider": "openai", "config": {"model": MODEL, "openai_base_url": GATEWAY,
+                                                                              "api_key": "gateway", "temperature": 0.0,
+                                                                              "max_tokens": 8000}})
+        self.memory = self.inner.memory
+        self._lock = self.inner._lock
 
     def add(self, scope: str, text: str, ts: datetime, **metadata) -> None:
         with self._lock:

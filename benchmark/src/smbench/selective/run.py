@@ -29,13 +29,14 @@ RESULTS = Path("results/selective")
 
 
 def make_system(name: str, run: str, args):
+    cfg = json.loads(args.bank_config) if getattr(args, "bank_config", None) else None
     if name == "nofilter":
-        return systems.NoFilter(args.hindsight, run)
+        return systems.NoFilter(args.hindsight, run, cfg)
     if name == "peragent":
-        return systems.PerAgent(args.hindsight, run)
+        return systems.PerAgent(args.hindsight, run, cfg)
     if name == "memgate":
         from memgate.context import Gate
-        return systems.Memgate(args.gated, run, Gate.from_env())
+        return systems.Memgate(args.gated, run, Gate.from_env(), cfg)
     if name.startswith("mem0-"):                       # needs the mem0 environment (systems_mem0.py)
         from smbench.selective import systems_mem0
         if name == "mem0-nofilter":
@@ -139,6 +140,8 @@ def main() -> None:
     p.add_argument("--hindsight", default="http://127.0.0.1:8888")
     p.add_argument("--gated", default="http://127.0.0.1:8890")
     p.add_argument("--skip-ingest", action="store_true")
+    p.add_argument("--bank-config", help='Hindsight per-bank settings applied to every bank this run creates, as JSON, '
+                                         'e.g. \'{"enable_observations": false}\' (the consolidation ablation)')
     p.add_argument("--banks-from", help="probe the banks of this earlier run (implies --skip-ingest); results go to --run")
     p.add_argument("--probe", choices=["direct", "paraphrase", "indirect", "multi"], default="direct",
                    help="question style: direct names the topic; paraphrase and indirect come from questions.py; "

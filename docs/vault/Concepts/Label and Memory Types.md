@@ -42,6 +42,7 @@ A fourth label kind, `class:C`, only on personal memory. {self:A, class:unattrib
 - **Feasibility, 2026-10-02** (this repo's maintainer session, in reply to CHORUS; recorded here because the answer lived only in CHORUS's memory-phase3.md §9): a class label is about a day's work, needs no policy or proof change, and the host keeps the meet.
 - **Design ruled by Gus, 2026-10-05** (relayed by CHORUS's plan, memory-unattributed.md §4): one ordered list of classes (`unattributed` for now); `carry_out(cls=)`; the host decides the class, as the stricter of each stretch's recorded setting and the tree's current one; no class on conversation sets; no Cedar or proof change. memgate added, as its own calls: refusing a carry-out to a less strict class, an environment's `min_class` as a guard against a host bug, and failing closed per set on labels a version doesn't know.
 - **Outside the proofs:** the separation itself (checked live by conformance's `class-apart`) and the two carry-out rules (client-side, tested).
+- **Consolidation per class (0.6.0, ruled 2026-10-06 after measuring):** the world file may mark a class `consolidate: false`; its personal sets then live in a partition of their own (`class_bank`) where the store builds no derived memories. On the env worlds, observations off matched or beat observations on under every question style ([[Review Ablations consolidation and reranker 2026-10-06]]).
 
 ## The environment decides (accepted)
 

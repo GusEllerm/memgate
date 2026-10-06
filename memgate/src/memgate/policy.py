@@ -80,9 +80,9 @@ class Policy:
         if result.diagnostics.errors:
             raise Unsupported("partial evaluation reported errors")
         if result.decision == cedarpy.Decision.Allow:      # decided without looking at the label set
-            return "1", []
+            return "TRUE", []
         if result.decision == cedarpy.Decision.Deny:
-            return "0", []
+            return "FALSE", []
         return Compiler(self.world).where(result.residuals)
 
     def allowed_ids(self, agent: str, location: str) -> set[str]:
