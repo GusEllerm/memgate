@@ -1,6 +1,6 @@
 {
   "name": "memgate",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Integrate memgate (context-scoped permissions for agent memory) into a host application: map the host's world, deploy, wire the Context-based API, and verify with memgate conformance.",
   "author": { "name": "Gus Ellerm" },
   "repository": "https://github.com/GusEllerm/memgate",

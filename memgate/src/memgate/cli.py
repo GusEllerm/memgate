@@ -296,6 +296,50 @@ def cmd_attach_sources(args) -> int:
     return 0 if not skipped else 1
 
 
+def cmd_inspect_location(args) -> int:
+    """A location's view (0.8.0): every item in its conversation sets, with participants; agents' notes are not shown."""
+    import json
+    mem = _memory(args)
+    if mem is None:
+        return 2
+    try:
+        items = mem.location(args.location)
+    except KeyError as e:
+        print(f"refused: {e}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps([{**i.__dict__, **({} if args.text else {"text": f"({len(i.text)} chars; --text shows it)"})} for i in items],
+                         indent=1, default=str))
+        return 0
+    print(f"{args.location}'s memory ({len(items)} items" + ("" if args.text else "; --text shows the text") + "):")
+    for i in items:
+        body = i.text[:160] if args.text else f"({len(i.text)} chars)"
+        print(f"  {i.write_id}  {i.when or '-'} [{', '.join(i.participants)}]  {i.kind}: {body}")
+    return 0
+
+
+def cmd_forget_location(args) -> int:
+    """Delete a location's memory (0.8.0): its conversation sets with what was derived from them, and the private
+    notes bound to it. The tree owner's request, relayed by the host."""
+    mem = _memory(args)
+    if mem is None:
+        return 2
+    if not args.yes:
+        print("forget-location is a hard delete of everything the place remembers; add --yes to confirm", file=sys.stderr)
+        return 2
+    try:
+        counts = mem.forget_location(args.location)
+    except KeyError as e:
+        print(f"refused: {e}", file=sys.stderr)
+        return 1
+    except (OSError, RuntimeError) as e:
+        print(f"failed: {e}", file=sys.stderr)
+        return 1
+    print(f"forgotten at {args.location}: {counts['writes']} write(s) in {counts['sets']} conversation set(s), "
+          f"{counts['derived']} derived item(s), {counts['notes']} note(s)")
+    return 0
+
+
 def cmd_forget(args) -> int:
     """Delete one item of an agent's personal memory by write ID (the owner's request, relayed by the host)."""
     mem = _memory(args)
@@ -378,17 +422,24 @@ def main(argv: list[str] | None = None) -> int:
 
     for name, fn, help_ in (("inspect", cmd_inspect, "counts, timestamps and an agent's personal items (admin; never agents)"),
                             ("forget", cmd_forget, "delete one item of an agent's personal memory by write id (hard delete)"),
+                            ("inspect-location", cmd_inspect_location, "list a location's conversation memory, with participants (0.8.0)"),
+                            ("forget-location", cmd_forget_location, "delete a location's conversation memory and the notes bound to it (hard delete, 0.8.0)"),
                             ("attach-sources", cmd_attach_sources,
                              "give pre-0.7.0 personal items their source location from a {write_id: location} JSON file (re-writes each, forgets the old copy)")):
         o = sub.add_parser(name, help=help_)
-        o.add_argument("agent", nargs="?" if name == "inspect" else None)
-        if name == "forget":
+        if name.endswith("-location"):
+            o.add_argument("location")
+        else:
+            o.add_argument("agent", nargs="?" if name == "inspect" else None)
+        if name == "forget-location":
+            o.add_argument("--yes", action="store_true", help="confirm the hard delete")
+        elif name == "forget":
             o.add_argument("write_id")
             o.add_argument("--yes", action="store_true", help="confirm the hard delete")
         elif name == "attach-sources":
             o.add_argument("mapping", help="JSON file: {write_id: source location}")
             o.add_argument("--dry-run", action="store_true", help="report what would be re-written, write nothing")
-        else:
+        elif name in ("inspect", "inspect-location"):
             o.add_argument("--json", action="store_true")
             o.add_argument("--text", action="store_true", help="show the items' text (memory text is labelled data: off by default)")
         o.add_argument("--url", default=_env("MEMGATE_URL", f"http://127.0.0.1:{_env('MEMGATE_PORT', '8889')}"))

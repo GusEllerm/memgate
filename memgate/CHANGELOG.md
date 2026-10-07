@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.8.0 (2026-10-07)
+
+The location's view and purge, asked by CHORUS after Gus asked whether a tree's own memory can be seen;
+ruled by Gus on 2026-10-07 (vault: Decision Log).
+
+- **`Memory.location(L)`** lists everything in L's conversation sets ({loc:L, with:...}), derived items
+  included, each with its `participants` (a new field on `Listed`). Agents' private notes bound to L are
+  not listed. **`Memory.forget_location(L)`** hard-deletes every write in those sets with what the store
+  derived from them, and the private notes bound to L (purged, never listed); personal sets carried out
+  of L are left alone. Idempotent; returns `{sets, writes, derived, notes}`. Both host-trusted, like the
+  owner's view and forget; memgate does not require L to be held. `stats(location=L)` counts per
+  conversation set. `memgate inspect-location` and `memgate forget-location --yes` from a terminal. Event
+  lines `location_listed` and `forget_location` carry ids and counts only.
+- **Conformance** gains `location-view`: the canary conversation is listed with its participants and a
+  note is not; after `forget_location`, participants recall nothing of it, the listing is empty, the note is
+  gone, and a repeat finds nothing. It runs last, since it empties the location.
+- A location marked high-assurance after conversations were recorded there keeps those earlier writes in
+  the shared partition, where recall inside still finds them; the location's view and purge now look there
+  too (as the owner's view does for a class that stopped consolidating).
+
 ## 0.7.0 (2026-10-06)
 
 The source seal. Ruled by Gus on 2026-10-06 on CHORUS's question (vault: Decision Log, 2026-10-06 rows).

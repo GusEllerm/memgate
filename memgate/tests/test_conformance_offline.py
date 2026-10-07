@@ -33,7 +33,7 @@ def test_everything_applicable_passes_on_a_correct_fake_store(world, registry):
         assert checks[cid].status == "skip"
         assert "second lock" in checks[cid].detail or (cid == "ha-partition-search" and "no partitions" in checks[cid].detail)
     for cid in ("witness", "non-witness", "elsewhere", "carry-out", "carry-refused", "class-carry-out", "class-downgrade",
-                "class-minimum", "owner-view", "class-legacy", "ha-inside", "ha-outside", "ha-seal"):
+                "class-minimum", "owner-view", "class-legacy", "ha-inside", "ha-outside", "ha-seal", "location-view"):
         assert checks[cid].status == "pass", (cid, checks[cid].detail)
     assert checks["ha-partition"].status == "skip" and "no partitions" in checks["ha-partition"].detail
     assert checks["class-apart"].status == "skip" and "derived nothing" in checks["class-apart"].detail

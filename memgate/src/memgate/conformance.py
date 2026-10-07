@@ -65,6 +65,7 @@ CLAIMS = [
     ("ha-partition-search", "The partition cannot be searched from outside"),
     ("ha-seal", "Personal memory cannot be written inside a high-assurance location"),
     ("split-scope", "In a split deployment, each server refuses the other's banks"),
+    ("location-view", "A location's conversation memory is listed with its participants, notes excluded; forgetting the location removes it all, notes included, and a participant recalls nothing of it afterwards"),
 ]
 SECOND_LOCK_CHECKS = ("secret", "side-doors", "forged-tags", "write-rules", "ha-partition-search")
 
@@ -172,7 +173,7 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         l2 = ordinary[1] if len(ordinary) > 1 else None
         codes = {k: f"MGC-{k.upper()}-{uuid.uuid4().hex[:6]}" for k in ("conv", "carry", "refused", "ha", "class", "legacy")}
         here = Context(a, l1, (a, b))
-        keep(mem.remember(here, f"{a} and {b} agreed the conformance canary for {l1} is {codes['conv']}."))
+        conv_id = keep(mem.remember(here, f"{a} and {b} agreed the conformance canary for {l1} is {codes['conv']}."))
         written = [here.conversation().id]
 
         carry_type = next((t for t in sorted(w.carry_out_types(frozenset({l1})))), None)
@@ -421,6 +422,29 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         else:
             for cid in ("ha-inside", "ha-outside", "ha-partition", "ha-partition-search", "ha-seal", "split-scope"):
                 skip(cid, "the world has no high-assurance location")
+        # The location's view and purge (0.8.0): last, because it empties l1.
+        if not (caps.list_by_label_set and caps.delete):
+            skip("location-view", "the store cannot list by label set or delete")
+        else:
+            note_code = uuid.uuid4().hex[:8].upper()
+            keep(mem.keep_note(Context(a, l1), f"{a}'s private note at {l1}: {note_code}."))
+            deadline5 = time.time() + wait_s
+            while mem.pending_operations() and time.time() < deadline5:
+                time.sleep(2)
+            listed = mem.location(l1)
+            conv_listed = any((i.write_id == conv_id or codes["conv"] in i.text) and i.participants == sorted((a, b)) for i in listed)
+            note_hidden = not any(note_code in i.text for i in listed)
+            others_out = not any(codes[k] in i.text for i in listed for k in ("carry", "class", "ha") if k in codes)
+            counts = mem.forget_location(l1)
+            gone = not sees(a, l1, codes["conv"]) and not sees(b, l1, codes["conv"])
+            empty = mem.location(l1) == []
+            note_gone = not sees(a, l1, note_code, "private note")
+            again = mem.forget_location(l1)
+            ok("location-view", conv_listed and note_hidden and others_out and counts["writes"] >= 1 and counts["notes"] >= 1
+               and gone and empty and note_gone and again["writes"] == 0 and again["notes"] == 0,
+               f"listed {len(listed)} item(s) with the conversation {conv_listed}, note hidden {note_hidden}, nothing of other sets {others_out}; "
+               f"forgot {counts['writes']} write(s), {counts['derived']} derived, {counts['notes']} note(s); recalled after {not gone}, "
+               f"listed after {not empty}, note recalled after {not note_gone}; repeat {again['writes']}/{again['notes']}")
     finally:
         if hindsight:
             for bk in mem.partitions():

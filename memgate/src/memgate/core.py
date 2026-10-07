@@ -186,6 +186,31 @@ class Core:
         """A personal set of `agent`: its identity alone, any class, any source; no location, no participants."""
         return labels.selfs == {agent} and not labels.locs and not labels.withs
 
+    @staticmethod
+    def is_conversation_at(labels: LabelSet, location: str) -> bool:
+        """A conversation set of `location`: that location alone, participants, no identity."""
+        return labels.locs == {location} and not labels.selfs
+
+    @staticmethod
+    def is_note_at(labels: LabelSet, location: str) -> bool:
+        """An agent's private note bound to `location` ({self:A, loc:L}, from `keep_note`)."""
+        return labels.locs == {location} and len(labels.selfs) == 1 and not labels.withs
+
+    def location_sets(self, location: str) -> list[tuple[str, str]]:
+        """The conversation sets of `location` that exist in the registry, as (label-set ID, partition) pairs,
+        sorted by participants. KeyError for a location the world does not list."""
+        if location not in self.gate.world.locations:
+            raise KeyError(f"unknown location {location!r}")
+        known = self.gate.registry.all()
+        sets = sorted((ls for ls in known.values() if self.is_conversation_at(ls, location)), key=lambda ls: sorted(ls.withs))
+        return [(ls.id, part) for ls in sets for part in self.partitions_holding(ls)]
+
+    def note_sets(self, location: str) -> list[tuple[str, str]]:
+        """The private-note sets bound to `location`, as (label-set ID, partition) pairs."""
+        known = self.gate.registry.all()
+        sets = sorted((ls for ls in known.values() if self.is_note_at(ls, location)), key=lambda ls: sorted(ls.selfs))
+        return [(ls.id, part) for ls in sets for part in self.partitions_holding(ls)]
+
     def owned_by(self, agent: str, write_id: str) -> str:
         """The label set a write ID was minted under, if it is one of `agent`'s personal sets (plain, any class,
         any source); PermissionError otherwise. A host-trusted check: the host has verified the owner."""
@@ -198,11 +223,12 @@ class Core:
 
     def partitions_holding(self, labels: LabelSet) -> list[str]:
         """Every partition that may hold items of this label set: where new writes go (`partition_for`), and,
-        for a class the world keeps out of consolidation, the shared partition too, since items carried in
-        before the class was marked `consolidate: false` (or by a 0.5.x client) live there and recall still
-        finds them. The owner's view and forget must see what recall sees."""
+        for a class the world keeps out of consolidation or a location marked high-assurance, the shared
+        partition too, since items written before the class was marked `consolidate: false` (or by a 0.5.x
+        client), or before the location became high-assurance, live there and recall still finds them. The
+        owner's and location's views and the two forgets must see what recall sees."""
         first = self.partition_for(labels)
-        return [first, self.shared] if first not in (self.shared,) and strictest(labels.classes) else [first]
+        return [first, self.shared] if first != self.shared else [first]
 
     def personal_sets(self, agent: str) -> list[tuple[str, str]]:
         """An agent's personal sets that exist in the registry, as (label-set ID, partition) pairs: the plain
@@ -220,6 +246,8 @@ class Core:
         if labels and labels.srcs:
             item.source = sorted(labels.srcs)[0]
             item.withheld = any(self.gate.world.sealed(l) for l in labels.srcs)
+        if labels and labels.withs and not labels.selfs:
+            item.participants = sorted(labels.withs)
         return item
 
     def partitions_of_write(self, write_id: str) -> list[str]:
@@ -359,12 +387,62 @@ class Memory:
         _event("personal_listed", agent=agent, items=len(out))
         return out
 
-    def stats(self, agent: str | None = None) -> dict:
+    def location(self, location: str) -> list[Listed]:
+        """The location's view (0.8.0): everything in `location`'s conversation sets ({loc:L, with:...}), as kept,
+        derived items included, each with its participants. Agents' private notes bound to the location are
+        not listed. Host-trusted, like `personal`: the host decides who may see a place's memory. Needs
+        capability `list_by_label_set`; KeyError for a location the world does not list."""
+        if not self.store.capabilities.list_by_label_set:
+            raise NotImplementedError("this store cannot list by label set")
+        out: list[Listed] = []
+        seen: set[str] = set()
+        for ls, partition in self.core.location_sets(location):
+            listed = [self.core.describe(i) for i in self.store.list(partition, ls) if i.write_id not in seen]
+            out += listed
+            seen |= {i.write_id for i in listed}
+        _event("location_listed", location=location, items=len(out))
+        return out
+
+    def forget_location(self, location: str) -> dict:
+        """Hard-delete a location's memory (0.8.0): every write in its conversation sets, with what the store
+        derived from them, and every private note bound to it (notes are purged, never listed). Personal
+        sets carried out of the location are left alone (the host forgets those per write). Host-trusted,
+        like `forget`; idempotent. Returns counts: sets, writes, derived, notes. Needs `list_by_label_set`
+        and `delete`."""
+        caps = self.store.capabilities
+        if not (caps.list_by_label_set and caps.delete):
+            raise NotImplementedError("this store cannot list by label set and delete")
+        counts = {"sets": 0, "writes": 0, "derived": 0, "notes": 0}
+        sets_with_items: set[str] = set()                     # a set may live in two partitions; count it once
+        for kind, pairs in (("conversation", self.core.location_sets(location)), ("note", self.core.note_sets(location))):
+            for ls, partition in pairs:
+                items = self.store.list(partition, ls)
+                writes = {i.write_id for i in items if i.kind == "memory"}
+                derived = {i.write_id for i in items if i.kind != "memory"}
+                removed = sum(self.store.delete(partition, w) for w in sorted(writes))
+                left = {i.write_id for i in self.store.list(partition, ls)} if derived else set()
+                for d in sorted(derived & left):              # whatever the store did not take with the writes
+                    if self.store.delete(partition, d):
+                        left.discard(d)
+                if kind == "conversation":
+                    if items:
+                        sets_with_items.add(ls)
+                    counts["sets"] = len(sets_with_items)
+                    counts["writes"] += removed
+                    counts["derived"] += len(derived - left)
+                else:
+                    counts["notes"] += removed
+        _event("forget_location", location=location, **counts)
+        if self.core.provenance:
+            self.core.provenance.audit(None, "forget_location", location=location, **counts)
+        return counts
+
+    def stats(self, agent: str | None = None, location: str | None = None) -> dict:
         """Counts and timestamps for an operator or owner: per partition, and per personal set of `agent`
-        in the partition that holds it. Needs capability `stats`."""
+        or per conversation set of `location` (0.8.0) in the partition that holds it. Needs capability `stats`."""
         if not self.store.capabilities.stats:
             raise NotImplementedError("this store has no stats")
-        sets = self.core.personal_sets(agent) if agent else []
+        sets = (self.core.personal_sets(agent) if agent else []) + (self.core.location_sets(location) if location else [])
         return {p: self.store.stats(p, [ls for ls, part in sets if part == p] or None) for p in self.core.partitions()}
 
 
@@ -467,9 +545,54 @@ class AsyncMemory:
             seen |= {i.write_id for i in listed}
         return out
 
-    async def stats(self, agent: str | None = None) -> dict:
+    async def location(self, location: str) -> list[Listed]:
+        """See `Memory.location`."""
+        if not self.store.capabilities.list_by_label_set:
+            raise NotImplementedError("this store cannot list by label set")
+        out: list[Listed] = []
+        seen: set[str] = set()
+        for ls, partition in self.core.location_sets(location):
+            listed = [self.core.describe(i) for i in await self._s("list", partition, ls) if i.write_id not in seen]
+            out += listed
+            seen |= {i.write_id for i in listed}
+        _event("location_listed", location=location, items=len(out))
+        return out
+
+    async def forget_location(self, location: str) -> dict:
+        """See `Memory.forget_location`."""
+        caps = self.store.capabilities
+        if not (caps.list_by_label_set and caps.delete):
+            raise NotImplementedError("this store cannot list by label set and delete")
+        counts = {"sets": 0, "writes": 0, "derived": 0, "notes": 0}
+        sets_with_items: set[str] = set()                     # a set may live in two partitions; count it once
+        for kind, pairs in (("conversation", self.core.location_sets(location)), ("note", self.core.note_sets(location))):
+            for ls, partition in pairs:
+                items = await self._s("list", partition, ls)
+                writes = {i.write_id for i in items if i.kind == "memory"}
+                derived = {i.write_id for i in items if i.kind != "memory"}
+                removed = 0
+                for w in sorted(writes):
+                    removed += bool(await self._s("delete", partition, w))
+                left = {i.write_id for i in await self._s("list", partition, ls)} if derived else set()
+                for d in sorted(derived & left):
+                    if await self._s("delete", partition, d):
+                        left.discard(d)
+                if kind == "conversation":
+                    if items:
+                        sets_with_items.add(ls)
+                    counts["sets"] = len(sets_with_items)
+                    counts["writes"] += removed
+                    counts["derived"] += len(derived - left)
+                else:
+                    counts["notes"] += removed
+        _event("forget_location", location=location, **counts)
+        if self.core.provenance:
+            self.core.provenance.audit(None, "forget_location", location=location, **counts)
+        return counts
+
+    async def stats(self, agent: str | None = None, location: str | None = None) -> dict:
         """See `Memory.stats`."""
         if not self.store.capabilities.stats:
             raise NotImplementedError("this store has no stats")
-        sets = self.core.personal_sets(agent) if agent else []
+        sets = (self.core.personal_sets(agent) if agent else []) + (self.core.location_sets(location) if location else [])
         return {p: await self._s("stats", p, [ls for ls, part in sets if part == p] or None) for p in self.core.partitions()}

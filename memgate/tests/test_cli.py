@@ -224,3 +224,18 @@ def test_serve_sets_onnx_pooling_for_bge_and_warns_about_torch(tmp_path, monkeyp
     assert seen["env"]["HINDSIGHT_API_RERANKER_PROVIDER"] == "rrf"
     _serve(tmp_path, monkeypatch, ("--embeddings-provider", "onnx", "--reranker", "local"))
     assert "still needs torch" in capsys.readouterr().err
+
+
+def test_inspect_location_and_forget_location(operator_env, capsys):
+    from memgate.store import Listed
+    _FakeMemory.location = lambda self, loc: ([Listed("w_ls_y_0123456789abcdef", "ls_y", "they spoke of the kiln code EMBER-4471", "2026-10", participants=["ada", "bo"])]
+                                              if loc == "l" else (_ for _ in ()).throw(KeyError(f"unknown location {loc!r}")))
+    _FakeMemory.forget_location = lambda self, loc: {"sets": 1, "writes": 1, "derived": 2, "notes": 1}
+    assert cli.main(["inspect-location", "l", "--bank", "b"]) == 0
+    out = capsys.readouterr().out
+    assert "EMBER" not in out and "[ada, bo]" in out and "w_ls_y_0123456789abcdef" in out
+    assert cli.main(["inspect-location", "l", "--bank", "b", "--text"]) == 0 and "EMBER-4471" in capsys.readouterr().out
+    assert cli.main(["inspect-location", "nowhere", "--bank", "b"]) == 1 and "refused" in capsys.readouterr().err
+    assert cli.main(["forget-location", "l", "--bank", "b"]) == 2 and "--yes" in capsys.readouterr().err
+    assert cli.main(["forget-location", "l", "--bank", "b", "--yes"]) == 0
+    assert "1 write(s) in 1 conversation set(s), 2 derived item(s), 1 note(s)" in capsys.readouterr().out

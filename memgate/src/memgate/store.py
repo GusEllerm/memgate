@@ -62,6 +62,7 @@ class Listed:
     sources: list[str] = field(default_factory=list)   # write IDs a derived item was built from, when known
     source: str | None = None        # filled by Memory.personal: the location it was carried out of (0.7.0)
     withheld: bool = False           # filled by Memory.personal: that location currently lets nothing out
+    participants: list[str] = field(default_factory=list)   # filled by Memory.location: who was present (0.8.0)
 
 
 @runtime_checkable
