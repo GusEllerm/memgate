@@ -312,6 +312,11 @@ sig = "f2013177e6d5920d"
 
 [[bindings]]
 doc = "docs/vault/Decision Log.md"
+target = "memgate/src/memgate/core.py#Recalled"
+sig = "21d31283ce03c8e6"
+
+[[bindings]]
+doc = "docs/vault/Decision Log.md"
 target = "memgate/src/memgate/provenance.py#TrailNode"
 sig = "65805f5240e82863"
 
@@ -329,6 +334,11 @@ sig = "f045fe9deda958f4"
 doc = "docs/vault/Decision Log.md"
 target = "memgate/src/memgate/store.py#Store"
 sig = "6ef8b05f66f4f489"
+
+[[bindings]]
+doc = "docs/vault/Decision Log.md"
+target = "memgate/src/memgate/world.py#Environment"
+sig = "645263bcd7aeadfb"
 
 [[bindings]]
 doc = "docs/vault/Modules/ALCF Gateway.md"
