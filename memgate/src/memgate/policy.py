@@ -58,6 +58,8 @@ class Policy:
                 "withs": [_uid("Agent", a) for a in sorted(ls.withs)],
                 "haLocs": [_uid("Location", l) for l in sorted(ls.locs) if self.world.high_assurance(l)],
                 "carryTypes": sorted(self.world.carry_out_types(ls.locs)),
+                "srcs": [_uid("Location", l) for l in sorted(ls.srcs)],
+                "sealedSrcs": [_uid("Location", l) for l in sorted(ls.srcs) if self.world.sealed(l)],
             },
             "parents": [],
         }
@@ -65,11 +67,17 @@ class Policy:
     def _entities(self, label_sets: dict[str, LabelSet]) -> list[dict]:
         w = self.world
         agents = set(w.agents) | {a for ls in label_sets.values() for a in ls.selfs | ls.withs}
+        # A source location the world no longer lists still names an entity, so the policies never error on it.
+        extra_locs = {l for ls in label_sets.values() for l in ls.srcs} - set(w.locations)
         ents = [{"uid": {"type": "Agent", "id": a}, "attrs": {}, "parents": []} for a in sorted(agents)]
         ents += [{"uid": {"type": "Environment", "id": e}, "attrs": {}, "parents": []} for e in sorted(w.environments)]
         ents += [{"uid": {"type": "Location", "id": l.id},
                   "attrs": {"highAssurance": l.high_assurance, "environment": _uid("Environment", l.environment)},
                   "parents": []} for l in w.locations.values()]
+        if extra_locs:
+            ents.append({"uid": {"type": "Environment", "id": "∅"}, "attrs": {}, "parents": []})
+            ents += [{"uid": {"type": "Location", "id": l}, "attrs": {"highAssurance": False, "environment": _uid("Environment", "∅")},
+                      "parents": []} for l in sorted(extra_locs)]
         ents += [self._label_set_entity(i, ls) for i, ls in label_sets.items()]
         return ents
 

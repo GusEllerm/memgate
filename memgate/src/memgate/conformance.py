@@ -26,6 +26,7 @@ Exit code 0 means every applicable check passed.
 from __future__ import annotations
 
 import json
+import os
 import time
 import uuid
 from dataclasses import dataclass
@@ -54,6 +55,8 @@ CLAIMS = [
     ("class-downgrade", "Content from a class set cannot be carried into a less strict personal set"),
     ("class-minimum", "An environment's minimum class refuses a carry-out without it"),
     ("class-apart", "Consolidation never builds on another label set: the class set never gets the named item's name"),
+    ("held-withheld", "Once a location's environment lets nothing out, what was carried out of it is recalled only there, and comes back when it is released"),
+    ("held-derived", "What the store derived from a withheld item is withheld with it"),
     ("owner-view", "An agent's personal items can be listed, and only its own; forget removes one and nothing else"),
     ("class-legacy", "A class item kept in the shared partition before the class stopped consolidating is still listed and forgotten"),
     ("ha-inside", "A high-assurance conversation is recalled inside its location"),
@@ -178,14 +181,14 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         kept_id = None
         if carry_type:
             kept_id = keep(mem.carry_out(here, f"{a}'s own {carry_type}: the conformance keepsake code is {codes['carry']}.", carry_type, cls=floor))
-            written.append(personal_labels(a, floor).id)
+            written.append(personal_labels(a, floor, src=l1).id)
             # The same fact twice, once with a name in the plain personal set and once without in the class set.
             # A canary name, so that finding it in the class set can only mean the two sets were mixed.
             topic = f"the conformance buffer drifts above {codes['class']} degrees"
             if floor is None:
                 keep(mem.carry_out(here, f"{canary_name} says {topic}.", carry_type))
             keep(mem.carry_out(here, f"A colleague says {topic}.", carry_type, cls=UNATTRIBUTED))
-            written.append(personal_labels(a, UNATTRIBUTED).id)
+            written.append(personal_labels(a, UNATTRIBUTED, src=l1).id)
         refusing = next(((l, t) for l in ordinary for t in sorted(MEMORY_TYPES - w.carry_out_types(frozenset({l})))), None)
         if ha:
             v = ha[0]
@@ -230,7 +233,7 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
                 skip(cid, "no ordinary location lets any memory type out, or only one location")
         if carry_type:
             try:
-                mem.carry_out(Context(a, l1), "downgraded", carry_type, source=personal_labels(a, UNATTRIBUTED), cls=None)
+                mem.carry_out(Context(a, l1), "downgraded", carry_type, source=personal_labels(a, UNATTRIBUTED, src=l1), cls=None)
                 ok("class-downgrade", False, f"a {UNATTRIBUTED} item was carried into {a}'s plain personal set")
             except PermissionError as e:
                 ok("class-downgrade", True, str(e))
@@ -249,7 +252,7 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         if not caps.list_by_label_set:
             skip("class-apart", "the store cannot list by label set")
         elif carry_type and floor is None:
-            passed, detail = _apart(mem, bank, written, personal_labels(a, UNATTRIBUTED).id, canary_name)
+            passed, detail = _apart(mem, bank, written, personal_labels(a, UNATTRIBUTED, src=l1).id, canary_name)
             if passed is None:
                 skip("class-apart", detail)
             else:
@@ -267,12 +270,74 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         else:
             skip("carry-refused", "every ordinary location lets every memory type out")
 
+        # The source seal (before owner-view forgets the keepsake): hold l1's environment in the world file and watch the keepsake disappear outside l1.
+        flip = gate.world_path if gate.world_path and os.access(gate.world_path, os.W_OK) else None
+        if not carry_type or not l2:
+            skip("held-withheld", "no ordinary location lets any memory type out, or only one location")
+            skip("held-derived", "no ordinary location lets any memory type out, or only one location")
+        elif flip is None:
+            skip("held-withheld", "conformance cannot write the world file to hold a location (MEMGATE_WORLD not writable)")
+            skip("held-derived", "conformance cannot write the world file to hold a location (MEMGATE_WORLD not writable)")
+        else:
+            env_id = w.locations[l1].environment
+            tmp = flip.with_suffix(flip.suffix + ".memgate-conformance")
+
+            def set_hold(value):
+                """Rewrite only l1's environment's carry_out in the live world file (re-read, so a host edit made
+                meanwhile survives), atomically, as the guide asks hosts to write it."""
+                spec = json.loads(flip.read_text())
+                for e in spec["environments"]:
+                    if e["id"] == env_id:
+                        if value is None:
+                            e.pop("carry_out", None)
+                        else:
+                            e["carry_out"] = value
+                tmp.write_text(json.dumps(spec)); os.replace(tmp, flip)
+                gate.refresh(force=True)
+
+            def server_shows(loc):
+                """Whether the server's own lock (polled on its own world-reload clock) still returns the keepsake."""
+                status, body = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall",
+                                    {"query": "conformance keepsake code", "tags": [personal_labels(a, floor, src=l1).id],
+                                     "tags_match": "any"}, as_(a, loc))
+                return status != 200 or codes["carry"] in body
+
+            before_hold = json.loads(flip.read_text())
+            held_value = next((e.get("carry_out") for e in before_hold["environments"] if e["id"] == env_id), None)
+            settle = max(2 * gate.check_every, 1.0) + 1.0
+            try:
+                set_hold([])
+                deadline3 = time.time() + settle + 10
+                while time.time() < deadline3 and (sees(a, l2, codes["carry"], "conformance keepsake code") or (probes and server_shows(l2))):
+                    time.sleep(0.5)                                            # both sides re-read the world within the interval
+                withheld_elsewhere = not sees(a, l2, codes["carry"], "conformance keepsake code")
+                kept_at_source = sees(a, l1, codes["carry"], "conformance keepsake code")
+                validator_hidden = not probes or not server_shows(l2)
+                marked = any(i.withheld and i.source == l1 for i in mem.personal(a)) if caps.list_by_label_set else True
+                derived = [i for i in (mem.store.list(mem.core.partition_for(personal_labels(a, floor, src=l1)), personal_labels(a, floor, src=l1).id)
+                                       if caps.list_by_label_set else []) if i.kind == "derived"]
+                derived_ids = {d.write_id for d in derived}
+                elsewhere = mem.recall(Context(a, l2), "conformance keepsake code", k=20)
+                derived_hidden = not any(codes["carry"] in r.text or r.write_id in derived_ids for r in elsewhere)
+            finally:
+                set_hold(held_value)                                           # back to what the host had
+            deadline4 = time.time() + settle + 10
+            while time.time() < deadline4 and (not sees(a, l2, codes["carry"], "conformance keepsake code") or (probes and not server_shows(l2))):
+                time.sleep(0.5)
+            released = sees(a, l2, codes["carry"], "conformance keepsake code") and (not probes or server_shows(l2))
+            ok("held-withheld", withheld_elsewhere and kept_at_source and validator_hidden and marked and released,
+               f"withheld at {l2} {withheld_elsewhere}, kept at {l1} {kept_at_source}, validator hid it {validator_hidden}, "
+               f"owner's view marked it {marked}, released again {released}")
+            if derived:
+                ok("held-derived", derived_hidden, f"{len(derived)} derived item(s) in the held set, none recalled elsewhere: {derived_hidden}")
+            else:
+                skip("held-derived", "the store derived nothing from the held set within the wait")
         if not caps.list_by_label_set:
             skip("owner-view", "the store cannot list by label set")
         elif carry_type and kept_id:
             mine = mem.personal(a)
             theirs = mem.personal(b)
-            own_sets = {personal_labels(a, x).id for x in (None, *CLASSES)}
+            own_sets = {ls_id for ls_id, _ in mem.core.personal_sets(a)}                # plain, by class, by source
             own_ok = any(i.write_id == kept_id for i in mine) and all(i.label_set in own_sets for i in mine)
             if caps.delete:
                 before = sum(i.kind == "memory" for i in mine)

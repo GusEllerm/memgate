@@ -12,6 +12,8 @@ entity LabelSet {
   withs: Set<Agent>,
   haLocs: Set<Location>,      // the high-assurance locations among locs (Cedar can't loop over set members)
   carryTypes: Set<String>,    // memory types every location in locs lets out
+  srcs: Set<Location>,        // where a personal memory was carried out of (0.7.0)
+  sealedSrcs: Set<Location>,  // the srcs whose environment currently lets nothing out (carry_out: [])
 };
 action read appliesTo {
   principal: Agent,

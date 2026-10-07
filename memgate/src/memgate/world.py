@@ -80,6 +80,11 @@ class World:
     def high_assurance(self, loc: str) -> bool:
         return self.locations[loc].high_assurance
 
+    def sealed(self, loc: str) -> bool:
+        """Whether `loc`'s environment currently lets nothing out (carry_out: []): nothing is carried out of it,
+        and what was carried out while it was open is recalled only inside it (the source seal, 0.7.0)."""
+        return loc in self.locations and not self.environments[self.locations[loc].environment].carry_out
+
     def carry_out_types(self, locs: frozenset[str]) -> frozenset[str]:
         """Memory types every one of these locations lets out; all types when there are none."""
         allowed = MEMORY_TYPES

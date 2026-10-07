@@ -2,9 +2,9 @@
 type: design
 status: draft
 authority: describes
-summary: "Selective memory for a social simulation of agents: three label types (identity, location, participants), plus a class on personal memory since memgate 0.5.0; participants recall a discussion in its location; personal memory is always readable, and the environment decides what may enter it."
+summary: "Selective memory for a social simulation of agents: three label types (identity, location, participants), plus a class on personal memory since memgate 0.5.0 and its source location since 0.7.0 (the source seal); participants recall a discussion in its location; personal memory is readable everywhere except what was carried out of a location now held shut, and the environment decides what may enter it."
 created: 2026-09-25
-updated: 2026-10-05
+updated: 2026-10-06
 tags: [memgate, design, permissions, memory-types]
 ---
 
@@ -43,6 +43,15 @@ A fourth label kind, `class:C`, only on personal memory. {self:A, class:unattrib
 - **Design ruled by Gus, 2026-10-05** (relayed by CHORUS's plan, memory-unattributed.md §4): one ordered list of classes (`unattributed` for now); `carry_out(cls=)`; the host decides the class, as the stricter of each stretch's recorded setting and the tree's current one; no class on conversation sets; no Cedar or proof change. memgate added, as its own calls: refusing a carry-out to a less strict class, an environment's `min_class` as a guard against a host bug, and failing closed per set on labels a version doesn't know.
 - **Outside the proofs:** the separation itself (checked live by conformance's `class-apart`) and the two carry-out rules (client-side, tested).
 - **Consolidation per class (0.6.0, ruled 2026-10-06 after measuring):** the world file may mark a class `consolidate: false`; its personal sets then live in a partition of their own (`class_bank`) where the store builds no derived memories. On the env worlds, observations off matched or beat observations on under every question style ([[Review Ablations consolidation and reranker 2026-10-06]]).
+
+## The source seal (memgate 0.7.0)
+
+A fifth label kind, `src:L`, only beside a self: `personal_labels(agent, cls, src=L)` = {self:A, class?, src:L}, and every `carry_out` records the Context's location as the source. Unlike the class, the policies do see it: `source-seal` forbids recall of a set whose source's environment currently lets nothing out (`carry_out: []`, `World.sealed`) anywhere but in that location, and `write-source` lets a sourced set be written only at its source. So closing a tree holds, everywhere but inside, everything its agents carried out of it, derived items included (consolidation stays within one label set), and opening the list releases it all; nothing is deleted or rewritten.
+
+- **Asked for** by CHORUS (2026-10-06): a tree whose rule changes to "nothing leaves" after agents have left with memories. The 2026-09-29 ruling made carry-outs final; Gus ruled on 2026-10-06 that a held tree (`carry_out: []`) withholds what already left, as a proved memgate rule, and that any narrower list still lets earlier items through (carry-outs stay final otherwise). See [[Decision Log]].
+- **Proved:** R8, R9 (given the tested `sealedSrcs` attribute), W7, with R6 and W5 restated ([[memgate Proofs]]); the compiled read filter is tested against Cedar on random worlds with held environments.
+- **Legacy items** carried out before 0.7.0 have no source and are never withheld; `memgate attach-sources` gives them one from the host's record (CHORUS's lineage table), re-writing each under its sourced set.
+- **The owner's view** reports each item's source and whether it is withheld.
 
 ## The environment decides (accepted)
 

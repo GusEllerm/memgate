@@ -187,7 +187,7 @@ def test_a_keyed_carry_out_replaces_itself_in_personal_memory(world, registry, t
     ctx = Context("ada", "lab")                                              # after leaving: the agent alone
     first = mem.carry_out(ctx, "the kiln runs hot", "fact", source=src, source_writes=["w_s1"], key="carry:d1:0")
     again = mem.carry_out(ctx, "the kiln runs hot", "fact", source=src, source_writes=["w_s1", "w_s2"], key="carry:d1:0")
-    assert first == again and write_id_label_set(first) == personal_labels("ada").id
+    assert first == again and write_id_label_set(first) == personal_labels("ada", src="lab").id
     assert mem.carry_out(ctx, "x", "fact", source=src, key="carry:d1:1") != first
     assert log.sources_of(first, ["shared"]) == ["w_s1", "w_s2"]            # the retry's sources replace the first's
     assert [b["items"][0]["document_id"] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")][:2] == [first, first]
@@ -214,7 +214,7 @@ def test_carry_out_with_a_class_goes_to_the_class_set():
     mem.carry_out(Context("ada", "shade", ("ada", "bo")), "a colleague says the buffer drifts", "fact", cls="unattributed")
     mem.carry_out(Context("ada", "lab", ("ada", "bo")), "Bo says the buffer drifts", "fact")
     tags = [b["items"][0]["tags"][0] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")]
-    assert tags == [personal_labels("ada", "unattributed").id, personal_labels("ada").id]
+    assert tags == [personal_labels("ada", "unattributed", src="shade").id, personal_labels("ada", src="lab").id]
 
 
 def test_the_class_rules_refuse_before_anything_is_stored(tmp_path):
@@ -259,7 +259,7 @@ def test_the_async_client_applies_the_same_class_rules():
         return rec
     rec = asyncio.run(go())
     assert [b["items"][0]["tags"][0] for _, m, p, b, *_ in rec.calls if p.endswith("/memories")] == \
-        [personal_labels("ada", "unattributed").id]
+        [personal_labels("ada", "unattributed", src="shade").id]
 
 
 def test_version_mismatch_is_exported_beside_hindsight_error():

@@ -58,12 +58,19 @@ fn properties() -> Vec<Property> {
             assumes: Some("haLocs = the locations in locs whose highAssurance is true"),
             claim: "Outside a high-assurance location, nothing formed in a high-assurance location is recalled",
             policy: r#"permit (principal, action == Action::"read", resource) when { resource.haLocs.isEmpty() || context.location.highAssurance };"# },
+        Property { id: "R8-source-seal", action: "read", check: Check::Implies, assumes: None,
+            claim: "A memory carried out of a location that now lets nothing out is recalled only in that location",
+            policy: r#"permit (principal, action == Action::"read", resource) when { [context.location].containsAll(resource.sealedSrcs) };"# },
+        Property { id: "R9-source-seal-by-world", action: "read", check: Check::Implies,
+            assumes: Some("sealedSrcs = the locations in srcs whose environment has an empty carry_out"),
+            claim: "Outside a sealed source location, nothing carried out of one is recalled; what was carried out of an open location is unaffected",
+            policy: r#"permit (principal, action == Action::"read", resource) when { resource.sealedSrcs.isEmpty() || resource.sealedSrcs.contains(context.location) };"# },
         Property { id: "R6-read-spec", action: "read", check: Check::Equivalent, assumes: None,
-            claim: "Recall is allowed exactly when R1–R4 all hold (no other way in, and nothing they allow is refused)",
+            claim: "Recall is allowed exactly when R1–R4 and R8 all hold (no other way in, and nothing they allow is refused)",
             policy: r#"permit (principal, action == Action::"read", resource) when {
                 [principal].containsAll(resource.selfs) && [context.location].containsAll(resource.locs) &&
                 (resource.withs.isEmpty() || resource.withs.contains(principal)) &&
-                [context.location].containsAll(resource.haLocs) };"# },
+                [context.location].containsAll(resource.haLocs) && [context.location].containsAll(resource.sealedSrcs) };"# },
         Property { id: "R7-read-live", action: "read", check: Check::NotAlwaysDenies, assumes: None,
             claim: "Recall is possible at all (the policies are not vacuously safe)", policy: "" },
         // -- carry-out into personal memory ----------------------------------------------------------
@@ -102,12 +109,16 @@ fn properties() -> Vec<Property> {
         Property { id: "W4-write-seal", action: "write", check: Check::Implies, assumes: None,
             claim: "Anything written in a high-assurance location carries that location's label",
             policy: r#"permit (principal, action == Action::"write", resource) when { !context.location.highAssurance || resource.locs.contains(context.location) };"# },
+        Property { id: "W7-write-source", action: "write", check: Check::Implies, assumes: None,
+            claim: "A memory with a source label is written only in that source location",
+            policy: r#"permit (principal, action == Action::"write", resource) when { [context.location].containsAll(resource.srcs) };"# },
         Property { id: "W5-write-spec", action: "write", check: Check::Equivalent, assumes: None,
-            claim: "A write is allowed exactly when W1–W4 all hold",
+            claim: "A write is allowed exactly when W1–W4 and W7 all hold",
             policy: r#"permit (principal, action == Action::"write", resource) when {
                 [principal].containsAll(resource.selfs) && (!resource.selfs.isEmpty() || resource.withs.contains(principal)) &&
                 [context.location].containsAll(resource.locs) &&
-                (!context.location.highAssurance || resource.locs.contains(context.location)) };"# },
+                (!context.location.highAssurance || resource.locs.contains(context.location)) &&
+                [context.location].containsAll(resource.srcs) };"# },
         Property { id: "W6-write-live", action: "write", check: Check::NotAlwaysDenies, assumes: None,
             claim: "Writing is possible at all", policy: "" },
     ]

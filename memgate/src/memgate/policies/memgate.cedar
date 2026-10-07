@@ -12,6 +12,13 @@ when {
 forbid (principal, action == Action::"read", resource)
 unless { [context.location].containsAll(resource.haLocs) };
 
+// The source seal (0.7.0): a personal memory carried out of a location whose environment now lets nothing
+// out is recalled only in that location. Evaluated against the current world, so holding a location
+// withholds what already left it, and releasing the location releases it again.
+@id("source-seal")
+forbid (principal, action == Action::"read", resource)
+unless { [context.location].containsAll(resource.sealedSrcs) };
+
 // Writing: the writer holds every identity label (never another agent's), and either there is one
 // (personal memory, notes) or the writer is a participant (conversations). A label set with a
 // location may only be written in that location.
@@ -28,6 +35,11 @@ when {
 @id("high-assurance-write-seal")
 forbid (principal, action == Action::"write", resource)
 when { context.location.highAssurance && !resource.locs.contains(context.location) };
+
+// A source label names where the memory was carried out of, so it is written only there (0.7.0).
+@id("write-source")
+forbid (principal, action == Action::"write", resource)
+unless { [context.location].containsAll(resource.srcs) };
 
 // Carrying a memory into personal memory drops its location and participant labels, so it needs
 // the carrier's own access to it where it is (the source must be readable here) and the permission

@@ -60,6 +60,8 @@ class Listed:
     when: str | None = None          # month precision (YYYY-MM): the owner's view shows no exact dates
     kind: str = "memory"             # "memory" (a stored write) or "derived" (built by the store from others)
     sources: list[str] = field(default_factory=list)   # write IDs a derived item was built from, when known
+    source: str | None = None        # filled by Memory.personal: the location it was carried out of (0.7.0)
+    withheld: bool = False           # filled by Memory.personal: that location currently lets nothing out
 
 
 @runtime_checkable

@@ -16,7 +16,7 @@ tags: [module, memgate, permissions]
 ## Pieces
 
 - **Decisions and the API** (`memgate/src/memgate/core.py`, since 0.6.0; see [[Store Protocol]]). `Core` makes every decision with no I/O: `plan_write` (may_write, register, `write_id_for`, `partition_for`, whether the class consolidates), `plan_carry_out` (may_carry_out plus the two class rules), `plan_recall` and `finish_recall` (the client-side filter over whatever the store returned, sorted by score), `say`, `owned_by`, `personal_sets` and `partitions_of_write` serve the owner's operations; since 0.6.2 a class set the world keeps out of consolidation is looked for in its class partition and in the shared one (`partitions_holding`), because items carried in before the flag was set live there and recall finds them. `Memory` and `AsyncMemory` put a `Store` behind it: `remember`, `keep_note`, `carry_out`, `say`, `recall`, `pending_operations`, and the host-trusted `forget`, `personal` and `stats`. Every event (write, recall, refused, forget) is one JSON line on the logger `memgate`, never with text.
-- **The store protocol** (`memgate/src/memgate/store.py`): `Store` (`ensure`, `put`, `search`, `pending`, and the optional `delete`, `list`, `stats`), `Capabilities`, and the records `Item`, `Hit`, `Listed`.
+- **The store protocol** (`memgate/src/memgate/store.py`): `Store` (`ensure`, `put`, `search`, `pending`, and the optional `delete`, `list`, `stats`), `Capabilities`, and the records `Item`, `Hit`, `Listed` (`source` and `withheld` since 0.7.0).
 - **Labels** (`memgate/src/memgate/labels.py`).
   - `Label` has four kinds: self, loc, with and (since 0.5.0) class. A class label is allowed only beside a self label, at most one per `LabelSet`, with a value from the ordered list `CLASSES` (`class_rank`, `strictest`); `LabelSet.classes` reads it. The policies never see it: it only makes a separate personal label set, so the memory system keeps classed personal memory apart.
   - A `LabelSet`'s `id` is a content-addressed hash, so every store and process agrees on it without coordination.
@@ -47,7 +47,7 @@ tags: [module, memgate, permissions]
   - `Policy.may_carry_out` checks a carry-out into personal memory, from the carrier's current location.
   - `Policy.validate` checks the policies against the schema.
 - **Derivation** (`memgate/src/memgate/derivation.py`):
-  - `conversation_labels` gives the location plus everyone present; `personal_labels` and `personal_note_labels` cover personal memory; `personal_labels(agent, cls)` gives the class set {self:A, class:C}.
+  - `conversation_labels` gives the location plus everyone present; `personal_labels` and `personal_note_labels` cover personal memory; `personal_labels(agent, cls)` gives the class set {self:A, class:C}; `personal_labels(agent, cls, src=L)` (0.7.0) adds the source location, which every `Core.carry_out` records and the `source-seal` policy reads (`World.sealed`, [[Label and Memory Types]]). `Core.personal_sets` enumerates an agent's sets, plain, by class and by source, and `Core.describe` fills a `Listed` item's `source` and `withheld`.
   - `derived_labels` combines identity and location labels, intersects participants, and keeps the strictest class.
   - `check_merge` raises `CrossLabelSetMerge` if a merge would cross label sets.
 

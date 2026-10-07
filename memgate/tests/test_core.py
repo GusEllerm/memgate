@@ -16,7 +16,7 @@ from memgate.store import Capabilities, Hit, Item, Listed, Store
 
 class FakeStore:
     """Keeps items in a dict; answers searches with every item in the partitions, scored by order."""
-    capabilities = Capabilities(delete=True, list_by_label_set=True, stats=True)
+    capabilities = Capabilities(idempotent_replace=True, delete=True, list_by_label_set=True, stats=True)
 
     def __init__(self):
         self.items: dict[str, Item] = {}
@@ -107,7 +107,7 @@ def test_forget_is_bound_to_the_agents_own_personal_sets(mem):
     kept = mem.carry_out(ada, "kept", "fact")
     unnamed = mem.carry_out(ada, "unnamed", "fact", cls="unattributed")
     said = mem.remember(ada, "said")
-    assert write_id_label_set(kept) == personal_labels("ada").id
+    assert write_id_label_set(kept) == personal_labels("ada", src="lab").id        # a carry-out records its source
     with pytest.raises(PermissionError):
         mem.forget("bo", kept)                   # not Bo's
     with pytest.raises(PermissionError):
@@ -124,7 +124,8 @@ def test_personal_lists_every_personal_set_and_stats_cover_every_partition(mem):
     mem.remember(ada, "said")
     listed = mem.personal("ada")
     assert sorted(i.text for i in listed) == ["kept", "unnamed"]
-    assert {i.label_set for i in listed} == {personal_labels("ada").id, personal_labels("ada", "unattributed").id}
+    assert {i.label_set for i in listed} == {personal_labels("ada", src="lab").id, personal_labels("ada", "unattributed", src="lab").id}
+    assert all(i.source == "lab" and not i.withheld for i in listed)
     assert mem.personal("bo") == []
     st = mem.stats()
     assert set(st) == {"b", "b--class--unattributed", "b--ha--vault"} and st["b"]["items"] == 2 and st["b--class--unattributed"]["items"] == 1

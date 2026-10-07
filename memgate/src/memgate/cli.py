@@ -269,6 +269,33 @@ def cmd_inspect(args) -> int:
     return 0
 
 
+def cmd_attach_sources(args) -> int:
+    """Give personal items carried out before 0.7.0 their source location, from a host-supplied mapping
+    {write_id: location} (e.g. CHORUS's lineage table). Each item is re-written under {self:A, class?, src:S}
+    with the same text, as a write made at S, and the unsourced copy is forgotten. The source seal then
+    applies to it like any other carry-out."""
+    import json
+    mem = _memory(args)
+    if mem is None:
+        return 2
+    mapping = json.loads(Path(args.mapping).read_text())
+    if not isinstance(mapping, dict) or not all(isinstance(v, str) for v in mapping.values()):
+        print("the mapping must be a JSON object {write_id: location}", file=sys.stderr)
+        return 2
+    done, skipped = 0, []
+    for old_id, src in mapping.items():
+        try:
+            n = mem.attach_source(args.agent, old_id, src, dry_run=args.dry_run)
+        except (PermissionError, KeyError, ValueError) as e:
+            skipped.append(f"{old_id}: {e}")
+            continue
+        done += n
+    for line in skipped:
+        print(f"skipped {line}", file=sys.stderr)
+    print(f"{'would attach' if args.dry_run else 'attached'} sources to {done} write(s); {len(skipped)} skipped")
+    return 0 if not skipped else 1
+
+
 def cmd_forget(args) -> int:
     """Delete one item of an agent's personal memory by write ID (the owner's request, relayed by the host)."""
     mem = _memory(args)
@@ -350,12 +377,17 @@ def main(argv: list[str] | None = None) -> int:
     g.set_defaults(func=cmd_secret)
 
     for name, fn, help_ in (("inspect", cmd_inspect, "counts, timestamps and an agent's personal items (admin; never agents)"),
-                            ("forget", cmd_forget, "delete one item of an agent's personal memory by write id (hard delete)")):
+                            ("forget", cmd_forget, "delete one item of an agent's personal memory by write id (hard delete)"),
+                            ("attach-sources", cmd_attach_sources,
+                             "give pre-0.7.0 personal items their source location from a {write_id: location} JSON file (re-writes each, forgets the old copy)")):
         o = sub.add_parser(name, help=help_)
         o.add_argument("agent", nargs="?" if name == "inspect" else None)
         if name == "forget":
             o.add_argument("write_id")
             o.add_argument("--yes", action="store_true", help="confirm the hard delete")
+        elif name == "attach-sources":
+            o.add_argument("mapping", help="JSON file: {write_id: source location}")
+            o.add_argument("--dry-run", action="store_true", help="report what would be re-written, write nothing")
         else:
             o.add_argument("--json", action="store_true")
             o.add_argument("--text", action="store_true", help="show the items' text (memory text is labelled data: off by default)")

@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.7.0 (2026-10-06)
+
+The source seal. Ruled by Gus on 2026-10-06 on CHORUS's question (vault: Decision Log, 2026-10-06 rows).
+
+- **A carry-out records its source.** `carry_out` files the item under {self:A, class?, src:L}, L being
+  the Context's location (`personal_labels(agent, cls, src=)`; `src` is the fifth label kind, only beside a
+  self). Two new Cedar rules: `source-seal` withholds at recall any item whose source's environment
+  currently lets nothing out (`carry_out: []`), except in that location; `write-source` lets a sourced set
+  be written only at its source. Proved (R8, R9, W7; R6 and W5 restated) and compiled into the residual
+  filter (`sealedSrcs`). So a host that closes a tree holds everything carried out of it, observations
+  included, and releases it by opening the list again; nothing is deleted or rewritten.
+- **The owner's view** reports each item's `source` and whether it is `withheld`.
+- **Items kept before 0.7.0** have no source and are never withheld. `memgate attach-sources <agent>
+  <mapping.json>` (`Memory.attach_source`) gives them one from a `{write_id: location}` mapping, re-writing
+  each under its sourced set and forgetting the unsourced copy.
+- **Conformance** gains `held-withheld` (holds a location by rewriting the world file, sees the keepsake
+  withheld elsewhere, kept at the source, hidden by the validator, marked in the owner's view, and back
+  once released) and `held-derived` (what the store derived from it is withheld with it); both skip when
+  conformance cannot write the world file. Holding the location is visible to real agents for a few seconds,
+  so run conformance on an idle deployment.
+- **Upgrading:** servers first. A 0.6.x server refuses writes to sourced sets (it does not know `src`), so
+  carry-outs from 0.7.0 clients fail until the server is on 0.7.0; 0.6.x clients are unaffected.
+
 ## 0.6.3 (2026-10-06)
 
 - The owner's view keeps every unit of a write again. 0.6.2 de-duplicated listed items by write id to cope

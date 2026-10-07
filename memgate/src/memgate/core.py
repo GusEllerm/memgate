@@ -181,12 +181,17 @@ class Core:
         return self.provenance.record_turn(ctx.agent, ctx.location, list(ctx.participants), text, list(recalls))
 
     # -- the owner's side: forget and list ------------------------------------------------------
+    @staticmethod
+    def is_personal(labels: LabelSet, agent: str) -> bool:
+        """A personal set of `agent`: its identity alone, any class, any source; no location, no participants."""
+        return labels.selfs == {agent} and not labels.locs and not labels.withs
+
     def owned_by(self, agent: str, write_id: str) -> str:
-        """The label set a write ID was minted under, if it is one of `agent`'s personal sets (plain or any
-        class); PermissionError otherwise. A host-trusted check: the host has verified the owner."""
-        mine = {personal_labels(agent).id} | {personal_labels(agent, c).id for c in CLASSES}
+        """The label set a write ID was minted under, if it is one of `agent`'s personal sets (plain, any class,
+        any source); PermissionError otherwise. A host-trusted check: the host has verified the owner."""
         ls = write_id_label_set(write_id)
-        if ls not in mine or not re.fullmatch(rf"w_{ls}_[0-9a-f]{{16}}", write_id):
+        known = self.gate.registry.all()
+        if ls not in known or not self.is_personal(known[ls], agent) or not re.fullmatch(rf"w_{ls}_[0-9a-f]{{16}}", write_id):
             _event("refused", op="forget", agent=agent, write_id=write_id, why="not this agent's personal memory")
             raise PermissionError(f"{write_id} is not in {agent}'s personal memory")
         return ls
@@ -200,11 +205,22 @@ class Core:
         return [first, self.shared] if first not in (self.shared,) and strictest(labels.classes) else [first]
 
     def personal_sets(self, agent: str) -> list[tuple[str, str]]:
-        """An agent's personal sets that exist in the registry, as (label-set ID, partition) pairs: plain
-        first, then by class, a pair per partition that may hold the set (`partitions_holding`)."""
+        """An agent's personal sets that exist in the registry, as (label-set ID, partition) pairs: the plain
+        set first, then by class and source, a pair per partition that may hold the set (`partitions_holding`)."""
         known = self.gate.registry.all()
-        sets = [personal_labels(agent)] + [personal_labels(agent, c) for c in CLASSES]
-        return [(ls.id, part) for ls in sets if ls.id in known for part in self.partitions_holding(ls)]
+        sets = sorted((ls for ls in known.values() if self.is_personal(ls, agent)),
+                      key=lambda ls: (class_rank(strictest(ls.classes)), sorted(ls.srcs)))
+        return [(ls.id, part) for ls in sets for part in self.partitions_holding(ls)]
+
+    def describe(self, item: Listed) -> Listed:
+        """Fill the owner-view fields: where the item was carried out of, and whether that location currently
+        lets nothing out (so the item is recalled only there)."""
+        known = self.gate.registry.all()
+        labels = known.get(item.label_set)
+        if labels and labels.srcs:
+            item.source = sorted(labels.srcs)[0]
+            item.withheld = any(self.gate.world.sealed(l) for l in labels.srcs)
+        return item
 
     def partitions_of_write(self, write_id: str) -> list[str]:
         """The partitions a write ID's item may live in (its label set is in the ID), the likeliest first."""
@@ -263,7 +279,7 @@ class Memory:
         `min_class` must be met. `key` as in `remember`; a key must be unique across everything the agent
         carries out. Raises PermissionError if refused."""
         writes = self.core.plan_carry_out(ctx, memory_type, source, source_writes, cls)
-        return self._keep(ctx.agent, ctx.location, personal_labels(ctx.agent, cls), text, when,
+        return self._keep(ctx.agent, ctx.location, personal_labels(ctx.agent, cls, src=ctx.location), text, when,
                           f"carried out ({memory_type})", "carry_out", derived_from=writes, key=key)
 
     def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
@@ -299,6 +315,36 @@ class Memory:
             self.core.provenance.audit(None, "forget", agent=agent, write_id=write_id, existed=existed)
         return existed
 
+    def attach_source(self, agent: str, write_id: str, src: str, *, dry_run: bool = False) -> int:
+        """Give a personal item carried out before 0.7.0 (no source label) its source location: re-write its
+        text under {self:A, class?, src:S} as a write made at S, then forget the unsourced copy. Host-trusted,
+        like forget; needs `list_by_label_set`, `delete` and `idempotent_replace` (so a re-run after a failure
+        converges on one copy). Returns 1 if a write was (or would be) re-sourced,
+        0 if the item is already sourced or not found. Raises PermissionError for another agent's item and
+        KeyError for a location the world does not list."""
+        caps = self.store.capabilities
+        if not (caps.list_by_label_set and caps.delete and caps.idempotent_replace):
+            raise NotImplementedError("this store cannot list by label set, delete and replace idempotently")
+        ls_id = self.core.owned_by(agent, write_id)
+        labels = self.gate.registry.get(ls_id)
+        if labels.srcs:
+            return 0
+        if src not in self.gate.world.locations:
+            raise KeyError(f"unknown location {src!r}")
+        items = [i for p in self.core.partitions_holding(labels) for i in self.store.list(p, ls_id) if i.write_id == write_id and i.kind == "memory"]
+        if not items:
+            return 0
+        text = "\n".join(i.text for i in items)              # a write's units, together again
+        if dry_run:
+            return 1
+        cls = strictest(labels.classes)
+        new_labels = personal_labels(agent, cls, src=src)
+        when = datetime.fromisoformat(items[0].when + "-01") if items[0].when else None   # the month it was kept
+        self._keep(agent, src, new_labels, text, when, None, "carry_out", derived_from=[write_id], key=f"attach:{write_id}")
+        self.forget(agent, write_id)
+        _event("attach_source", agent=agent, write_id=write_id, source=src)
+        return 1
+
     def personal(self, agent: str) -> list[Listed]:
         """The owner's view: everything in `agent`'s personal sets, plain and by class, as kept. Needs
         capability `list_by_label_set`."""
@@ -307,7 +353,7 @@ class Memory:
         out: list[Listed] = []
         seen: set[str] = set()                           # write ids listed by an earlier partition
         for ls, partition in self.core.personal_sets(agent):
-            listed = [i for i in self.store.list(partition, ls) if i.write_id not in seen]
+            listed = [self.core.describe(i) for i in self.store.list(partition, ls) if i.write_id not in seen]
             out += listed                                # every unit of a write stays: one write may be several lines
             seen |= {i.write_id for i in listed}         # a store without partitions answers the same for each
         _event("personal_listed", agent=agent, items=len(out))
@@ -377,7 +423,7 @@ class AsyncMemory:
                         source_writes: list[str] = (), key: str | None = None, cls: str | None = None) -> str:
         """See `Memory.carry_out`."""
         writes = self.core.plan_carry_out(ctx, memory_type, source, source_writes, cls)
-        return await self._keep(ctx.agent, ctx.location, personal_labels(ctx.agent, cls), text, when,
+        return await self._keep(ctx.agent, ctx.location, personal_labels(ctx.agent, cls, src=ctx.location), text, when,
                                 f"carried out ({memory_type})", "carry_out", derived_from=writes, key=key)
 
     async def say(self, ctx: Context, text: str, recalls: list[str] = ()) -> str | None:
@@ -416,7 +462,7 @@ class AsyncMemory:
         out: list[Listed] = []
         seen: set[str] = set()
         for ls, partition in self.core.personal_sets(agent):
-            listed = [i for i in await self._s("list", partition, ls) if i.write_id not in seen]
+            listed = [self.core.describe(i) for i in await self._s("list", partition, ls) if i.write_id not in seen]
             out += listed
             seen |= {i.write_id for i in listed}
         return out

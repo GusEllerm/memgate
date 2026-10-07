@@ -28,11 +28,12 @@ def conversation_labels(location: str, participants: Iterable[str]) -> LabelSet:
     return LabelSet.build(locs=[location], withs=people)
 
 
-def personal_labels(agent: str, cls: str | None = None) -> LabelSet:
-    """Labels for an agent's personal memory: readable by the agent everywhere. With a class (one of
-    `labels.CLASSES`), a separate personal set, {self:A, class:C}: read exactly like {self:A}, but a
-    different label set, so the memory system never consolidates the two together."""
-    return LabelSet.build(selfs=[agent], classes=[cls] if cls else [])
+def personal_labels(agent: str, cls: str | None = None, src: str | None = None) -> LabelSet:
+    """Labels for an agent's personal memory: readable by the agent everywhere, except that a memory whose
+    source location `src` currently lets nothing out is readable only there (the source seal, 0.7.0). With
+    a class (one of `labels.CLASSES`), a separate set, {self:A, class:C}, kept apart by the store. Every
+    carry-out since 0.7.0 records its source, so each (class, source) is its own set."""
+    return LabelSet.build(selfs=[agent], classes=[cls] if cls else [], srcs=[src] if src else [])
 
 
 def personal_note_labels(agent: str, location: str) -> LabelSet:
@@ -53,7 +54,8 @@ def derived_labels(sources: Iterable[LabelSet]) -> LabelSet:
     # A derived memory is at least as strict as its strictest source (a class needs a self, which the
     # union above keeps, since a classed source always has one).
     cls = strictest(set().union(*(s.classes for s in sources)))
-    return LabelSet.build(selfs=selfs, locs=locs, withs=withs, classes=[cls] if cls else [])
+    srcs = set().union(*(s.srcs for s in sources))            # every source location: sealed if any is sealed
+    return LabelSet.build(selfs=selfs, locs=locs, withs=withs, classes=[cls] if cls else [], srcs=srcs)
 
 
 def check_merge(label_set_ids: Iterable[str]) -> str:

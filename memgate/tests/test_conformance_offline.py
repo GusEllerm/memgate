@@ -81,3 +81,42 @@ def test_every_claim_is_reported_once(world, registry):
     gate = Gate(world_for_conformance(world), registry, "s")
     checks = run(gate, memory=Memory(gate, FakeStore(), shared="x"))
     assert [c.id for c in checks] == [cid for cid, _ in CLAIMS]
+
+
+def test_the_source_seal_checks_run_when_conformance_can_write_the_world_file(world, registry, tmp_path):
+    import json
+    from memgate.context import load_world
+    from memgate.store import Listed
+    w = world_for_conformance(world)
+    path = tmp_path / "world.json"
+    path.write_text(json.dumps({
+        "environments": [{"id": e.id, **({"carry_out": sorted(e.carry_out)} if e.carry_out != frozenset(["fact", "opinion", "skill", "episode"]) else {}),
+                          **({"min_class": e.min_class} if e.min_class else {})} for e in w.environments.values()],
+        "locations": [{"id": l.id, "environment": l.environment, **({"high_assurance": True} if l.high_assurance else {})} for l in w.locations.values()],
+        "agents": sorted(w.agents),
+        "classes": [{"id": c, "consolidate": w.consolidates(c)} for c in w.classes] if getattr(w, "classes", None) else []}))
+
+    class Deriving(FakeStore):
+        """Builds one derived item per write, in the write's own label set, repeating its text."""
+        def put(self, item, *, agent, location):
+            super().put(item, agent=agent, location=location)
+            self.derived = getattr(self, "derived", {})
+            self.derived[item.write_id] = Listed(f"d_{item.write_id}", item.label_set, item.text, kind="derived", sources=[item.write_id])
+        def list(self, partition, label_set):
+            return super().list(partition, label_set) + [d for d in getattr(self, "derived", {}).values() if d.label_set == label_set]
+        def search(self, partitions, query, allowed, k, *, agent, location):
+            from memgate.store import Hit
+            hits = super().search(partitions, query, allowed, k, agent=agent, location=location)
+            return hits + [Hit(d.text, d.label_set, None, d.write_id, 0.01) for d in getattr(self, "derived", {}).values() if d.label_set in allowed]
+        def delete(self, partition, write_id):
+            getattr(self, "derived", {}).pop(write_id, None)
+            return super().delete(partition, write_id)
+
+    gate = Gate(load_world(path), registry, "s", world_path=path, check_every=0)
+    checks = by_id(run(gate, memory=Memory(gate, Deriving(), shared="production")))
+    assert checks["held-withheld"].status == "pass", checks["held-withheld"].detail
+    assert checks["held-derived"].status == "pass", checks["held-derived"].detail
+    assert json.loads(path.read_text())["environments"] == json.loads(path.read_text())["environments"]  # restored, parseable
+    assert not any(e.get("carry_out") == [] for e in json.loads(path.read_text())["environments"] if e["id"] == gate.world.locations["lab"].environment)
+    plain = Gate(load_world(path), registry, "s", world_path=path, check_every=0)
+    assert by_id(run(plain, memory=Memory(plain, FakeStore(), shared="production")))["held-derived"].status == "skip"

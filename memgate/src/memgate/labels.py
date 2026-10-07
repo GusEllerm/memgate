@@ -1,6 +1,6 @@
 """Labels and label sets.
 
-Four label kinds (docs/vault/Concepts/Label and Memory Types.md):
+Five label kinds (docs/vault/Concepts/Label and Memory Types.md):
 - self:A   identity, the owner of a personal memory; all must be held
 - loc:L    the conceptual location a memory was formed in; all must be held
 - with:X   a participant present when the memory was formed; the reader must be one of them
@@ -9,6 +9,11 @@ Four label kinds (docs/vault/Concepts/Label and Memory Types.md):
            Only alongside a self label, at most one per set, from the ordered list CLASSES. It decides
            nothing about who may read: the policies never see it. It only makes a separate label set,
            so the memory system keeps the class apart.
+- src:S    (since 0.7.0) the location a personal memory was carried out of. Only alongside a self label.
+           The policies read it: while S's environment lets nothing out (carry_out: []), a memory carried
+           from S is recalled only in S (the source seal), evaluated against the world as it stands, so
+           holding a location withholds at once and releasing it releases again. A separate label set
+           per source also keeps the store from consolidating across locations.
 
 A label set is the full set of labels on a memory. Its ID is content-addressed, so every store
 and process agrees on it without coordination, and a memory system only ever sees the opaque ID.
@@ -20,8 +25,8 @@ import hashlib
 from dataclasses import dataclass
 from typing import Iterable, Literal
 
-Kind = Literal["self", "loc", "with", "class"]
-KINDS: tuple[Kind, ...] = ("self", "loc", "with", "class")
+Kind = Literal["self", "loc", "with", "class", "src"]
+KINDS: tuple[Kind, ...] = ("self", "loc", "with", "class", "src")
 
 # Classes of personal memory, least strict first. A memory never moves to a less strict class
 # (the client refuses that carry-out), and an environment may set a minimum (World.min_class).
@@ -78,6 +83,8 @@ class LabelSet:
             raise ValueError(f"a class label needs a self label beside it: {sorted(str(l) for l in self.labels)}")
         if len(classes) > 1:
             raise ValueError(f"at most one class per label set: {sorted(str(l) for l in classes)}")
+        if any(l.kind == "src" for l in self.labels) and not any(l.kind == "self" for l in self.labels):
+            raise ValueError(f"a source label needs a self label beside it: {sorted(str(l) for l in self.labels)}")
 
     @classmethod
     def of(cls, labels: Iterable[Label | str]) -> "LabelSet":
@@ -85,9 +92,9 @@ class LabelSet:
 
     @classmethod
     def build(cls, *, selfs: Iterable[str] = (), locs: Iterable[str] = (), withs: Iterable[str] = (),
-              classes: Iterable[str] = ()) -> "LabelSet":
+              classes: Iterable[str] = (), srcs: Iterable[str] = ()) -> "LabelSet":
         return cls.of([Label("self", v) for v in selfs] + [Label("loc", v) for v in locs] + [Label("with", v) for v in withs]
-                      + [Label("class", v) for v in classes])
+                      + [Label("class", v) for v in classes] + [Label("src", v) for v in srcs])
 
     def values(self, kind: Kind) -> frozenset[str]:
         return frozenset(l.value for l in self.labels if l.kind == kind)
@@ -107,6 +114,10 @@ class LabelSet:
     @property
     def classes(self) -> frozenset[str]:
         return self.values("class")
+
+    @property
+    def srcs(self) -> frozenset[str]:
+        return self.values("src")
 
     @property
     def key(self) -> str:

@@ -46,8 +46,9 @@ class AttrSet:
 class Compiler:
     def __init__(self, world: World):
         ha = tuple(sorted(l.id for l in world.locations.values() if l.high_assurance))
+        sealed = tuple(sorted(l for l in world.locations if world.sealed(l)))
         self.attrs = {"selfs": AttrSet("self"), "locs": AttrSet("loc"), "withs": AttrSet("with"),
-                      "haLocs": AttrSet("loc", ha)}
+                      "haLocs": AttrSet("loc", ha), "srcs": AttrSet("src"), "sealedSrcs": AttrSet("src", sealed)}
 
     # -- operands ------------------------------------------------------------------------------------
     def _attr(self, node) -> AttrSet | None:
