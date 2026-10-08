@@ -76,14 +76,15 @@ class Core:
         return [self.shared] + self.class_partitions() + \
             [partition_key(self.shared, l) for l in sorted(w.locations) if w.high_assurance(l)]
 
-    def partition_for(self, labels: LabelSet) -> str:
+    def partition_for(self, labels: LabelSet, world=None) -> str:
         """Where a memory with these labels is kept: its high-assurance location's partition, else its
-        non-consolidating class's, else the shared one."""
-        ha = sorted(l for l in labels.locs if self.gate.world.high_assurance(l))
+        non-consolidating class's, else the shared one. With `world`, routed by that snapshot."""
+        w = self.gate.world if world is None else world
+        ha = sorted(l for l in labels.locs if w.high_assurance(l))
         if ha:
             return partition_key(self.shared, ha[0])
         cls = strictest(labels.classes)
-        if cls and not self.gate.world.consolidates(cls):
+        if cls and not w.consolidates(cls):
             return class_bank(self.shared, cls)
         return self.shared
 
@@ -100,12 +101,17 @@ class Core:
         """Check and label a write. Raises PermissionError. With a `key`, the write ID is derived from it
         (see `write_id_for`), so the same key under the same label set re-sent replaces the earlier write
         in a store with idempotent replace."""
-        if not self.gate.policy.may_write(agent, location, labels):
+        w = self.gate.world                  # one world for the decision and the routing: a reload in between could
+        unlisted = sorted(labels.locs - set(w.locations))   # otherwise send a high-assurance write to the shared partition
+        if unlisted:
+            _event("refused", op="write", agent=agent, location=location, label_set=labels.id, why="unlisted location")
+            raise PermissionError(f"{labels} names a location the world doesn't list: {unlisted}")
+        if not self.gate.policy.may_write(agent, location, labels, world=w):
             _event("refused", op="write", agent=agent, location=location, label_set=labels.id, why="policy")
             raise PermissionError(f"{agent} may not write {labels} at {location}")
         ls_id = self.gate.registry.register(labels)
-        return Item(text=text, label_set=ls_id, write_id=write_id_for(ls_id, key), partition=self.partition_for(labels),
-                    when=when, about=about, consolidate=self.gate.world.consolidates(strictest(labels.classes)))
+        return Item(text=text, label_set=ls_id, write_id=write_id_for(ls_id, key), partition=self.partition_for(labels, w),
+                    when=when, about=about, consolidate=w.consolidates(strictest(labels.classes)))
 
     def record_write(self, agent: str, location: str, item: Item, kind: str, turns=(), derived_from=()) -> None:
         _event("write", kind=kind, agent=agent, location=location, label_set=item.label_set, write_id=item.write_id,

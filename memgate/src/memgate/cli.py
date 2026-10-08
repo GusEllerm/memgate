@@ -57,10 +57,12 @@ def redact_db_url(url: str) -> str:
 
 
 def cmd_check_world(args) -> int:
-    from memgate.worldcheck import check_world_file
+    from memgate.worldcheck import check_world_file, world_file_warnings
     errors = check_world_file(args.world)
     for e in errors:
         print(f"error: {e}")
+    for w in ([] if errors else world_file_warnings(args.world)):
+        print(f"warning: {w}")
     if not errors:
         from memgate.context import load_world
         w = load_world(args.world)
@@ -81,6 +83,9 @@ def cmd_serve(args) -> int:
     if errors:
         print("the world file has problems (memgate check-world):\n  " + "\n  ".join(errors), file=sys.stderr)
         return 1
+    from memgate.worldcheck import world_file_warnings
+    for w in world_file_warnings(world):
+        print(f"memgate: {w} (the server follows the world file and picks it up when it changes)", file=sys.stderr)
     if _secret_in_query(args.db):
         print("refusing a database URL with a password in its query (e.g. ?password=...): Hindsight 0.10.1 logs "
               "the query in clear at startup. Put the password in the user part instead "

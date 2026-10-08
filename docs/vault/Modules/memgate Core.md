@@ -42,7 +42,7 @@ tags: [module, memgate, permissions]
     3. The result is cached per agent and location, keyed on `World.fingerprint`, and later calls check only label sets registered since.
     4. `memgate/tests/test_residual.py` checks the compiled answer against Cedar's exact answer for every agent and location in 300 random worlds, with and without an over-broad grant.
   - `Policy.may_write` decides every write (agent, location, label set); memgate's client and the validator both call it.
-  - Every decision fails closed on an agent or location the world doesn't list (`Policy._known`): Cedar skips a policy that errors, and a skipped forbid would allow.
+  - Every decision fails closed on an agent or location the world doesn't list (`Policy._known`): Cedar skips a policy that errors, and a skipped forbid would allow. Since 0.8.2 each decision reads the world once and decides with that snapshot (`Policy.may_write(..., world=)`), `Core.plan_write` routes the write with the same snapshot and refuses a label set naming an unlisted location, and `World.high_assurance` is False for an unlisted location (a refusal, not a KeyError), so a fresh deployment's empty world and a tree removed from the world both give clean refusals.
 - **Deployment** (`Gate` in `memgate/src/memgate/context.py`): the world, registry and secret. Given the world file's path, `Gate.refresh` reloads it when it changes (checked at most once a second), so a running simulation can change agents, locations and environments without a restart; an unreadable file keeps the last good world.
   - `Policy.may_carry_out` checks a carry-out into personal memory, from the carrier's current location.
   - `Policy.validate` checks the policies against the schema.

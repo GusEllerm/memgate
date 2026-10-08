@@ -23,5 +23,11 @@ def test_each_mistake_is_reported():
         assert expected in errors, expected
 
 
-def test_empty_worlds_are_refused():
-    assert check_world({}) and check_world([]) and check_world({"environments": [], "locations": [], "agents": []})
+def test_malformed_worlds_are_refused_but_an_empty_one_is_valid():
+    """0.8.2: a well-formed world that lists nothing yet is valid (a fresh deployment starts on it), with warnings;
+    a world that is not an object, or lacks one of the three lists, is still refused."""
+    from memgate.worldcheck import world_warnings
+    assert check_world({}) and check_world([]) and check_world({"locations": [], "agents": []})
+    empty = {"environments": [], "locations": [], "agents": []}
+    assert check_world(empty) == [] and len(world_warnings(empty)) == 2
+    assert world_warnings({"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["a"]}) == []

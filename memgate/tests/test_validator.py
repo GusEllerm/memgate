@@ -427,3 +427,18 @@ def test_events_are_json_without_text(validator, capsys):
     events = [json.loads(l) for l in out.splitlines() if l.startswith("{")]
     assert [e["event"] for e in events][-2:] == ["write", "recall"]
     assert "EMBER" not in out and "kiln" not in out
+
+
+def test_retain_refuses_a_label_set_naming_a_location_the_world_no_longer_lists_for_every_role(validator, tmp_path):
+    """0.8.2: with a location removed from the server's world, a write under a label set that names it is refused,
+    the admin role included; routing such a write would otherwise skip the high-assurance partition rule."""
+    import os
+    from memgate.derivation import conversation_labels
+    vault_set = conversation_labels("vault", ["ada", "bo"])
+    assert retain(validator, f"{BANK}--ha--vault", vault_set, agent="ada", location="vault").allowed
+    world = json.loads(open(os.environ["MEMGATE_WORLD"]).read())
+    world["locations"] = [l for l in world["locations"] if l["id"] != "vault"]
+    (tmp_path / "world.json").write_text(json.dumps(world))
+    validator.gate.refresh(force=True)
+    assert not retain(validator, BANK, vault_set, role="admin").allowed
+    assert not retain(validator, BANK, vault_set, agent="ada", location="lab").allowed

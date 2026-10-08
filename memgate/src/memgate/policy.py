@@ -37,35 +37,37 @@ class Policy:
         # (agent, location) -> (world fingerprint, compiled filter, allowed IDs, newest registry row seen)
         self._cache: dict[tuple[str, str], tuple] = {}
 
-    def _known(self, agent: str, location: str) -> bool:
+    def _known(self, agent: str, location: str, w: World | None = None) -> bool:
         """Fail closed: decide nothing about an agent or location the world doesn't list.
 
         Cedar skips a policy whose evaluation errors, and a skipped forbid allows. A location missing
         from the world has no entity, so the high-assurance write seal would error and be skipped.
         The proofs assume every agent and location in a request exists; this makes that true."""
-        return agent in self.world.agents and location in self.world.locations
+        w = self.world if w is None else w
+        return agent in w.agents and location in w.locations
 
     def validate(self) -> list[str]:
         result = cedarpy.validate_policies(self.policies, self.schema)
         return [str(e) for e in result.errors]
 
-    def _label_set_entity(self, id_: str, ls: LabelSet) -> dict:
+    def _label_set_entity(self, id_: str, ls: LabelSet, w: World | None = None) -> dict:
+        w = self.world if w is None else w
         return {
             "uid": {"type": "LabelSet", "id": id_},
             "attrs": {
                 "selfs": [_uid("Agent", a) for a in sorted(ls.selfs)],
                 "locs": [_uid("Location", l) for l in sorted(ls.locs)],
                 "withs": [_uid("Agent", a) for a in sorted(ls.withs)],
-                "haLocs": [_uid("Location", l) for l in sorted(ls.locs) if self.world.high_assurance(l)],
-                "carryTypes": sorted(self.world.carry_out_types(ls.locs)),
+                "haLocs": [_uid("Location", l) for l in sorted(ls.locs) if w.high_assurance(l)],
+                "carryTypes": sorted(w.carry_out_types(ls.locs)),
                 "srcs": [_uid("Location", l) for l in sorted(ls.srcs)],
-                "sealedSrcs": [_uid("Location", l) for l in sorted(ls.srcs) if self.world.sealed(l)],
+                "sealedSrcs": [_uid("Location", l) for l in sorted(ls.srcs) if w.sealed(l)],
             },
             "parents": [],
         }
 
-    def _entities(self, label_sets: dict[str, LabelSet]) -> list[dict]:
-        w = self.world
+    def _entities(self, label_sets: dict[str, LabelSet], w: World | None = None) -> list[dict]:
+        w = self.world if w is None else w
         agents = set(w.agents) | {a for ls in label_sets.values() for a in ls.selfs | ls.withs}
         # A source location the world no longer lists still names an entity, so the policies never error on it.
         extra_locs = {l for ls in label_sets.values() for l in ls.srcs} - set(w.locations)
@@ -78,46 +80,49 @@ class Policy:
             ents.append({"uid": {"type": "Environment", "id": "∅"}, "attrs": {}, "parents": []})
             ents += [{"uid": {"type": "Location", "id": l}, "attrs": {"highAssurance": False, "environment": _uid("Environment", "∅")},
                       "parents": []} for l in sorted(extra_locs)]
-        ents += [self._label_set_entity(i, ls) for i, ls in label_sets.items()]
+        ents += [self._label_set_entity(i, ls, w) for i, ls in label_sets.items()]
         return ents
 
-    def _residual_where(self, agent: str, location: str) -> tuple[str, list]:
+    def _residual_where(self, agent: str, location: str, w: World | None = None) -> tuple[str, list]:
+        w = self.world if w is None else w
         request = {"principal": _ref("Agent", agent), "action": _ref("Action", "read"), "resource": None,
                    "context": {"location": _uid("Location", location)}}
-        result = cedarpy.is_authorized_partial(request, self.policies, self._entities({}), self.schema)
+        result = cedarpy.is_authorized_partial(request, self.policies, self._entities({}, w), self.schema)
         if result.diagnostics.errors:
             raise Unsupported("partial evaluation reported errors")
         if result.decision == cedarpy.Decision.Allow:      # decided without looking at the label set
             return "TRUE", []
         if result.decision == cedarpy.Decision.Deny:
             return "FALSE", []
-        return Compiler(self.world).where(result.residuals)
+        return Compiler(w).where(result.residuals)
 
     def allowed_ids(self, agent: str, location: str) -> set[str]:
         """Label sets `agent` may read at `location`, via the compiled residual (exact fallback).
 
         Cached per (agent, location): the registry only grows, so a repeat call checks only label sets
         registered since the last one. A change to the world invalidates the cache."""
-        if not self._known(agent, location):
+        w = self.world                                     # one world for the whole decision
+        if not self._known(agent, location, w):
             return set()
-        key, fp = (agent, location), self.world.fingerprint()
+        key, fp = (agent, location), w.fingerprint()
         cached = self._cache.get(key)
         if cached and cached[0] == fp:
             _, where, params, allowed, newest = cached
         else:
             try:
-                where, params = self._residual_where(agent, location)
+                where, params = self._residual_where(agent, location, w)
             except Unsupported:
-                return self.allowed_ids_exact(agent, location)
+                return self.allowed_ids_exact(agent, location, w)
             allowed, newest = set(), 0
         new, newest = self.registry.select_ids(where, params, after=newest)
         allowed = allowed | new
         self._cache[key] = (fp, where, params, allowed, newest)
         return set(allowed)
 
-    def allowed_ids_exact(self, agent: str, location: str) -> set[str]:
+    def allowed_ids_exact(self, agent: str, location: str, w: World | None = None) -> set[str]:
         """Check every registered label set with Cedar (the reference answer)."""
-        if not self._known(agent, location):
+        w = self.world if w is None else w
+        if not self._known(agent, location, w):
             return set()
         label_sets = self.registry.all()
         if not label_sets:
@@ -125,22 +130,25 @@ class Policy:
         requests = [{"principal": _ref("Agent", agent), "action": _ref("Action", "read"),
                      "resource": _ref("LabelSet", i), "context": {"location": _uid("Location", location)}}
                     for i in label_sets]
-        results = cedarpy.is_authorized_batch(requests, self.policies, self._entities(label_sets), self.schema)
+        results = cedarpy.is_authorized_batch(requests, self.policies, self._entities(label_sets, w), self.schema)
         return {i for i, r in zip(label_sets, results) if r.allowed}
 
-    def may_write(self, agent: str, location: str, labels: LabelSet) -> bool:
-        """May `agent`, at `location`, store a memory under `labels`?"""
-        if not self._known(agent, location):
+    def may_write(self, agent: str, location: str, labels: LabelSet, world: World | None = None) -> bool:
+        """May `agent`, at `location`, store a memory under `labels`? Decided with `world` when given (the caller's
+        snapshot, so the decision and the write's routing see the same world), else the current one."""
+        w = self.world if world is None else world
+        if not self._known(agent, location, w):
             return False
         request = {"principal": _ref("Agent", agent), "action": _ref("Action", "write"),
                    "resource": _ref("LabelSet", labels.id), "context": {"location": _uid("Location", location)}}
-        return cedarpy.is_authorized(request, self.policies, self._entities({labels.id: labels}), self.schema).allowed
+        return cedarpy.is_authorized(request, self.policies, self._entities({labels.id: labels}, w), self.schema).allowed
 
-    def may_carry_out(self, agent: str, location: str, source: LabelSet, memory_type: str) -> bool:
+    def may_carry_out(self, agent: str, location: str, source: LabelSet, memory_type: str, world: World | None = None) -> bool:
         """May `agent`, at `location`, carry a `memory_type` formed under `source` into personal memory?"""
-        if not self._known(agent, location):
+        w = self.world if world is None else world
+        if not self._known(agent, location, w):
             return False
         request = {"principal": _ref("Agent", agent), "action": _ref("Action", "writePersonal"),
                    "resource": _ref("LabelSet", source.id),
                    "context": {"memoryType": memory_type, "location": _uid("Location", location)}}
-        return cedarpy.is_authorized(request, self.policies, self._entities({source.id: source}), self.schema).allowed
+        return cedarpy.is_authorized(request, self.policies, self._entities({source.id: source}, w), self.schema).allowed

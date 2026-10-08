@@ -43,6 +43,7 @@ UNATTRIBUTED = CLASSES[0]
 
 CLAIMS = [
     ("secret", "A request without memgate's secret is refused (the validator is loaded and keyed)"),
+    ("unlisted-refused", "An agent and location the world doesn't list are refused: no write is stored, by either lock, and recall returns nothing"),
     ("side-doors", "Reflect, memory listing and document reads are refused to agents"),
     ("witness", "A participant recalls a conversation in its location"),
     ("non-witness", "An agent who wasn't there cannot recall it, even in the same location"),
@@ -162,7 +163,32 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
         if probes:
             status, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall", {"query": "x"}, {})
             ok("secret", status == 403, f"status {status}")
+        # Fail closed on ids the world doesn't list (0.8.2): runs on any world, the empty one included, so a
+        # deployment that starts before the host has created anything is checked too.
+        # Fixed ids, so the label set this registers is one row however often conformance runs.
+        ghost, nowhere = "memgate-conformance-unlisted-agent", "memgate-conformance-unlisted-location"
+        while ghost in w.agents or nowhere in w.locations:
+            ghost, nowhere = ghost + "-", nowhere + "-"
+        ghost_ctx = Context(ghost, nowhere, (ghost,))
+        try:
+            keep(mem.remember(ghost_ctx, "an unlisted agent's write"))
+            client_refused = False
+        except PermissionError:
+            client_refused = True
+        recalled = mem.recall(ghost_ctx, "unlisted agent", k=5)
+        validator_write, validator_recall = None, None
+        if probes:
+            ghost_ls = gate.registry.register(ghost_ctx.conversation())     # registered, so only the policy refuses it
+            validator_write, _ = _raw(url, "POST", f"/v1/default/banks/{bank}/memories",
+                                      {"items": [{"content": "an unlisted agent's write", "tags": [ghost_ls]}]}, as_(ghost, nowhere))
+            validator_recall, body = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall",
+                                          {"query": "unlisted agent", "tags": [ghost_ls], "tags_match": "any"}, as_(ghost, nowhere))
+            validator_recall = validator_recall if validator_recall != 200 or "unlisted agent's write" not in body else -1
+        unlisted_writes = (client_refused and len(recalled) == 0 and validator_write in (None, 403) and validator_recall in (None, 200, 403),
+                           f"client refused the write {client_refused}" + (f", validator write {validator_write}" if probes else ""))
         if len(agents) < 3 or not ordinary:
+            ok("unlisted-refused", unlisted_writes[0], unlisted_writes[1] + "; the recall half needs a stored canary, so a world "
+               "with at least three agents and one ordinary location")
             for c in checks.values():
                 if c.status == "skip" and not c.detail:
                     c.detail = "the world needs at least three agents and one ordinary location"
@@ -208,6 +234,18 @@ def run(gate: Gate, url: str | None = None, wait_s: float = 900, partition_url: 
             s3, _ = _raw(url, "GET", f"/v1/default/banks/{bank}/documents", None, as_(a, l1))
             ok("side-doors", {s1, s2, s3} == {403}, f"reflect {s1}, list {s2}, documents {s3}")
 
+        # The recall half of unlisted-refused, now that a canary is stored: an unlisted agent at the canary's location,
+        # and a participant at an unlisted location, recall nothing of it, from either lock.
+        leaks = [f"{who}@{where}" for who, where in ((ghost, l1), (a, nowhere)) if sees(who, where, codes["conv"])]
+        if probes:
+            conv_tag = gate.registry.register(here.conversation())
+            for who, where in ((ghost, l1), (a, nowhere)):
+                status, body = _raw(url, "POST", f"/v1/default/banks/{bank}/memories/recall",
+                                    {"query": "conformance canary code", "tags": [conv_tag], "tags_match": "any"}, as_(who, where))
+                if status == 200 and codes["conv"] in body:
+                    leaks.append(f"validator {who}@{where}")
+        ok("unlisted-refused", unlisted_writes[0] and not leaks,
+           unlisted_writes[1] + f"; recall of a stored canary by an unlisted agent or at an unlisted location: {leaks or 'nothing'}")
         ok("witness", sees(a, l1, codes["conv"]))
         ok("non-witness", not sees(c, l1, codes["conv"]))
         if l2:

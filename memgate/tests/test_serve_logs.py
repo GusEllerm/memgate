@@ -138,3 +138,77 @@ def test_conformance_over_a_unix_socket():
         except subprocess.TimeoutExpired:
             proc.kill()
         shutil.rmtree(base, ignore_errors=True)
+
+
+def test_serve_starts_on_an_empty_world_and_follows_it_when_it_fills():
+    """0.8.2: a fresh deployment writes a world that lists no locations and no agents. serve starts on it and is
+    healthy, refuses an unlisted agent by both locks, and picks up the populated world when the host rewrites the
+    file, with no restart. No LLM: Hindsight runs without extraction (provider none)."""
+    import json
+    import shutil
+    import tempfile
+    import time
+    from memgate.adapters.hindsight import HindsightMemory
+    from memgate.adapters.hindsight.client import send
+    from memgate.conformance import run
+    from memgate.context import Context, Gate, load_world
+    from memgate.registry import Registry
+    base = tempfile.mkdtemp(prefix="mge", dir="/tmp")
+    world = os.path.join(base, "world.json")
+    spec = {"agents": [], "locations": [], "environments": [{"id": "open"}], "classes": [{"id": "unattributed", "consolidate": False}]}
+
+    def write_world():
+        tmp = world + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump(spec, f)
+        os.replace(tmp, world)
+    write_world()
+    registry = os.path.join(base, "registry.sqlite")
+    env = dict(os.environ, MEMGATE_WORLD=world, MEMGATE_REGISTRY=registry, MEMGATE_SECRET="empty-secret",
+               MEMGATE_DB=f"pg0://memgate-emptyworld-{os.getpid()}", MEMGATE_LLM_PROVIDER="none", MEMGATE_LLM_API_KEY="none",
+               MEMGATE_WORLD_CHECK_S="0.5")
+    memgate = Path(sys.executable).parent / "memgate"
+    sock = os.path.join(base, "run", "memgate.sock")
+    proc = subprocess.Popen([str(memgate), "serve", "--socket", sock], cwd=base, env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    try:
+        for _ in range(240):
+            if os.path.exists(sock):
+                break
+            if proc.poll() is not None:
+                pytest.fail("serve exited on an empty world: " + proc.stdout.read()[-2000:])
+            time.sleep(1)
+        else:
+            pytest.fail("no socket")
+        time.sleep(3)
+        status, _ = send(f"unix:{sock}", "GET", "/health", None, {}, 10)
+        assert status == 200
+        gate = Gate(load_world(world), Registry(registry), "empty-secret", world_path=world, check_every=0.5)
+        checks = {c.id: c for c in run(gate, f"unix:{sock}", wait_s=60)}
+        assert checks["secret"].status == "pass" and checks["unlisted-refused"].status == "pass", checks["unlisted-refused"].detail
+        assert not [c.id for c in checks.values() if c.status == "fail"]
+        mem = HindsightMemory(gate, bank="emptyworld", base_url=f"unix:{sock}", check_version=True)
+        with pytest.raises(PermissionError):
+            mem.remember(Context("ada", "lab", ("ada",)), "too early")
+        spec.update(locations=[{"id": "lab", "environment": "open"}], agents=["ada"])   # the host plants the first tree
+        write_world()
+        deadline, stored = time.time() + 30, None
+        while time.time() < deadline and stored is None:
+            try:
+                stored = mem.remember(Context("ada", "lab", ("ada",)), "the first tree's first memory is kiln nine")
+            except PermissionError:
+                time.sleep(0.5)
+        assert stored, "the populated world was not picked up"
+        deadline = time.time() + 120
+        while mem.pending_operations() and time.time() < deadline:
+            time.sleep(1)
+        assert any("kiln nine" in r.text for r in mem.recall(Context("ada", "lab", ("ada",)), "kiln nine"))
+        assert proc.poll() is None                                                        # never restarted
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        shutil.rmtree(base, ignore_errors=True)
+        shutil.rmtree(Path.home() / ".pg0" / "instances" / f"memgate-emptyworld-{os.getpid()}", ignore_errors=True)   # ~50 MB each

@@ -44,8 +44,8 @@ Do not guess these. Ask the owner, give a recommendation, and record the answers
 
 ## 4. Deploy
 
-- Install the pinned release named in `INTEGRATION.md`'s install lines (v0.8.1 at the time of writing; pin by tag or by commit hash), as two installs:
-  - the server, in its own environment: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.8.1#subdirectory=memgate"`;
+- Install the pinned release named in `INTEGRATION.md`'s install lines (v0.8.2 at the time of writing; pin by tag or by commit hash), as two installs:
+  - the server, in its own environment: `pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.8.2#subdirectory=memgate"`;
   - the client, in the host: the same URL without `[hindsight]`, with `[async]` if the host is asyncio (`AsyncHindsightMemory`), otherwise use the sync client in `asyncio.to_thread`.
 - If high-assurance locations should be isolated on their own server, run a second `memgate serve --scope partitions` beside one with `--scope shared`, and pass `partition_url=` to the client. See the guide.
 - Generate the secret with `memgate secret` and store it where only the host can read it. Never put it where an agent process can see it.

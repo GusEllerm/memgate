@@ -30,7 +30,7 @@ memgate trusts the **Context** it is given. It cannot know where an agent really
 
 1. **The host builds every Context from verified facts.** An agent never supplies its own agent id, location or participants. If agents run as separate processes, the host must verify the caller's identity (per-agent credentials) and take location and participants from its own simulation state. A common design is a short-lived context token signed by the host and bound to the agent's credential, reissued whenever the agent moves.
 2. **Agents never reach memgate or the memory store directly.** memgate runs inside a host-controlled service. The shared secret (`MEMGATE_SECRET`) and the memory store's port (loopback by default) are out of agents' reach. An agent that can read the secret can impersonate anyone.
-3. **The world file mirrors the host's world.** Every agent, location and environment the host uses must be listed before it is used. Unlisted ones are refused. Regenerate the file when the world changes. Write it to a temporary name and rename it, so memgate never reads a half-written file. memgate picks up changes within a second, with no restart.
+3. **The world file mirrors the host's world.** Every agent, location and environment the host uses must be listed before it is used. Unlisted ones are refused. Regenerate the file when the world changes. Write it to a temporary name and rename it, so memgate never reads a half-written file. memgate picks up changes within a second, with no restart. A world that lists no locations or agents yet is valid (0.8.2): a fresh deployment's `memgate serve` starts on it and reports healthy, every memory call is refused until the world lists the agent and the location, and the server and client pick up the populated world when the host rewrites the file, with no restart.
 4. **The host clears or seals an agent's working context when it leaves a location,** above all a high-assurance one. memgate filters what an agent can *recall*. What is already in its prompt or scratchpad goes with it unless the host drops it.
 5. **The host scopes tools by the same labels.** Files, databases, messages, code execution and web access are all ways to move information that memgate never sees. Give storage the location's labels. Turn off outbound tools inside high-assurance locations.
 6. **Logs, traces and transcripts are labelled data.** Store them per high-assurance partition, as memgate does for its own provenance.
@@ -71,9 +71,9 @@ Ids are free strings, except that `--ha--` is reserved.
 
 ```sh
 # the server side: memgate with the Hindsight version its validator is tested against (its own environment)
-pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.8.1#subdirectory=memgate"
+pip install "memgate[hindsight] @ git+https://github.com/GusEllerm/memgate@v0.8.2#subdirectory=memgate"
 # the host side: the client only (cedarpy is its one dependency); add [async] for AsyncHindsightMemory (httpx)
-pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.8.1#subdirectory=memgate"
+pip install "memgate[async] @ git+https://github.com/GusEllerm/memgate@v0.8.2#subdirectory=memgate"
 
 export MEMGATE_WORLD=/srv/host/world.json
 export MEMGATE_REGISTRY=/srv/host/memgate/registry.sqlite     # label-set registry, shared by both sides: a SQLite path, or postgresql://... (0.6.0)
@@ -173,7 +173,7 @@ memgate's decisions live in `memgate.core` and know nothing about the store; a s
 ## Verify
 
 1. `memgate check-world world.json`: the host's world file is usable.
-2. `memgate conformance --url unix:/path/to/memgate.sock` (or an `http://` address), with the same `MEMGATE_*` settings as the server; add `--partition-url` for a split deployment. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal, since 0.7.0 the source seal, and since 0.8.0 the location's view and purge), then deletes the bank. The source-seal checks hold one ordinary location by rewriting the world file (`MEMGATE_WORLD`, which conformance must be able to write and the server must follow): for a few seconds, carry-outs from that location are refused and what real agents carried out of it is withheld, then only that environment's `carry_out` is put back. Run it on an idle deployment, or let the checks skip by making the file read-only to conformance. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
+2. `memgate conformance --url unix:/path/to/memgate.sock` (or an `http://` address), with the same `MEMGATE_*` settings as the server; add `--partition-url` for a split deployment. This plants canaries in a throwaway bank, checks every rule against the live deployment (validator present, witnesses, elsewhere, forged tags, write rules, carry-out, high assurance and its partition and seal, since 0.7.0 the source seal, since 0.8.0 the location's view and purge, and since 0.8.2 that an agent and location the world doesn't list are refused, which runs on any world, an empty one included), then deletes the bank. The source-seal checks hold one ordinary location by rewriting the world file (`MEMGATE_WORLD`, which conformance must be able to write and the server must follow): for a few seconds, carry-outs from that location are refused and what real agents carried out of it is withheld, then only that environment's `carry_out` is put back. Run it on an idle deployment, or let the checks skip by making the file read-only to conformance. It adapts to the host's world and skips checks the world has no place for. It exits non-zero on any failure. Run it after every deployment change.
 3. **Host-level tests memgate can't do for you:**
    - an agent's Context changes when it moves;
    - participants match who is really present;
@@ -188,7 +188,7 @@ memgate's decisions live in `memgate.core` and know nothing about the store; a s
 - turning on Hindsight's reflect or mental models: both blend a whole bank, and the validator refuses them;
 - disabling a failing conformance check.
 
-## Limits (0.8.1)
+## Limits (0.8.2)
 
 - **Two memory systems:** Hindsight 0.10.1 (pinned; the only store with a second lock) and Mem0 2.2 (client-side enforcement only). Another store is a `Store` implementation.
 - **Python:** 3.11 to 3.14 for the client (tested on 3.12 and 3.14 in CI); the server runs on 3.12, which Hindsight's stack is tested with.

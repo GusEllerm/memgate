@@ -78,7 +78,10 @@ class World:
                 tuple(sorted((c.id, c.consolidate) for c in self.classes.values())))
 
     def high_assurance(self, loc: str) -> bool:
-        return self.locations[loc].high_assurance
+        """Whether `loc` is a high-assurance location. False for a location the world doesn't list (0.8.2): every
+        decision about such a location is already refused (`Policy._known`), and a label set that names one (a
+        tree since removed, or a world reloaded mid-write) must give a refusal, not a KeyError."""
+        return loc in self.locations and self.locations[loc].high_assurance
 
     def sealed(self, loc: str) -> bool:
         """Whether `loc`'s environment currently lets nothing out (carry_out: []): nothing is carried out of it,
@@ -89,6 +92,8 @@ class World:
         """Memory types every one of these locations lets out; all types when there are none."""
         allowed = MEMORY_TYPES
         for loc in locs:
+            if loc not in self.locations:
+                return frozenset()                         # fail closed: nothing leaves a location the world doesn't list
             allowed = allowed & self.environments[self.locations[loc].environment].carry_out
         return allowed
 

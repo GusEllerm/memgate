@@ -23,6 +23,9 @@ def check_world(spec) -> list[str]:
     unknown = set(spec) - {"environments", "locations", "agents", "classes"}
     if unknown:
         errors.append(f"unknown top-level keys: {sorted(unknown)}")
+    missing = [k for k in ("environments", "locations", "agents") if k not in spec]
+    if missing:                                            # present, though they may be empty lists (0.8.2)
+        errors.append(f"missing top-level keys: {missing} (each a list, empty if there are none yet)")
 
     def ids(kind: str, items) -> list[str]:
         out = []
@@ -81,11 +84,22 @@ def check_world(spec) -> list[str]:
             errors.append(f"class {c['id']!r}: unknown keys {sorted(set(c) - {'id', 'consolidate'})}")
     if "classes" in spec and not isinstance(spec["classes"], list):
         errors.append("classes must be a list")
-    if not spec.get("locations"):
-        errors.append("the world has no locations")
-    if not spec.get("agents"):
-        errors.append("the world has no agents")
     return errors
+
+
+def world_warnings(spec) -> list[str]:
+    """What is legal but worth saying (0.8.2): a world that lists no locations or no agents is valid, so a
+    fresh deployment can start before the host has created any (every memory call is refused until the
+    world lists the agent and the location, as for any id the world doesn't list), and the server picks
+    up the populated world when the host rewrites the file, with no restart."""
+    if not isinstance(spec, dict):
+        return []
+    out = []
+    if not spec.get("locations"):
+        out.append("the world lists no locations yet: every memory call is refused until it lists one")
+    if not spec.get("agents"):
+        out.append("the world lists no agents yet: every memory call is refused until it lists one")
+    return out
 
 
 def check_world_file(path: str | Path) -> list[str]:
@@ -94,3 +108,11 @@ def check_world_file(path: str | Path) -> list[str]:
     except (OSError, ValueError) as e:
         return [f"cannot read {path}: {e}"]
     return check_world(spec)
+
+
+def world_file_warnings(path: str | Path) -> list[str]:
+    """`world_warnings` for a file; nothing if it does not parse (check_world_file reports that)."""
+    try:
+        return world_warnings(json.loads(Path(path).read_text()))
+    except (OSError, ValueError):
+        return []

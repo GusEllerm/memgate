@@ -244,7 +244,8 @@ class MemgateValidator(OperationValidatorExtension):
         if (why := self._out_of_scope(ctx.bank_id)):
             return ValidationResult.reject(why)
         known = self.gate.registry.all()
-        part = partition_location(ctx.bank_id, self.gate.world)
+        w = self.gate.world                       # one world for the whole request, as the client does
+        part = partition_location(ctx.bank_id, w)
 
         def refuse(why: str) -> ValidationResult:
             _event("refused", op="write", agent=agent, location=location, bank=ctx.bank_id, role=role, why=why)
@@ -253,6 +254,8 @@ class MemgateValidator(OperationValidatorExtension):
             tags = item.get("tags") or []
             if len(tags) != 1 or tags[0] not in known:
                 return refuse("each item needs exactly one registered label-set tag")
+            if not known[tags[0]].locs <= set(w.locations):   # any role: routing needs every location listed
+                return refuse("the label set names a location the world doesn't list")
             if item.get("observation_scopes") not in (None, "combined"):
                 return refuse("observation scopes that widen beyond a label set are not allowed")
             # A document_id names the document this write replaces (Hindsight upserts by it), so it must
@@ -262,13 +265,13 @@ class MemgateValidator(OperationValidatorExtension):
                 return refuse("update_mode is not allowed: it would fold another document into this write")
             if (doc := item.get("document_id")) is not None and write_id_label_set(doc) != tags[0]:
                 return refuse("a write ID must carry the label set it is written under")
-            ha = {l for l in known[tags[0]].locs if self.gate.world.high_assurance(l)}
+            ha = {l for l in known[tags[0]].locs if w.high_assurance(l)}
             if (part is None and ha) or (part is not None and part not in ha):
                 return refuse("memory stored in the wrong partition for its high-assurance label")
             if role != "admin":
                 if not agent or not location:
                     return refuse("a write needs an agent and a location")
-                if not self.gate.policy.may_write(agent, location, known[tags[0]]):
+                if not self.gate.policy.may_write(agent, location, known[tags[0]], world=w):
                     return refuse("writer may not write this label set here")
         _event("write", agent=agent, location=location, bank=ctx.bank_id, role=role, items=len(ctx.contents),
                label_sets=sorted({(i.get("tags") or [""])[0] for i in ctx.contents}))

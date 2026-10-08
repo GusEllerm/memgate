@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.8.2 (2026-10-08)
+
+A fresh deployment starts. Asked by CHORUS after its first production deploy crash-looped (approved by Gus,
+2026-10-08).
+
+- **An empty world is valid.** A world file that lists no locations and no agents yet (what a host writes
+  before anything exists) passes `memgate check-world` with warnings, and `memgate serve` starts on it and
+  reports healthy. Every memory call is refused until the world lists the agent and the location, as for any
+  unlisted id, and both the server and the client pick up the populated world when the host rewrites the
+  file, with no restart. A world must still be a JSON object with the `environments`, `locations` and
+  `agents` lists present, empty or not.
+- **Unlisted locations give refusals, never errors.** A label set that names a location the world doesn't
+  list (a tree removed from the world, or a world caught mid-reload) could raise a KeyError: the client's
+  recall at an unlisted location did. Such a location now counts as not high-assurance, and nothing can be
+  carried out of it; every read and write at it was already refused, so nothing becomes readable. Writes
+  under a label set naming an unlisted location are refused outright, by the client and by the validator
+  for every role, and each decision and the write's partition routing use one snapshot of the world, so a
+  reload in between can never send a high-assurance write to the shared partition. (As since 0.7.0, a
+  location removed from the world is not held: what was carried out of it is no longer withheld.)
+- **Conformance** gains `unlisted-refused`: an agent and location the world doesn't list get no write stored
+  by either lock, and once a canary is stored, an unlisted agent at its location and a participant at an
+  unlisted location recall nothing of it. The write half runs on any world, the empty one included; the
+  ids are fixed, so the label set it registers is one row however often conformance runs. A live test starts `memgate serve` on an empty world, checks health and the
+  refusal, then fills the world and stores and recalls a memory without a restart.
+- Server-only for the fix CHORUS needs: a 0.8.0 or 0.8.1 client works against it. The client-side KeyError
+  fix reaches a host when its client moves to 0.8.2.
+
 ## 0.8.1 (2026-10-08)
 
 A torch-free server for a small instance, asked by CHORUS for its production host (approved by Gus, 2026-10-08).

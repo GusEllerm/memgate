@@ -33,7 +33,8 @@ def test_everything_applicable_passes_on_a_correct_fake_store(world, registry):
         assert checks[cid].status == "skip"
         assert "second lock" in checks[cid].detail or (cid == "ha-partition-search" and "no partitions" in checks[cid].detail)
     for cid in ("witness", "non-witness", "elsewhere", "carry-out", "carry-refused", "class-carry-out", "class-downgrade",
-                "class-minimum", "owner-view", "class-legacy", "ha-inside", "ha-outside", "ha-seal", "location-view"):
+                "class-minimum", "owner-view", "class-legacy", "ha-inside", "ha-outside", "ha-seal", "location-view",
+                "unlisted-refused"):
         assert checks[cid].status == "pass", (cid, checks[cid].detail)
     assert checks["ha-partition"].status == "skip" and "no partitions" in checks["ha-partition"].detail
     assert checks["class-apart"].status == "skip" and "derived nothing" in checks["class-apart"].detail
@@ -120,3 +121,29 @@ def test_the_source_seal_checks_run_when_conformance_can_write_the_world_file(wo
     assert not any(e.get("carry_out") == [] for e in json.loads(path.read_text())["environments"] if e["id"] == gate.world.locations["lab"].environment)
     plain = Gate(load_world(path), registry, "s", world_path=path, check_every=0)
     assert by_id(run(plain, memory=Memory(plain, FakeStore(), shared="production")))["held-derived"].status == "skip"
+
+
+def test_conformance_runs_on_an_empty_world_and_checks_unlisted_ids_are_refused(registry):
+    """A fresh deployment's world lists nothing yet (0.8.2): conformance still runs, checks that an unlisted agent
+    is refused, and skips the rest with the reason."""
+    from memgate.world import World
+    w = World()
+    w.add_environment("open")
+    gate = Gate(w, registry, "s")
+    checks = by_id(run(gate, memory=Memory(gate, FakeStore(), shared="production")))
+    assert checks["unlisted-refused"].status == "pass", checks["unlisted-refused"].detail
+    assert all(c.status != "fail" for c in checks.values())
+    assert checks["witness"].status == "skip" and "at least three agents" in checks["witness"].detail
+
+
+def test_unlisted_refused_fails_when_an_unlisted_agent_can_recall_a_stored_canary(world, registry, monkeypatch):
+    """The recall half is not vacuous: if the policy let an unlisted agent read everything, the check fails."""
+    from memgate.policy import Policy
+    gate = Gate(world_for_conformance(world), registry, "s")
+    real = Policy.allowed_ids
+
+    def leaky(self, agent, location):
+        return set(registry.all()) if agent.startswith("memgate-conformance-unlisted") else real(self, agent, location)
+    monkeypatch.setattr(Policy, "allowed_ids", leaky)
+    checks = by_id(run(gate, memory=Memory(gate, FakeStore(), shared="production")))
+    assert checks["unlisted-refused"].status == "fail", checks["unlisted-refused"].detail
