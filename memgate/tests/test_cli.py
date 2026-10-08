@@ -129,6 +129,7 @@ def test_serve_resolves_a_relative_hindsight_bin_before_changing_directory(tmp_p
         seen["binary"] = binary
         raise SystemExit(0)
     monkeypatch.setattr(cli.os, "execve", no_exec)
+    monkeypatch.setattr(cli, "serve_preflight", lambda *a, **k: None)      # the test interpreter may have no models
     with pytest.raises(SystemExit):
         cli.main(["serve", "--world", "world.json", "--registry", "data/r.sqlite", "--hindsight-bin", "bin/hindsight-api"])
     assert os.path.isabs(seen["binary"]) and os.path.exists(seen["binary"])

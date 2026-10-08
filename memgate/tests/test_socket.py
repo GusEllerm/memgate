@@ -113,6 +113,7 @@ def test_serve_on_a_socket_runs_uvicorn_with_no_port(tmp_path, monkeypatch):
         seen.update(argv=argv)
         raise SystemExit(0)
     monkeypatch.setattr(cli.os, "execve", no_exec)
+    monkeypatch.setattr(cli, "serve_preflight", lambda *a, **k: None)      # the test interpreter may have no models
     with pytest.raises(SystemExit):
         cli.main(["serve", "--world", str(world), "--registry", str(tmp_path / "r.sqlite"), "--hindsight-bin", str(fake_bin),
                   "--socket", f"{d}/memgate.sock"])
