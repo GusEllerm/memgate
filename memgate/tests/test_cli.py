@@ -1,5 +1,7 @@
 """The command line never prints a secret."""
 
+import json
+
 import pytest
 
 from memgate import cli
@@ -34,6 +36,7 @@ def test_serve_does_not_print_the_database_password(tmp_path, monkeypatch, capsy
         assert "hunter2" in env["HINDSIGHT_API_DATABASE_URL"]                # the child still gets the real URL
         raise SystemExit(0)
     monkeypatch.setattr(cli.os, "execve", no_exec)
+    monkeypatch.setattr(cli, "serve_preflight", lambda *a, **k: None)
     monkeypatch.chdir(tmp_path)                 # serve changes directory before starting Hindsight; restore it after
     # --db's default is read from MEMGATE_DB when the parser is built, so build it after setting the env.
     with pytest.raises(SystemExit):
@@ -77,6 +80,7 @@ def _serve(tmp_path, monkeypatch, extra=()):
         seen.update(cwd=os.getcwd(), env=env)
         raise SystemExit(0)
     monkeypatch.setattr(cli.os, "execve", no_exec)
+    monkeypatch.setattr(cli, "serve_preflight", lambda *a, **k: None)      # the test interpreter has no models
     monkeypatch.chdir(tmp_path)
     try:
         rc = cli.main(["serve", "--world", str(world), "--registry", str(tmp_path / "data" / "r.sqlite"),
@@ -239,3 +243,77 @@ def test_inspect_location_and_forget_location(operator_env, capsys):
     assert cli.main(["forget-location", "l", "--bank", "b"]) == 2 and "--yes" in capsys.readouterr().err
     assert cli.main(["forget-location", "l", "--bank", "b", "--yes"]) == 0
     assert "1 write(s) in 1 conversation set(s), 2 derived item(s), 1 note(s)" in capsys.readouterr().out
+
+
+def test_serve_forces_and_fingerprints_the_hosted_embedder_settings(tmp_path, monkeypatch, capsys):
+    """The openai provider's model, base URL, key and dimensions are in the forced set either way, so a .env can't
+    redirect embeddings; the key falls back to the LLM key."""
+    monkeypatch.setenv("MEMGATE_LLM_API_KEY", "llm-key")
+    monkeypatch.delenv("MEMGATE_EMBEDDINGS_API_KEY", raising=False)
+    _, seen = _serve(tmp_path, monkeypatch, ("--embeddings-provider", "openai", "--embeddings-base-url", "https://openrouter.ai/api/v1",
+                                             "--embeddings-model", "openai/text-embedding-3-small", "--embeddings-dimensions", "512",
+                                             "--reranker", "flashrank"))
+    env, keys = seen["env"], seen["env"]["MEMGATE_SERVE_KEYS"].split(",")
+    assert env["HINDSIGHT_API_EMBEDDINGS_PROVIDER"] == "openai"
+    assert env["HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL"] == "https://openrouter.ai/api/v1"
+    assert env["HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL"] == "openai/text-embedding-3-small"
+    assert env["HINDSIGHT_API_EMBEDDINGS_OPENAI_API_KEY"] == "llm-key"
+    assert env["HINDSIGHT_API_EMBEDDINGS_OPENAI_DIMENSIONS"] == "512"
+    assert env["HINDSIGHT_API_RERANKER_PROVIDER"] == "flashrank"
+    for k in ("HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL", "HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL",
+              "HINDSIGHT_API_EMBEDDINGS_OPENAI_API_KEY", "HINDSIGHT_API_EMBEDDINGS_OPENAI_DIMENSIONS"):
+        assert k in keys
+    out = capsys.readouterr().out
+    line = next(json.loads(l) for l in out.splitlines() if l.startswith("{"))
+    assert line["event"] == "serve" and line["embeddings"] == {"provider": "openai", "model": "openai/text-embedding-3-small",
+                                                               "base_url": "https://openrouter.ai/api/v1", "dimensions": 512}
+    assert line["reranker"] == "flashrank" and "llm-key" not in out
+    monkeypatch.setenv("MEMGATE_EMBEDDINGS_API_KEY", "embed-key")
+    _, seen = _serve(tmp_path, monkeypatch, ("--embeddings-provider", "openai", "--embeddings-base-url", "https://openrouter.ai/api/v1"))
+    assert seen["env"]["HINDSIGHT_API_EMBEDDINGS_OPENAI_API_KEY"] == "embed-key"
+    assert seen["env"]["HINDSIGHT_API_EMBEDDINGS_OPENAI_DIMENSIONS"] == ""            # unset: detected from the model
+    _, seen = _serve(tmp_path, monkeypatch, ())
+    assert seen["env"]["HINDSIGHT_API_EMBEDDINGS_PROVIDER"] == "local" and "HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL" in seen["env"]["MEMGATE_SERVE_KEYS"]
+
+
+def test_serve_preflight_names_the_missing_packages_and_the_extra(tmp_path, monkeypatch, capsys):
+    full = tmp_path / "full"; full.mkdir()
+    (full / "python").write_text("#!/bin/sh\nexit 0\n"); (full / "python").chmod(0o755)       # every import succeeds
+    assert cli.serve_preflight("onnx", "flashrank", python_dir=full) is None
+    bare = tmp_path / "bare"; bare.mkdir()
+    (bare / "python").write_text("#!/bin/sh\nexit 1\n"); (bare / "python").chmod(0o755)       # nothing installed
+    msg = cli.serve_preflight("onnx", "flashrank", python_dir=bare)
+    assert "onnxruntime" in msg and "transformers" in msg and "flashrank" in msg and "hindsight-slim" in msg
+    assert "hindsight]" in cli.serve_preflight("local", "rrf", python_dir=bare)
+    one = tmp_path / "one"; one.mkdir()                                                          # flashrank only is missing
+    (one / "python").write_text("#!/bin/sh\ncase \"$*\" in *flashrank*) exit 1;; *) exit 0;; esac\n"); (one / "python").chmod(0o755)
+    msg = cli.serve_preflight("openai", "flashrank", python_dir=one)
+    assert msg.startswith("--embeddings-provider openai --reranker flashrank needs flashrank,") and "onnxruntime" not in msg
+
+    def refuse(*a, **k):
+        return "--embeddings-provider local needs sentence_transformers"
+    world = tmp_path / "world.json"
+    world.write_text('{"environments": [{"id": "e"}], "locations": [{"id": "l", "environment": "e"}], "agents": ["a"]}')
+    fake_bin = tmp_path / "hindsight-api"; fake_bin.write_text("#!/bin/sh\n"); fake_bin.chmod(0o755)
+    monkeypatch.setenv("MEMGATE_SECRET", "s"); monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(cli, "serve_preflight", refuse)
+    monkeypatch.setattr(cli.os, "execve", lambda *a: (_ for _ in ()).throw(AssertionError("exec'd despite the preflight")))
+    rc = cli.main(["serve", "--world", str(world), "--registry", str(tmp_path / "r.sqlite"), "--hindsight-bin", str(fake_bin)])
+    assert rc == 2 and "sentence_transformers" in capsys.readouterr().err
+
+
+def test_serve_refuses_a_hosted_embedder_without_a_key_or_with_bad_dimensions(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("MEMGATE_LLM_API_KEY", raising=False); monkeypatch.delenv("MEMGATE_EMBEDDINGS_API_KEY", raising=False)
+    rc, _ = _serve(tmp_path, monkeypatch, ("--embeddings-provider", "openai", "--embeddings-base-url", "https://openrouter.ai/api/v1"))
+    assert rc == 2 and "needs a key" in capsys.readouterr().err
+    monkeypatch.setenv("MEMGATE_EMBEDDINGS_DIMENSIONS", "abc")
+    assert cli.main(["check-world", str(tmp_path / "world.json")]) in (0, 1)            # other commands are untouched by the variable
+    rc, _ = _serve(tmp_path, monkeypatch, ())
+    assert rc == 2 and "positive integer" in capsys.readouterr().err
+    monkeypatch.setenv("MEMGATE_EMBEDDINGS_DIMENSIONS", "")
+    _, seen = _serve(tmp_path, monkeypatch, ())
+    assert seen["env"]["HINDSIGHT_API_EMBEDDINGS_OPENAI_DIMENSIONS"] == ""
+    monkeypatch.setenv("MEMGATE_LLM_API_KEY", "k")
+    _, seen = _serve(tmp_path, monkeypatch, ("--embeddings-provider", "openai", "--embeddings-base-url", "https://user:pw@host/v1?api_key=zzz"))
+    out = capsys.readouterr().out
+    assert "pw" not in out and "zzz" not in out and seen["env"]["HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL"] == "https://user:pw@host/v1?api_key=zzz"

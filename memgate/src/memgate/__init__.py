@@ -18,7 +18,7 @@ from memgate.labels import CLASSES, Label, LabelSet, NOBODY
 from memgate.store import Capabilities, Hit, Item, Listed, Store
 from memgate.world import ClassPolicy, Environment, Location, World
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 
 __all__ = ["Context", "Gate", "load_world", "Label", "LabelSet", "NOBODY", "CLASSES", "Environment", "Location", "World",
            "ClassPolicy", "Memory", "AsyncMemory", "Recalled", "RecallBatch", "Store", "Capabilities", "Item", "Hit", "Listed"]

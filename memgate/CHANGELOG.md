@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.8.1 (2026-10-08)
+
+A torch-free server for a small instance, asked by CHORUS for its production host (approved by Gus, 2026-10-08).
+
+- **A hosted embedder:** `memgate serve --embeddings-provider openai` with `--embeddings-base-url`,
+  `--embeddings-model`, `MEMGATE_EMBEDDINGS_API_KEY` (else `MEMGATE_LLM_API_KEY`) and `--embeddings-dimensions`
+  (env: `MEMGATE_EMBEDDINGS_PROVIDER`, `MEMGATE_EMBEDDINGS_BASE_URL`, `MEMGATE_EMBEDDINGS_MODEL`,
+  `MEMGATE_EMBEDDINGS_DIMENSIONS`). The settings are forced and fingerprinted like the rest. Note that every
+  memory text and recall query is then sent to that endpoint; the `onnx` embedder keeps them on the host.
+- **A slim extra that exists:** the 0.6.0 guide named `memgate[hindsight-slim]`, which was never defined;
+  `memgate[hindsight]` pulled Hindsight's meta-package, which always brings torch. Now `memgate[hindsight]`
+  installs Hindsight's full set of local models (torch, onnx) as before, and `memgate[hindsight-slim]` its
+  torch-free package (`hindsight-api-slim`) with the onnx extra and flashrank: 1.1 GB on disk against 2.1 GB.
+  `memgate serve` checks at start that the chosen providers' packages are importable and names the extra to
+  install.
+- **Startup line:** `memgate serve` prints a JSON `serve` event with the live embedder, model, base URL,
+  dimensions and reranker.
+- **Resident memory** of the serve process (macOS arm64, Hindsight under uvicorn, embedded Postgres excluded;
+  idle after start, then after six retains and five recalls; one run each, so tens of MB are noise):
+
+  | Install | `--embeddings-provider` | `--reranker` | idle | after recalls |
+  | --- | --- | --- | --- | --- |
+  | hindsight (torch) | local (bge-small) | local | 933 MB | 950 MB |
+  | hindsight (torch) | onnx (bge-small) | flashrank | 1039 MB | 1050 MB |
+  | hindsight-slim | onnx (bge-small) | flashrank | 697 MB | 710 MB |
+  | hindsight-slim | openai (hosted) | flashrank | 488 MB | 510 MB |
+  | hindsight-slim | openai (hosted) | rrf | 344 MB | 363 MB |
+
+  Two things the table says: a venv that has torch loads it even for the onnx embedder (transformers' tokenizer
+  imports torch when it is present), so the slim install is what makes `onnx` slim; and Hindsight itself is the
+  floor at about 350 MB, flashrank adds about 150 MB (onnxruntime and its model), the in-process onnx embedder
+  about 200 MB more. Below 400 MB only `rrf` fits, which halves recall on indirect questions (changelog 0.6.0).
+- Live conformance from the slim install, 0 failed both ways: `onnx` + `flashrank`, and `openai` (against a local
+  OpenAI-compatible bge-small server) + `flashrank`.
+- With `--embeddings-provider openai`, `serve` refuses to start without a key, and a non-numeric
+  `MEMGATE_EMBEDDINGS_DIMENSIONS` is refused with a message instead of a traceback.
+- Switching embedders changes the vector size: Hindsight refuses to start on a database whose units were
+  embedded at another size while rows exist, and names the fix; start the new embedder on a fresh database.
+
 ## 0.8.0 (2026-10-07)
 
 The location's view and purge, asked by CHORUS after Gus asked whether a tree's own memory can be seen;

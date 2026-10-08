@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import os
 import secrets
+import subprocess
 import shutil
 import sys
 from pathlib import Path
@@ -137,6 +138,14 @@ def cmd_serve(args) -> int:
         print(f"refusing to start: {dotenv} is not empty. Hindsight would load it over memgate's settings; "
               "memgate serve keeps that file empty on purpose.", file=sys.stderr)
         return 1
+    dims = args.embeddings_dimensions
+    if dims not in (None, ""):
+        if not str(dims).isdigit() or int(dims) <= 0:
+            print(f"memgate: --embeddings-dimensions (MEMGATE_EMBEDDINGS_DIMENSIONS) must be a positive integer, not {dims!r}", file=sys.stderr)
+            return 2
+        dims = int(dims)
+    else:
+        dims = None
     env = dict(os.environ)
     forced = {
         "MEMGATE_WORLD": str(Path(world).resolve()),
@@ -163,6 +172,12 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_EMBEDDINGS_ONNX_POOLING": "cls" if "bge" in args.embedder.lower() else "mean",
         "HINDSIGHT_API_EMBEDDINGS_ONNX_QUERY_PREFIX": "" if "bge" in args.embedder.lower() else "query: ",
         "HINDSIGHT_API_EMBEDDINGS_ONNX_PASSAGE_PREFIX": "" if "bge" in args.embedder.lower() else "passage: ",
+        # A hosted, OpenAI-compatible embedder (0.8.1): used when --embeddings-provider openai; forced and
+        # fingerprinted either way, so a .env cannot redirect embeddings to another endpoint.
+        "HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL": args.embeddings_model,
+        "HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL": args.embeddings_base_url or "",
+        "HINDSIGHT_API_EMBEDDINGS_OPENAI_API_KEY": _env("MEMGATE_EMBEDDINGS_API_KEY") or _env("MEMGATE_LLM_API_KEY", "none"),
+        "HINDSIGHT_API_EMBEDDINGS_OPENAI_DIMENSIONS": str(dims or ""),
         "HINDSIGHT_API_RERANKER_PROVIDER": args.reranker,
         "HINDSIGHT_API_LLM_TRACE_ENABLED": "false",     # traces would hold memory content outside the partitions
         "HINDSIGHT_API_AUDIT_LOG_ENABLED": "false",
@@ -172,9 +187,18 @@ def cmd_serve(args) -> int:
         "HINDSIGHT_API_LOG_LEVEL": args.hindsight_log_level,
         "MEMGATE_SERVE_MIN_CLIENT": args.min_client_version or "",
     }
-    if args.embeddings_provider == "onnx" and args.reranker == "local":
-        print("memgate: --embeddings-provider onnx with --reranker local still needs torch (the local reranker is a "
-              "sentence-transformers cross-encoder); use --reranker flashrank or rrf for a torch-free server", file=sys.stderr)
+    if args.embeddings_provider != "local" and args.reranker == "local":
+        print(f"memgate: --embeddings-provider {args.embeddings_provider} with --reranker local still needs torch (the local "
+              "reranker is a sentence-transformers cross-encoder); use --reranker flashrank or rrf for a torch-free server", file=sys.stderr)
+    if args.embeddings_provider == "openai" and not args.embeddings_base_url:
+        print("memgate: --embeddings-provider openai with no --embeddings-base-url: embeddings go to api.openai.com", file=sys.stderr)
+    if args.embeddings_provider == "openai" and not (_env("MEMGATE_EMBEDDINGS_API_KEY") or _env("MEMGATE_LLM_API_KEY")):
+        print("memgate: --embeddings-provider openai needs a key: MEMGATE_EMBEDDINGS_API_KEY (or MEMGATE_LLM_API_KEY)", file=sys.stderr)
+        return 2
+    missing = serve_preflight(args.embeddings_provider, args.reranker, python_dir=Path(binary).parent)
+    if missing:
+        print(f"memgate: {missing}", file=sys.stderr)
+        return 2
     if args.min_client_version:
         from memgate import __version__
         from memgate.context import release
@@ -191,6 +215,14 @@ def cmd_serve(args) -> int:
     where = f"unix:{sock}" if sock else f"http://{args.host}:{args.port}"
     print(f"memgate: Hindsight with the validator on {where} "
           f"(scope {args.scope}, database {redact_db_url(args.db)})", flush=True)
+    from memgate import __version__
+    import json as _json
+    print(_json.dumps({"event": "serve", "version": __version__, "scope": args.scope,     # which embedder and reranker are live
+                       "embeddings": {"provider": args.embeddings_provider,
+                                      "model": args.embeddings_model if args.embeddings_provider == "openai" else args.embedder,
+                                      "base_url": redact_db_url(args.embeddings_base_url) if args.embeddings_provider == "openai" and args.embeddings_base_url else None,
+                                      "dimensions": dims},
+                       "reranker": args.reranker}), flush=True)
     os.chdir(workdir)
     if sock:
         # Hindsight's own launcher has no socket option; its ASGI app under uvicorn is the documented
@@ -201,6 +233,30 @@ def cmd_serve(args) -> int:
                            "--timeout-keep-alive", "30", "--timeout-graceful-shutdown", "5"], env)
     os.execve(binary, [binary], env)
     return 0  # not reached
+
+
+def serve_preflight(embeddings_provider: str, reranker: str, python_dir: Path | None = None) -> str | None:
+    """Why `memgate serve` cannot start with these providers in this environment, or None: each provider's
+    package must be importable by the Hindsight interpreter (sentence-transformers and torch for the local
+    ones, onnxruntime and transformers for onnx, flashrank for flashrank), so a slim install that asked for a
+    local model fails here with the fix named, not minutes later inside Hindsight."""
+    needs = {"local": ["sentence_transformers"], "onnx": ["onnxruntime", "transformers"], "openai": ["openai"]}[embeddings_provider]
+    needs += {"local": ["sentence_transformers"], "flashrank": ["flashrank"], "rrf": []}[reranker]
+    python = python_dir / "python" if python_dir and (python_dir / "python").exists() else Path(sys.executable)
+    missing = []
+    for mod in dict.fromkeys(needs):
+        try:
+            probe = subprocess.run([str(python), "-c", f"import importlib.util, sys; sys.exit(0 if importlib.util.find_spec({mod!r}) else 1)"],
+                                   capture_output=True, timeout=30)
+        except subprocess.TimeoutExpired:
+            return f"{python} did not answer an import check within 30 s"
+        if probe.returncode != 0:
+            missing.append(mod)
+    if not missing:
+        return None
+    extra = "memgate[hindsight]" if "sentence_transformers" in missing else "memgate[hindsight-slim]"
+    return (f"--embeddings-provider {embeddings_provider} --reranker {reranker} needs {', '.join(missing)}, not installed for "
+            f"{python}; install '{extra}' or choose providers the install supports")
 
 
 def cmd_conformance(args) -> int:
@@ -387,8 +443,18 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--embedder", default=_env("MEMGATE_EMBEDDER", "BAAI/bge-small-en-v1.5"),
                    help="the embedding model (a sentence-transformers model for the local provider, a Hugging Face "
                         "repo with an onnx/model.onnx export for onnx)")
-    s.add_argument("--embeddings-provider", choices=["local", "onnx"], default=_env("MEMGATE_EMBEDDINGS_PROVIDER", "local"),
-                   help="local (sentence-transformers, needs torch) or onnx (onnxruntime, no torch; the slim image)")
+    s.add_argument("--embeddings-provider", choices=["local", "onnx", "openai"], default=_env("MEMGATE_EMBEDDINGS_PROVIDER", "local"),
+                   help="local (sentence-transformers, needs torch), onnx (onnxruntime, no torch; the slim image) or openai "
+                        "(a hosted OpenAI-compatible endpoint, no model in the process; every memory text and recall query is "
+                        "sent to it)")
+    s.add_argument("--embeddings-model", default=_env("MEMGATE_EMBEDDINGS_MODEL", "text-embedding-3-small"),
+                   help="the hosted embedder's model name (openai provider)")
+    s.add_argument("--embeddings-base-url", default=_env("MEMGATE_EMBEDDINGS_BASE_URL"),
+                   help="the hosted embedder's OpenAI-compatible base URL, e.g. https://openrouter.ai/api/v1 (openai provider); "
+                        "its key is MEMGATE_EMBEDDINGS_API_KEY, else MEMGATE_LLM_API_KEY")
+    s.add_argument("--embeddings-dimensions", default=_env("MEMGATE_EMBEDDINGS_DIMENSIONS"),
+                   help="ask the hosted embedder for this many dimensions (text-embedding-3 models accept it); "
+                        "the vector size is otherwise detected from the model")
     s.add_argument("--reranker", choices=["local", "rrf", "flashrank"], default=_env("MEMGATE_RERANKER", "local"),
                    help="Hindsight's reranker: local (a cross-encoder, needs torch), rrf (no reranking: retrieval "
                         "order as is) or flashrank (a small ONNX reranker, no torch)")
